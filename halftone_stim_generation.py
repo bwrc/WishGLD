@@ -2,13 +2,23 @@
 from psychopy import visual,core,monitors,event,gui
 import itertools
 import random
+import os
 
 from PIL import Image
+
+# set FACES=0 or LETTERS=1
+type = 0
 
 IMG_W = 512
 IMG_H= 512
 DIMX = 26
 DIMY = 26
+COEF = 338 # X * Y / 2
+# s = os.sep
+tystr = ['face', 'letter']
+pth = '26x26/'
+outdir = tystr[type] + 'Cards/'
+# pth = 'C:\\Kride\\Projects\\ReKnow\\WCST\\26x26\\'
 
 #lenovo
 myMon=monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
@@ -18,13 +28,12 @@ win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon
 
 faces = []
 
-#faces
-#for i in range(17):
-#    faces.append( Image.open('C:\\Kride\\Projects\\ReKnow\\WCST\\26x26\\f' + '%02d' % (i+1,) + '.png') )
-
-#letters
-for i in range(17):
-    faces.append( Image.open('C:\\Kride\\Projects\\ReKnow\\WCST\\shinedef1by1\\ltr' + '%01d' % (i+1,) + ' (Custom).png') )
+if type == 1:
+    for i in range(16):
+        faces.append( Image.open(pth + 'sf' + '%02d' % (i+1,) + '.png') )   #faces
+else:
+    for i in range(17):
+        faces.append( Image.open(pth + 'smlltr' + '%01d' % (i+1,) + '.png') )    #letters
 
 #equiluminant colors
 col1 = (35/255.0, 197/255.0, 79/255.0)
@@ -88,12 +97,21 @@ step = IMG_W/DIMX
 half = -1*IMG_W/2 #image coords are centered
 
 PREVAIL_COL_RATIO = 0.5
-N_OF_FACES = 18
+N_OF_FACES = 16
+N_OF_LTRS = 17
 N_OF_FEATS = 4
 SAVE_FRAMES = True
 
+
 #card generation    
 for faceN in range( N_OF_FACES ):
+    
+    # Build color probabilities by observation
+    gt = 0  # greytotal
+    for xi in range(DIMX):
+        for yi in range(DIMY):
+            vali = faces[faceN].getpixel( (xi,DIMY-1-yi) )
+            gt = gt + (255-vali)/255.0
 
     for cardColor in range(4):
         colIdx = [0, 1, 2, 3]
@@ -113,6 +131,8 @@ for faceN in range( N_OF_FACES ):
                         #flip y-axis
                         sz = (255-val)/255.0
                         
+                        PREVAIL_COL_RATIO = (sz/gt)*COEF
+                        
                         if (random.random() <= PREVAIL_COL_RATIO):
                             c = cardColor
                         else:
@@ -130,8 +150,7 @@ for faceN in range( N_OF_FACES ):
                 win.flip()
                 if( SAVE_FRAMES ):
                     win.getMovieFrame()
-#faces                    win.saveMovieFrames( 'C:\\Kride\\Projects\\ReKnow\\WCST\\facecards\\%02d_%02d_%02d_%02d.png' % (faceN, cardColor, featN, featOrientation ))
-                    win.saveMovieFrames( 'C:\\Kride\\Projects\\ReKnow\\WCST\\lettercards\\%02d_%02d_%02d_%02d.png' % (faceN, cardColor, featN, featOrientation ))
+                    win.saveMovieFrames( outdir + '%02d_%02d_%02d_%02d.png' % (faceN, cardColor, featN, featOrientation ))
 
 #                keys = event.getKeys()
 #                if keys:
