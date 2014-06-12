@@ -41,7 +41,9 @@ elif type == 1:
 else:
     imgs.append( Image.open(pth + 'testicles.png') )   #TEST!
 
-# THIS SECTION MIGHT BELONG IN A SEPARATE FILE
+
+# CREATING COLORS -------------------------------------------------------------------------------------------
+
 # Color selection for equally perceivable colours is a huge topic. Practical attempts have been proposed here:
 #   1 - http://stackoverflow.com/questions/470690/how-to-automatically-generate-n-distinct-colors/
 #   2 - http://stackoverflow.com/questions/2328339/how-to-generate-n-different-colors-for-any-natural-number-n
@@ -136,6 +138,10 @@ colors.append( purple )
 #colors.append( cyan )
 #colors.append( orange )
 
+
+# VISUAL FEATURES ----------------------------------------------------------------------------------------------
+feats=[]
+
 #SHAPES
 featTriangle = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
                          fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
@@ -174,19 +180,43 @@ featArrow = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lin
 #                         closeShape=True )
 
 
-feats=[]
+#LETTERS
+featA = visual.TextStim( win, text='A', font='Sloan', pos=(0.0, 0.0), depth=0, rgb=None, color=(0.0, 0.0, 0.0),\
+                    colorSpace='rgb', opacity=1.0, contrast=1.0, units='', ori=0.0, height=None, antialias=True,\
+                    bold=False, italic=False, alignHoriz='center', alignVert='center', fontFiles=[], wrapWidth=None,\
+                    flipHoriz=False, flipVert=False, name=None, autoLog=None )
 
-feats.append( featTriangle )
-feats.append( featDiamond )
-feats.append( featHouse )
-feats.append( featArrow )
+#letters='ADEFHJKLMNPRSTUVY'
+letters='ADEF'
+lenltrs = len(letters)
+
+# REFERENCE:
+#visual.TextStim( win, text='a letter', font='Sloan', pos=(0.0, 0.0), depth=0, rgb=None, color=(0.0, 0.0, 0.0),\
+#                colorSpace='rgb', opacity=1.0, contrast=1.0, units='', ori=0.0, height=None, antialias=True,\
+#                bold=False, italic=False, alignHoriz='center', alignVert='center', fontFiles=[], wrapWidth=None,\
+#                flipHoriz=False, flipVert=False, name=None, autoLog=None ) )
+
+if type == 0:
+    #feats.append( featTriangle )
+    #feats.append( featDiamond )
+    #feats.append( featHouse )
+    #feats.append( featArrow )
+elif type == 1:
+    for ltr in range(len(letters)):
+        feats.append( visual.TextStim( win, text=letters[ltr], font='Sloan', color=(0.0, 0.0, 0.0), bold=True ) )
+else:
+    imgs.append( Image.open(pth + 'testicles.png') )   #TEST!
+
+
+
+# BUILDING CARDS AS STIM/COLOR/FEATURE/ORIENTATION COMBINATIONS -------------------------------------------------------
 
 step = IMG_W/DIMX
 half = -1*IMG_W/2 #image coords are centered
 
 PREVAIL_COL_RATIO = 0.5
 N_OF_FACES = len(imgs)
-N_OF_FEATS = 4
+N_OF_FEATS = len(feats)
 SAVE_FRAMES = True
 N_CLRS = len(colors)
 
@@ -199,13 +229,13 @@ for faceN in range( N_OF_FACES ):
         for yi in range(DIMY):
             vali = imgs[faceN].getpixel( (xi,DIMY-1-yi) )
             gt = gt + (255-vali)/255.0
-#    print 'image gt=' + str(round(gt))
+#    print 'image gt=' + str(round(gt)) # DEBUG PRINT
 
     for cardColor in range(N_CLRS):
         colIdx = range(N_CLRS)
         colIdx.remove( cardColor )
 
-        for featN in range(4):# N_OF_FEATS ):
+        for featN in range( N_OF_FEATS ):
 
             for featOrientation in range( 4 ): 
 
@@ -223,7 +253,7 @@ for faceN in range( N_OF_FACES ):
                         
                         PREVAIL_COL_RATIO = (sz/gt)*coef
                         
-#                        print 'size=' + str(round(sz,3)) + '; PCR=' + str(round(PREVAIL_COL_RATIO,2))
+#                        print 'size=' + str(round(sz,3)) + '; PCR=' + str(round(PREVAIL_COL_RATIO,2)) # DEBUG PRINT
                         
                         if (random.random() < PREVAIL_COL_RATIO):
                             c = cardColor
@@ -231,11 +261,12 @@ for faceN in range( N_OF_FACES ):
                         else:
                             c = colIdx[random.randint(0,2)]
 #                            nt = nt + sz
-                            
+                        
+                        feats[featN].color      = colors[c]
                         feats[featN].fillColor  = colors[c]
                         feats[featN].lineColor  = colors[c]
                         feats[featN].ori        = 45+ 90*featOrientation
-                        feats[featN].size       = (sz, sz)
+                        feats[featN].size       = round(sz,1) #(sz, sz)
                         feats[featN].draw( win )
 
                 win.flip()
@@ -243,7 +274,7 @@ for faceN in range( N_OF_FACES ):
                     win.getMovieFrame()
                     win.saveMovieFrames( outdir + '%02d_%02d_%02d_%02d.png' % (faceN, cardColor, featN, featOrientation ))
 
-#                print 'image ct=' + str(round(ct)) + '; nt=' + str(round(nt)) + '; ratio=' + str(round(ct/gt, 2))
+#                print 'image ct=' + str(round(ct)) + '; nt=' + str(round(nt)) + '; ratio=' + str(round(ct/gt, 2)) # DEBUG PRINT
 
 #cleanup
 win.close()
