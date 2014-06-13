@@ -39,22 +39,28 @@ elif type == 1:
     for i in range(17):
         imgs.append( Image.open(pth + 'smlltr' + '%01d' % (i+1,) + '.png') )    #letters
 else:
-    imgs.append( Image.open(pth + 'testicles.png') )   #TEST!
+    imgs.append( Image.open(pth + 'testi.png') )   #TEST!
 
 
 # CREATING COLORS -------------------------------------------------------------------------------------------
 
-# Color selection for equally perceivable colours is a huge topic. Practical attempts have been proposed here:
-#   1 - http://stackoverflow.com/questions/470690/how-to-automatically-generate-n-distinct-colors/
-#   2 - http://stackoverflow.com/questions/2328339/how-to-generate-n-different-colors-for-any-natural-number-n
-# The simple answer seems to be: use the CIE LAB color space.
-# In the second stack exchange, a list of 128 distinct colours is given in HEX - may be useful to expand the palette.
-# But a nicer approach is given in the first stck exchange (among many), linking to this:
-#   3 - http://alumni.media.mit.edu/~wad/color/palette.html
-# which is a nice small palette in RGB, HSL and LAB space, derived from this peer reviewed paper:
-#   4 - Boynton. Eleven Colors That Are Almost Never Confused. (1989)
-# Based on sorting those 16 colors on their L(AB) value, we look for a subset of six that are equivalent, 
-# and have good contrast with white (background):
+# Color selection for equally perceivable colours is covered in Zeileis, Hornik and Murrell (2007), available here:
+#   http://epub.wu.ac.at/1692/1/document.pdf
+# The simple answer seems to be: use the CIE Luv color space. Code is here:
+#   http://cran.r-project.org/web/packages/colorspace/vignettes/hcl-colors.pdf
+# A palette derived from that R code (procedure unknown) is given as:
+
+col1 = "#DB9D85"
+col2 = "#86B875"
+col3 = "#4CB9CC"
+col4 = "#CD99D8"
+
+# In the link below, a list of 128 distinct CIE Lab colours is given in HEX - may be useful to expand the palette.
+#   http://stackoverflow.com/questions/2328339/how-to-generate-n-different-colors-for-any-natural-number-n
+# Another approach is given below; it is a palette in RGB, HSL and LAB space, derived from this peer reviewed paper:
+#   Boynton. Eleven Colors That Are Almost Never Confused. (1989)
+#   http://alumni.media.mit.edu/~wad/color/palette.html
+# Derivation was based on matching the qualitative palette from the paper with roughly even distributions in Lab space.
 #           H    S    L         L    A    B        R    G    B
 #Black      0    0    0         0    0    0        0    0    0
 #Dk. Gray   0    0    34        50   0    0        87   87   87
@@ -74,37 +80,31 @@ else:
 #White      0    0    100       100  0    0        255  255  255
 
 # set of duller colors
-red = (173, 35, 35)
-blue = (42, 75, 215)
-green = (29, 105, 20)
-brown = (129, 74, 25)
-purple = (129, 38, 192)
+#red = (173, 35, 35)
+#blue = (42, 75, 215)
+#green = (29, 105, 20)
+#brown = (129, 74, 25)
+#purple = (129, 38, 192)
 # set of brighter colors
-ltgreen = (129, 197, 122)
-ltblue = (157, 175, 255)
-cyan = (41, 208, 208)
-orange = (255, 146, 51)
-
+#ltgreen = (129, 197, 122)
+#ltblue = (157, 175, 255)
+#cyan = (41, 208, 208)
+#orange = (255, 146, 51)
+#
 # gray can be lighter or darker
-gray = (1, 1, 1)
-
-norm = 255.0
-gray = [x*(87/norm) for x in gray] # gray that you can set at any level by changing one number
-red = [x/norm for x in red]
-blue = [x/norm for x in blue]
-green = [x/norm for x in green]
-brown = [x/norm for x in brown]
-purple = [x/norm for x in purple]
-ltgreen = [x/norm for x in ltgreen]
-ltblue = [x/norm for x in ltblue]
-cyan = [x/norm for x in cyan]
-orange = [x/norm for x in orange]
-#equiluminant colors
-#col1 = (35/255.0, 197/255.0, 79/255.0)
-#col2 = (196/255.0, 171/255.0, 3/255.0) # NOT APPENDED
-#col3 = (255/255.0, 114/255.0, 75/255.0)
-#col4 = (222/255.0, 134/255.0, 255/255.0)
-#col5 = (0/255.0, 191/255.0, 187/255.0)
+#gray = (1, 1, 1)
+#
+#norm = 255.0
+#gray = [x*(87/norm) for x in gray] # gray that you can set at any level by changing one number
+#red = [x/norm for x in red]
+#blue = [x/norm for x in blue]
+#green = [x/norm for x in green]
+#brown = [x/norm for x in brown]
+#purple = [x/norm for x in purple]
+#ltgreen = [x/norm for x in ltgreen]
+#ltblue = [x/norm for x in ltblue]
+#cyan = [x/norm for x in cyan]
+#orange = [x/norm for x in orange]
 
 # HSL colors
 # Absolutely equiluminant colours can be selected simply by iterating around the colour wheel in 360/N arcs
@@ -119,20 +119,24 @@ def get_N_HexCol(N, S, L):
 
     return HEX_tuples
 #CMY, RGB
-colc = (0, 1, 1)
-colm = (1, 0, 1)
-coly = (1, 1, 0)
-colr = (1, 0, 0)
-colg = (0, 1, 0)
-colb = (0, 0, 1)
+#colc = (0, 1, 1)
+#colm = (1, 0, 1)
+#coly = (1, 1, 0)
+#colr = (1, 0, 0)
+#colg = (0, 1, 0)
+#colb = (0, 0, 1)
 
 colors = []
-colors.append( gray )
+colors.append( col1 )
+colors.append( col2 )
+colors.append( col3 )
+colors.append( col4 )
+#colors.append( gray )
 #colors.append( red )
 #colors.append( blue )
-colors.append( green )
-colors.append( brown )
-colors.append( purple )
+#colors.append( green )
+#colors.append( brown )
+#colors.append( purple )
 #colors.append( ltgreen )
 #colors.append( ltblue )
 #colors.append( cyan )
@@ -169,10 +173,10 @@ featArrow = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lin
 #                         vertices=((0, 10), (7, 1), (6.9, -4), (5.65, -5.65), (4, -6.9), (0,-8), (-4, -6.9), (-5.65, -5.65), (-6.9, -4), (-7, 1), (0, 10)), 
 #                         closeShape=True )
 
-#featStarTrek = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-#                         fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-#                         vertices=((0, 10), (8, -10), (0,0), (-8, -10), (0, 10)), 
-#                         closeShape=True )
+featStarTrek = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                         fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
+                         vertices=((0, 10), (8, -10), (0,0), (-8, -10), (0, 10)), 
+                         closeShape=True )
 
 #featA = visual.ShapeStim( win, lineWidth=2.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
 #                         fillColor=None, fillColorSpace='rgb',\
@@ -181,32 +185,27 @@ featArrow = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lin
 
 
 #LETTERS
-featA = visual.TextStim( win, text='A', font='Sloan', pos=(0.0, 0.0), depth=0, rgb=None, color=(0.0, 0.0, 0.0),\
-                    colorSpace='rgb', opacity=1.0, contrast=1.0, units='', ori=0.0, height=None, antialias=True,\
-                    bold=False, italic=False, alignHoriz='center', alignVert='center', fontFiles=[], wrapWidth=None,\
-                    flipHoriz=False, flipVert=False, name=None, autoLog=None )
 
 #letters='ADEFHJKLMNPRSTUVY'
 letters='ADEF'
 lenltrs = len(letters)
 
 # REFERENCE:
-#visual.TextStim( win, text='a letter', font='Sloan', pos=(0.0, 0.0), depth=0, rgb=None, color=(0.0, 0.0, 0.0),\
+#visual.TextStim( win, text='a letter', font='a system font', pos=(0.0, 0.0), depth=0, rgb=None, color=(0.0, 0.0, 0.0),\
 #                colorSpace='rgb', opacity=1.0, contrast=1.0, units='', ori=0.0, height=None, antialias=True,\
 #                bold=False, italic=False, alignHoriz='center', alignVert='center', fontFiles=[], wrapWidth=None,\
 #                flipHoriz=False, flipVert=False, name=None, autoLog=None ) )
 
 if type == 0:
-    #feats.append( featTriangle )
-    #feats.append( featDiamond )
-    #feats.append( featHouse )
-    #feats.append( featArrow )
+    feats.append( featTriangle )
+    feats.append( featDiamond )
+    feats.append( featHouse )
+    feats.append( featArrow )
 elif type == 1:
     for ltr in range(len(letters)):
         feats.append( visual.TextStim( win, text=letters[ltr], font='Sloan', color=(0.0, 0.0, 0.0), bold=True ) )
 else:
-    imgs.append( Image.open(pth + 'testicles.png') )   #TEST!
-
+    feats.append( featStarTrek )
 
 
 # BUILDING CARDS AS STIM/COLOR/FEATURE/ORIENTATION COMBINATIONS -------------------------------------------------------
@@ -266,7 +265,7 @@ for faceN in range( N_OF_FACES ):
                         feats[featN].fillColor  = colors[c]
                         feats[featN].lineColor  = colors[c]
                         feats[featN].ori        = 45+ 90*featOrientation
-                        feats[featN].size       = round(sz,1) #(sz, sz)
+                        feats[featN].size       = sz #round(sz,1) #(sz, sz)
                         feats[featN].draw( win )
 
                 win.flip()
