@@ -4,10 +4,11 @@ import itertools
 import random
 import os
 import colorsys
+import copy
 
 from PIL import Image
 
-def generator(globaltype, localtype, savef):
+def generator(globaltype, localtype, savef, inltr):
 
     # Global type, set FACES=0 or LETTERS=1 or TEST=2
     gtype = globaltype
@@ -22,15 +23,24 @@ def generator(globaltype, localtype, savef):
 
     coef = (DIMX * DIMY) / 2
     s = os.sep
-    tystr = ['face', 'lttr', 'test']
     pth = '26x26' + s
-    outdir = tystr[gtype] + tystr[ltype] + 'Cards' + s
+    tystr = ['face', 'letter', 'test']
+    outdir = tystr[gtype] + tystr[ltype]
+    
+    # debugging:
+    if ltype != 1:
+        inltr = 0
+    if inltr > 0:
+        outdir = outdir + inltr
+    outdir = outdir + 'Cards' + s
     if not os.path.exists(outdir):
         os.makedirs(outdir)
     # pth = 'C:\\Kride\\Projects\\ReKnow\\WCST\\26x26\\'
 
     #lenovo
-    myMon=monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
+#    myMon=monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
+    #HP Elitebook 2560p
+    myMon=monitors.Monitor('Bens', width=31.5, distance=40); myMon.setSizePix((1366, 768))
     #desktop
     #myMon=monitors.Monitor('asus', width=37.8, distance=40); myMon.setSizePix((1920, 1080))
     win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon, color=(1.0, 1.0, 1.0), colorSpace='rgb')
@@ -42,7 +52,7 @@ def generator(globaltype, localtype, savef):
             imgs.append( Image.open(pth + 'sf' + '%02d' % (i+1,) + '.png') )   #faces
     elif gtype == 1:
         for i in range(17):
-            imgs.append( Image.open(pth + 'smlltr' + '%01d' % (i+1,) + '.png') )    #letters
+            imgs.append( Image.open(pth + 'slt' + '%02d' % (i+1,) + '.png') )    #letters
     else:
         imgs.append( Image.open(pth + 'testi.png') )   #TEST!
 
@@ -194,9 +204,7 @@ def generator(globaltype, localtype, savef):
 
     #LETTERS
 
-    letters='ADEFHJKLMNPRSTUVY'
-    lenltrs = len(letters)
-    ltrH = (IMG_H/DIMY)+1
+    ltrH = (IMG_H/DIMY)+3
 
     # REFERENCE:
     #visual.TextStim( win, text='a letter', font='a system font', pos=(0.0, 0.0), depth=0, rgb=None, color=(0.0, 0.0, 0.0),\
@@ -212,11 +220,15 @@ def generator(globaltype, localtype, savef):
         feats.append( featHouse )
         feats.append( featArrow )
     elif ltype == 1:
+    #    letters='ADEFHJKLMNPRSTUVY'
+        letters=inltr
+        lenltrs = len(letters)
         for ltr in range(len(letters)):
             feats.append( visual.TextStim( win, text=letters[ltr], font='Sloan', bold=True, height=ltrH ) )
     else:
         feats.append( featStarTrek )
 
+#    f= copy.copy(feats)
 
     # BUILDING CARDS AS STIM/COLOR/FEATURE/ORIENTATION COMBINATIONS -------------------------------------------------------
 
@@ -243,17 +255,17 @@ def generator(globaltype, localtype, savef):
             colIdx = range(N_CLRS)
             colIdx.remove( cardColor )
 
-            for featN in range( N_OF_FEATS ):
+            for featOrientation in range( 4 ):
 
-                for featOrientation in range( 4 ): 
+                for featN in range( N_OF_FEATS ):
 
-                    ct = 0  # color total - to collect how much of the total coloured area is dominant
-                    nt = 0  # other colors
+#                    ct = 0  # color total - to collect how much of the total coloured area is dominant
+#                    nt = 0  # other colors
 
                     for x in range(DIMX):
                         for y in range(DIMY):
 
-                            feats[featN].pos = ( half+(x+1)*step, half+(y+1)*step)
+                            feats[featN].pos = (half+(x+1)*step, half+(y+1)*step)
                        
                             val = imgs[faceN].getpixel( (x,DIMY-1-y) )
                             #flip y-axis
@@ -270,22 +282,28 @@ def generator(globaltype, localtype, savef):
                                 c = colIdx[random.randint(0,2)]
 #                                nt = nt + sz
                             
-                            feats[featN].ori        = 45+ 90*featOrientation
+                            feats[featN].setOri( 45+90*featOrientation )
                             if ltype == 0:
                                 feats[featN].fillColor  = colors[c]
                                 feats[featN].lineColor  = colors[c]
                                 feats[featN].size       = sz
                             elif ltype == 1:
-                                feats[featN].color      = colors[c]
-                                feats[featN].setHeight(round(sz*ltrH,0))
+                                feats[featN].setColor( colors[c] )
+                                feats[featN].setHeight( sz*ltrH )
                                 feats[featN].text = feats[featN].text
-                                
+
                             feats[featN].draw( win )
+#                            feats[featN] = copy.copy(f[featN])
 
                     win.flip()
                     if( SAVE_FRAMES ):
                         win.getMovieFrame()
                         win.saveMovieFrames( outdir + '%02d_%02d_%02d_%02d.png' % (faceN, cardColor, featN, featOrientation ))
+                    
+
+                # Now clear the whole lot and re-init
+#                win.close()
+#                win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon, color=(1.0, 1.0, 1.0), colorSpace='rgb')
 
 #                    if ltype == 1:  print feats[featN].text # DEBUG PRINT
 #                    print 'image ct=' + str(round(ct)) + '; nt=' + str(round(nt)) + '; ratio=' + str(round(ct/gt, 2)) # DEBUG PRINT
@@ -295,6 +313,6 @@ def generator(globaltype, localtype, savef):
     core.quit()
 
 #generator(0,0,True)
-generator(0,1,True)
-generator(1,0,True)
-generator(1,1,True)
+generator(0,1,True,'A')
+#generator(1,0,True)
+#generator(1,1,True)
