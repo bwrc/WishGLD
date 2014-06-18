@@ -21,29 +21,29 @@ def generator(globaltype, localtype, savef, inltr):
     DIMX = 26
     DIMY = 26
 
-    coef = (DIMX * DIMY) / 2
     s = os.sep
     pth = '26x26' + s
     tystr = ['face', 'letter', 'test']
     outdir = tystr[gtype] + tystr[ltype]
-    
     # debugging:
     if ltype != 1:
         inltr = 0
     if inltr > 0:
         outdir = outdir + inltr
+    
     outdir = outdir + 'Cards' + s
     if not os.path.exists(outdir):
         os.makedirs(outdir)
     # pth = 'C:\\Kride\\Projects\\ReKnow\\WCST\\26x26\\'
 
+    # CREATING MONITORS
     #lenovo
 #    myMon=monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
     #HP Elitebook 2560p
     myMon=monitors.Monitor('Bens', width=31.5, distance=40); myMon.setSizePix((1366, 768))
     #desktop
     #myMon=monitors.Monitor('asus', width=37.8, distance=40); myMon.setSizePix((1920, 1080))
-    win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon, color=(1.0, 1.0, 1.0), colorSpace='rgb')
+    win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon,color=(1.0, 1.0, 1.0),colorSpace='rgb')
 
     imgs = []
 
@@ -203,9 +203,7 @@ def generator(globaltype, localtype, savef, inltr):
 
 
     #LETTERS
-
     ltrH = (IMG_H/DIMY)+3
-
     # REFERENCE:
     #visual.TextStim( win, text='a letter', font='a system font', pos=(0.0, 0.0), depth=0, rgb=None, color=(0.0, 0.0, 0.0),\
     #                colorSpace='rgb', opacity=1.0, contrast=1.0, units='', ori=0.0, height=None, antialias=True,\
@@ -221,7 +219,7 @@ def generator(globaltype, localtype, savef, inltr):
         feats.append( featArrow )
     elif ltype == 1:
     #    letters='ADEFHJKLMNPRSTUVY'
-        letters=inltr
+        letters=inltr   # DEBUGGING
         lenltrs = len(letters)
         for ltr in range(len(letters)):
             feats.append( visual.TextStim( win, text=letters[ltr], font='Sloan', bold=True, height=ltrH ) )
@@ -231,9 +229,6 @@ def generator(globaltype, localtype, savef, inltr):
 #    f= copy.copy(feats)
 
     # BUILDING CARDS AS STIM/COLOR/FEATURE/ORIENTATION COMBINATIONS -------------------------------------------------------
-
-    step = IMG_W/DIMX
-    half = -1*IMG_W/2 #image coords are centered
 
     PREVAIL_COL_RATIO = 0.5
     N_OF_FACES = len(imgs)
@@ -255,62 +250,68 @@ def generator(globaltype, localtype, savef, inltr):
             colIdx = range(N_CLRS)
             colIdx.remove( cardColor )
 
-            for featOrientation in range( 4 ):
+            for featN in range( N_OF_FEATS ):
 
-                for featN in range( N_OF_FEATS ):
+                for featOrientation in range( 4 ):
 
-#                    ct = 0  # color total - to collect how much of the total coloured area is dominant
-#                    nt = 0  # other colors
-
-                    for x in range(DIMX):
-                        for y in range(DIMY):
-
-                            feats[featN].pos = (half+(x+1)*step, half+(y+1)*step)
-                       
-                            val = imgs[faceN].getpixel( (x,DIMY-1-y) )
-                            #flip y-axis
-                            sz = (255-val)/255.0
-                            
-                            PREVAIL_COL_RATIO = (sz/gt)*coef
-                            
-#                            print 'size=' + str(round(sz,3)) + '; PCR=' + str(round(PREVAIL_COL_RATIO,2)) # DEBUG PRINT
-                            
-                            if (random.random() < PREVAIL_COL_RATIO):
-                                c = cardColor
-#                                ct = ct + sz
-                            else:
-                                c = colIdx[random.randint(0,2)]
-#                                nt = nt + sz
-                            
-                            feats[featN].setOri( 45+90*featOrientation )
-                            if ltype == 0:
-                                feats[featN].fillColor  = colors[c]
-                                feats[featN].lineColor  = colors[c]
-                                feats[featN].size       = sz
-                            elif ltype == 1:
-                                feats[featN].setColor( colors[c] )
-                                feats[featN].setHeight( sz*ltrH )
-                                feats[featN].text = feats[featN].text
-
-                            feats[featN].draw( win )
-#                            feats[featN] = copy.copy(f[featN])
-
-                    win.flip()
-                    if( SAVE_FRAMES ):
-                        win.getMovieFrame()
-                        win.saveMovieFrames( outdir + '%02d_%02d_%02d_%02d.png' % (faceN, cardColor, featN, featOrientation ))
-                    
-
-                # Now clear the whole lot and re-init
-#                win.close()
-#                win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon, color=(1.0, 1.0, 1.0), colorSpace='rgb')
-
-#                    if ltype == 1:  print feats[featN].text # DEBUG PRINT
-#                    print 'image ct=' + str(round(ct)) + '; nt=' + str(round(nt)) + '; ratio=' + str(round(ct/gt, 2)) # DEBUG PRINT
+                    # Here we draw one card
+                    cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feats[featN], featN, imgs[faceN], faceN, cardColor, colIdx, colors, featOrientation, SAVE_FRAMES, ltype)
 
     #cleanup
     win.close()
     core.quit()
+
+def cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feat, fN, img, iN, cardColor, colIdx, colors, featOri, SAVE_FRAMES, ltype):
+#    ct = 0  # color total - to collect how much of the total coloured area is dominant
+#    nt = 0  # other colors
+#    myMon=monitors.Monitor('Bens', width=31.5, distance=40); myMon.setSizePix((1366, 768))
+#    win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon, color=(1.0, 1.0, 1.0), colorSpace='rgb')
+
+    ltrH = (IMG_H/DIMY)+3
+    step = IMG_W/DIMX
+    half = -1*IMG_W/2 #image coords are centered
+    coef = (DIMX * DIMY) / 2
+    for x in range(DIMX):
+        for y in range(DIMY):
+
+            feat.pos = (half+(x+1)*step, half+(y+1)*step)
+
+            val = img.getpixel( (x,DIMY-1-y) )
+            #flip y-axis
+            sz = (255-val)/255.0
+            
+            PREVAIL_COL_RATIO = (sz/gt)*coef
+            
+    #            print 'size=' + str(round(sz,3)) + '; PCR=' + str(round(PREVAIL_COL_RATIO,2)) # DEBUG PRINT
+            
+            if (random.random() < PREVAIL_COL_RATIO):
+                c = cardColor
+    #                ct = ct + sz
+            else:
+                c = colIdx[random.randint(0,2)]
+    #                nt = nt + sz
+            
+            feat.setOri( 45+90*featOri )
+            if ltype == 0:
+                feat.fillColor  = colors[c]
+                feat.lineColor  = colors[c]
+                feat.size       = sz
+            elif ltype == 1:
+                feat.setColor( colors[c] )
+                feat.setHeight( sz*ltrH )
+                feat.text = feat.text
+
+            feat.draw( win )
+
+    win.flip()
+    if( SAVE_FRAMES ):
+        win.getMovieFrame()
+        win.saveMovieFrames( outdir + '%02d_%02d_%02d_%02d.png' % (iN, cardColor, fN, featOri))
+
+    #    if ltype == 1:  print feats[featN].text # DEBUG PRINT
+    #    print 'image ct=' + str(round(ct)) + '; nt=' + str(round(nt)) + '; ratio=' + str(round(ct/gt, 2)) # DEBUG PRINT
+
+#    win.close()
 
 #generator(0,0,True)
 generator(0,1,True,'A')
