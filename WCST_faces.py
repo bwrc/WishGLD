@@ -28,7 +28,9 @@ global USE_RANDOM_RULES; USE_RANDOM_RULES = False # True
 global RULE_COUNT; RULE_COUNT = 20 #if read from file, this will be overridden
 global SEPARATE_STIM; SEPARATE_STIM = True
 global SEP_STIM_DURATION; SEP_STIM_DURATION = 20 #n of frames (16ms)
-global N_OF_CARDS; N_OF_CARDS = 18
+global N_OF_CARDS; N_OF_CARDS = 16
+
+global PRESENTATION_MODE; PRESENTATION_MODE = 0
 
 global portCodes;
 portCodes = {'clear' : 0x00,\
@@ -71,7 +73,9 @@ def SelectCardSubset( subSetCount, deckSize ):
     return cards
 
 #setup paths
-global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\facecards\\'
+#global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\facecards\\'
+#global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\shinned\\letters\\'
+global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\shinned\\faces\\'
 global ruleFile; ruleFile = '.\\sets.csv'
 
 #setup rules
@@ -245,7 +249,11 @@ myDlg.addField('Age:', 18)
 
 myDlg.addText('Experiment Info')
 myDlg.addField('Randomize Category Cards:', choices=["No", "Yes"])
-myDlg.addField('Show Stim separate from Cat cards:', choices=["Yes", "No"])
+myDlg.addField('Select presentation mode', choices=["Sequential, Feedback:R/W", \
+                                                     "Sequential, Feedback: stimcard",\
+                                                     "Sequential, Feedback: framed target",\
+                                                     "Concurrent",\
+                                                     ])
 myDlg.addField('Group:', choices=["Test", "Control"])
 
 myDlg.show()  # show dialog and wait for OK or Cancel
@@ -328,10 +336,21 @@ SetupCategoryCards( tgtCards )
 
 #552 = 2*256 + 40
 # cards in clockwise order: up, right, down, left
+
+# TARGET CARD POSITIONS
+"""
+#cross formation
 stimCards = ( visual.ImageStim( win, pos=( 0, 552) ), \
               visual.ImageStim( win, pos=( 552, 0) ), \
               visual.ImageStim( win, pos=( 0, -552) ), \
               visual.ImageStim( win, pos=( -552, 0) ))
+"""
+#tight form
+stimCards = ( visual.ImageStim( win, pos=( 0, 266) ), \
+              visual.ImageStim( win, pos=( 522, 0) ), \
+              visual.ImageStim( win, pos=( 0, -266) ), \
+              visual.ImageStim( win, pos=( -522, 0) ))
+
 
 stimCards[0].setImage( tgtCards[0]['fn'] )
 stimCards[1].setImage( tgtCards[1]['fn'] )
