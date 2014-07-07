@@ -10,6 +10,7 @@ from PIL import Image
 
 def generator(globaltype, localtype, filtertype, savef):
 
+    cluster=1
     # Global type, set FACES=0 or LETTERS=1 or TEST=2
     gtype = globaltype
     # Local type, set shapes=0 or LETTERS=1 or TEST=2
@@ -18,8 +19,11 @@ def generator(globaltype, localtype, filtertype, savef):
     ftype=filtertype
     gstims=['faces_final', 'letters_final']
     filter=[]
-    filter.append(['shelimdf', 'bow'])
-    filter.append(['shsmimdf', 'bowsl'])
+    filter.append(['shelimdf', 'shsmimdf'])
+    filter.append(['bow', 'bowsl'])
+#    filter.append(['wob', 'wobsl'])
+    # cluster sets
+    clsets=['AVXY', 'DJLU', 'CGOQ', 'HMNW']
 
     SAVE_FRAMES = savef
     IMG_W = 512
@@ -28,9 +32,9 @@ def generator(globaltype, localtype, filtertype, savef):
     DIMY = 26
 
     s = os.sep
-    pth = '..'+s+'stimuli'+s+gstims[gtype]+s+'cluster_size_4'+s+'1'+s+filter[gtype][ftype]+s
+    pth = '..'+s+ 'stimuli' +s+ gstims[gtype] +s+ 'cluster_size_4' +s+ str(cluster+1) +s+ filter[gtype][ftype] +s
     tystr = ['face', 'letter', 'test']
-    outdir = '..' + s + 'stimuli' + s + tystr[gtype] + '_' + tystr[ltype] + '_' + filter[gtype][ftype]
+    outdir = '..' +s+ 'stimuli' +s+'output' +s+ tystr[gtype] + '_' + tystr[ltype] + '_' + filter[gtype][ftype]
     # debugging:
 #    if ltype != 1:
 #        inltr = 0
@@ -58,10 +62,11 @@ def generator(globaltype, localtype, filtertype, savef):
         for i in range(4):
             imgs.append( Image.open(pth + 'f' + '%02d' % (i+1,) + '.png') )   #faces
     elif gtype == 1:
+        letters=clsets[cluster]
         for i in range(4):
-            imgs.append( Image.open(pth + filter[gtype][ftype] + '%02d' % (i+1,) + '.png') )    #letters
-#    else:
-#        imgs.append( Image.open(pth + 'testi.png') )   #TEST!
+            imgs.append( Image.open(pth + filter[gtype][ftype] + letters[i] + '.png') )    #letters
+    else:
+        imgs.append( Image.open('26x26' +s+ 'testi.png') )   #TEST!
 
 
     # CREATING COLORS -------------------------------------------------------------------------------------------
@@ -225,9 +230,7 @@ def generator(globaltype, localtype, filtertype, savef):
         feats.append( featHouse )
         feats.append( featArrow )
     elif ltype == 1:
-        # cluster sets
-        clsets=['AVXY', 'DJLU', 'CGOQ', 'HMNW']
-        letters=clsets[1]
+        letters=clsets[cluster]
 #        letters=inltr   # DEBUGGING
         lenltrs = len(letters)
         for ltr in range(len(letters)):
@@ -268,7 +271,7 @@ def generator(globaltype, localtype, filtertype, savef):
 
     #cleanup
     win.close()
-    core.quit()
+#    core.quit()
 
 def cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feat, fN, img, iN, cardColor, colIdx, colors, featOri, SAVE_FRAMES, ltype):
 #    ct = 0  # color total - to collect how much of the total coloured area is dominant
@@ -279,7 +282,7 @@ def cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feat, fN, img, iN, card
     ltrH = (IMG_H/DIMY)+3
     step = IMG_W/DIMX
     half = -1*IMG_W/2 #image coords are centered
-    coef = (DIMX * DIMY) / 2
+    coef = (DIMX * DIMY) / 3
     for x in range(DIMX):
         for y in range(DIMY):
 
@@ -323,11 +326,11 @@ def cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feat, fN, img, iN, card
 #    win.close()
 
 
-generator(0,0,0,True)
+#generator(0,0,0,True)
 #generator(0,0,1,True)
 #generator(0,1,0,True)
 #generator(0,1,1,True)
-#generator(1,0,0,True)
-#generator(1,0,1,True)
+generator(1,0,0,True)
+generator(1,0,1,True)
 #generator(1,1,0,True)
 #generator(1,1,1,True)

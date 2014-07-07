@@ -1,5 +1,6 @@
 # explicit dirs #
 ###################
+localletters
 
 # autosave #
 ###################
@@ -10,7 +11,7 @@
 # misc #
 ###################
 .Rhistory
-*png
+.png
 
 # OS generated files #
 ######################
