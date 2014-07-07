@@ -33,7 +33,7 @@ def generator(globaltype, localtype, filtertype, savef):
 
     s = os.sep
     pth = '..'+s+ 'stimuli' +s+ gstims[gtype] +s+ 'cluster_size_4' +s+ str(cluster+1) +s+ filter[gtype][ftype] +s
-    tystr = ['face', 'letter', 'test']
+    tystr = ['face', 'letter', 'patch']
     outdir = '..' +s+ 'stimuli' +s+'output' +s+ tystr[gtype] + '_' + tystr[ltype] + '_' + filter[gtype][ftype]
     # debugging:
 #    if ltype != 1:
@@ -70,7 +70,170 @@ def generator(globaltype, localtype, filtertype, savef):
 
 
     # CREATING COLORS -------------------------------------------------------------------------------------------
+    colors=createColors()
 
+
+    # VISUAL FEATURES ----------------------------------------------------------------------------------------------
+    feats=[]
+
+    #SHAPES
+    featTriangle = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
+                             vertices=((0, 10), (8, -10), (-8, -10), (0, 10)), closeShape=True )
+                             
+    featDiamond = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
+                             vertices=((0, 10), (8, -6), (0,-10), (-8, -6), (0, 10)),\
+                             closeShape=True )
+
+    featHouse = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
+                             vertices=((0, 10), (5.7, 0), (5.7,-9), (-5.7, -9), (-5.7,0), (0, 10)), 
+                             closeShape=True )
+
+    featArrow = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
+                             vertices=((0, 10), (8, 0), (4,0), (4, -10), (-4,-10), (-4, 0), (-8, 0), (0,10)),\
+                             closeShape=True )
+
+    #not used
+    #featDrop = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+    #                         fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
+    #                         vertices=((0, 10), (7, 1), (6.9, -4), (5.65, -5.65), (4, -6.9), (0,-8), (-4, -6.9), (-5.65, -5.65), (-6.9, -4), (-7, 1), (0, 10)), 
+    #                         closeShape=True )
+
+    featStarTrek = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
+                             vertices=((0, 10), (8, -10), (0,0), (-8, -10), (0, 10)),\
+                             closeShape=True )
+
+    #featA = visual.ShapeStim( win, lineWidth=2.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+    #                         fillColor=None, fillColorSpace='rgb',\
+    #                         vertices=((-6, -8), (0,10), (6,-8), (3,-4), (-3,-4) ),\
+    #                         closeShape=True )
+
+    patch=visual.GratingStim(win, tex='sin', mask='none', units='', pos=(0.0, 0.0), size=None, sf=None,\
+                        ori=0.0, phase=(0.0, 0.0), texRes=128, rgb=None, dkl=None, lms=None,\
+                        color=(1.0, 1.0, 1.0), colorSpace='rgb', contrast=1.0, opacity=1.0, depth=0,\
+                        rgbPedestal=(0.0, 0.0, 0.0), interpolate=False, name=None, autoLog=None,\
+                        autoDraw=False, maskParams=None)
+
+    #LETTERS
+    ltrH = (IMG_H/DIMY)+3
+    # REFERENCE:
+    #visual.TextStim( win, text='a letter', font='a system font', pos=(0.0, 0.0), depth=0, rgb=None, color=(0.0, 0.0, 0.0),\
+    #                colorSpace='rgb', opacity=1.0, contrast=1.0, units='', ori=0.0, height=None, antialias=True,\
+    #                bold=False, italic=False, alignHoriz='center', alignVert='center', fontFiles=[], wrapWidth=None,\
+    #                flipHoriz=False, flipVert=False, name=None, autoLog=None ) )
+
+    #visual.TextStim( win, text='', fontFiles=['Sloan.otf'] )   # Uncomment IF SLOAN FONT IS NOT ON YOUR SYSTEM;
+
+    if ltype == 0:
+        feats.append( featTriangle )
+        feats.append( featDiamond )
+        feats.append( featHouse )
+        feats.append( featArrow )
+    elif ltype == 1:
+        letters=clsets[cluster]
+#        letters=inltr   # DEBUGGING
+        lenltrs = len(letters)
+        for ltr in range(len(letters)):
+            feats.append( visual.TextStim( win, text=letters[ltr], font='Sloan', bold=True, height=ltrH ) )
+    else:
+        feats.append( patch )
+
+#    f= copy.copy(feats)
+
+    # BUILDING CARDS AS STIM/COLOR/FEATURE/ORIENTATION COMBINATIONS -------------------------------------------------------
+
+    PREVAIL_COL_RATIO = 0.5
+    N_OF_FACES = len(imgs)
+    N_OF_FEATS = len(feats)
+    N_CLRS = len(colors)
+
+    #card generation
+    for faceN in range( N_OF_FACES ):
+        
+        # Build color probabilities by observation
+        gt = 0  # greytotal
+        for xi in range(DIMX):
+            for yi in range(DIMY):
+                vali = imgs[faceN].getpixel( (xi,DIMY-1-yi) )
+                gt = gt + (255-vali)/255.0
+#        print 'image gt=' + str(round(gt)) # DEBUG PRINT
+
+        for cardColor in range(N_CLRS):
+            colIdx = range(N_CLRS)
+            colIdx.remove( cardColor )
+
+            for featN in range( N_OF_FEATS ):
+                
+                if ltype > 1:
+                    cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feats[featN], featN, imgs[faceN], faceN,\
+                            cardColor, colIdx, colors, 0, SAVE_FRAMES, ltype)
+                else:
+                    for featOrientation in range( 4 ):
+                        # Here we draw one card
+                        cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feats[featN], featN, imgs[faceN],\
+                                faceN, cardColor, colIdx, colors, featOrientation, SAVE_FRAMES, ltype)
+
+    #cleanup
+    win.close()
+#    core.quit()
+
+def cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feat, fN, img, iN, cardColor, colIdx, colors, featOri, SAVE_FRAMES, ltype):
+#    ct = 0  # color total - to collect how much of the total coloured area is dominant
+#    nt = 0  # other colors
+#    myMon=monitors.Monitor('Bens', width=31.5, distance=40); myMon.setSizePix((1366, 768))
+#    win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon, color=(1.0, 1.0, 1.0), colorSpace='rgb')
+
+    ltrH = (IMG_H/DIMY)+3
+    step = IMG_W/DIMX
+    half = -1*IMG_W/2 #image coords are centered
+    coef = (DIMX * DIMY) / 3
+    for x in range(DIMX):
+        for y in range(DIMY):
+
+            feat.pos = (half+(x+1)*step, half+(y+1)*step)
+
+            val = img.getpixel( (x,DIMY-1-y) )
+            #flip y-axis
+            sz = (255-val)/255.0
+            
+            PREVAIL_COL_RATIO = (sz/gt)*coef
+            
+    #            print 'size=' + str(round(sz,3)) + '; PCR=' + str(round(PREVAIL_COL_RATIO,2)) # DEBUG PRINT
+            
+            if (random.random() < PREVAIL_COL_RATIO):
+                c = cardColor
+    #                ct = ct + sz
+            else:
+                c = colIdx[random.randint(0,2)]
+    #                nt = nt + sz
+            
+            feat.setOri( 45+90*featOri )
+            if ltype == 0:
+                feat.fillColor  = colors[c]
+                feat.lineColor  = colors[c]
+                feat.size       = sz
+            elif ltype == 1:
+                feat.setColor( colors[c] )
+                feat.setHeight( sz*ltrH )
+                feat.text = feat.text
+
+            feat.draw( win )
+
+    win.flip()
+    if( SAVE_FRAMES ):
+        win.getMovieFrame()
+        win.saveMovieFrames( outdir + '%02d_%02d_%02d_%02d.png' % (iN, cardColor, fN, featOri))
+
+    #    if ltype == 1:  print feats[featN].text # DEBUG PRINT
+    #    print 'image ct=' + str(round(ct)) + '; nt=' + str(round(nt)) + '; ratio=' + str(round(ct/gt, 2)) # DEBUG PRINT
+
+#    win.close()
+
+def createColors():
     # Color selection for equally perceivable colours is covered in Zeileis, Hornik and Murrell (2007), available here:
     #   http://epub.wu.ac.at/1692/1/document.pdf
     # The simple answer seems to be: use the CIE Luv color space. Code is here:
@@ -172,165 +335,19 @@ def generator(globaltype, localtype, filtertype, savef):
     #colors.append( ltblue )
     #colors.append( cyan )
     #colors.append( orange )
-
-
-    # VISUAL FEATURES ----------------------------------------------------------------------------------------------
-    feats=[]
-
-    #SHAPES
-    featTriangle = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0, 10), (8, -10), (-8, -10), (0, 10)), closeShape=True )
-                             
-    featDiamond = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0, 10), (8, -6), (0,-10), (-8, -6), (0, 10)),\
-                             closeShape=True )
-
-    featHouse = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0, 10), (5.7, 0), (5.7,-9), (-5.7, -9), (-5.7,0), (0, 10)), 
-                             closeShape=True )
-
-    featArrow = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0, 10), (8, 0), (4,0), (4, -10), (-4,-10), (-4, 0), (-8, 0), (0,10)),\
-                             closeShape=True )
-
-    #not used
-    #featDrop = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-    #                         fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-    #                         vertices=((0, 10), (7, 1), (6.9, -4), (5.65, -5.65), (4, -6.9), (0,-8), (-4, -6.9), (-5.65, -5.65), (-6.9, -4), (-7, 1), (0, 10)), 
-    #                         closeShape=True )
-
-    featStarTrek = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0, 10), (8, -10), (0,0), (-8, -10), (0, 10)),\
-                             closeShape=True )
-
-    #featA = visual.ShapeStim( win, lineWidth=2.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-    #                         fillColor=None, fillColorSpace='rgb',\
-    #                         vertices=((-6, -8), (0,10), (6,-8), (3,-4), (-3,-4) ),\
-    #                         closeShape=True )
-
-
-    #LETTERS
-    ltrH = (IMG_H/DIMY)+3
-    # REFERENCE:
-    #visual.TextStim( win, text='a letter', font='a system font', pos=(0.0, 0.0), depth=0, rgb=None, color=(0.0, 0.0, 0.0),\
-    #                colorSpace='rgb', opacity=1.0, contrast=1.0, units='', ori=0.0, height=None, antialias=True,\
-    #                bold=False, italic=False, alignHoriz='center', alignVert='center', fontFiles=[], wrapWidth=None,\
-    #                flipHoriz=False, flipVert=False, name=None, autoLog=None ) )
-
-    #visual.TextStim( win, text='', fontFiles=['Sloan.otf'] )   # Uncomment IF SLOAN FONT IS NOT ON YOUR SYSTEM;
-
-    if ltype == 0:
-        feats.append( featTriangle )
-        feats.append( featDiamond )
-        feats.append( featHouse )
-        feats.append( featArrow )
-    elif ltype == 1:
-        letters=clsets[cluster]
-#        letters=inltr   # DEBUGGING
-        lenltrs = len(letters)
-        for ltr in range(len(letters)):
-            feats.append( visual.TextStim( win, text=letters[ltr], font='Sloan', bold=True, height=ltrH ) )
-    else:
-        feats.append( featStarTrek )
-
-#    f= copy.copy(feats)
-
-    # BUILDING CARDS AS STIM/COLOR/FEATURE/ORIENTATION COMBINATIONS -------------------------------------------------------
-
-    PREVAIL_COL_RATIO = 0.5
-    N_OF_FACES = len(imgs)
-    N_OF_FEATS = len(feats)
-    N_CLRS = len(colors)
-
-    #card generation
-    for faceN in range( N_OF_FACES ):
-        
-        # Build color probabilities by observation
-        gt = 0  # greytotal
-        for xi in range(DIMX):
-            for yi in range(DIMY):
-                vali = imgs[faceN].getpixel( (xi,DIMY-1-yi) )
-                gt = gt + (255-vali)/255.0
-#        print 'image gt=' + str(round(gt)) # DEBUG PRINT
-
-        for cardColor in range(N_CLRS):
-            colIdx = range(N_CLRS)
-            colIdx.remove( cardColor )
-
-            for featN in range( N_OF_FEATS ):
-
-                for featOrientation in range( 4 ):
-
-                    # Here we draw one card
-                    cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feats[featN], featN, imgs[faceN], faceN, cardColor, colIdx, colors, featOrientation, SAVE_FRAMES, ltype)
-
-    #cleanup
-    win.close()
-#    core.quit()
-
-def cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feat, fN, img, iN, cardColor, colIdx, colors, featOri, SAVE_FRAMES, ltype):
-#    ct = 0  # color total - to collect how much of the total coloured area is dominant
-#    nt = 0  # other colors
-#    myMon=monitors.Monitor('Bens', width=31.5, distance=40); myMon.setSizePix((1366, 768))
-#    win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon, color=(1.0, 1.0, 1.0), colorSpace='rgb')
-
-    ltrH = (IMG_H/DIMY)+3
-    step = IMG_W/DIMX
-    half = -1*IMG_W/2 #image coords are centered
-    coef = (DIMX * DIMY) / 3
-    for x in range(DIMX):
-        for y in range(DIMY):
-
-            feat.pos = (half+(x+1)*step, half+(y+1)*step)
-
-            val = img.getpixel( (x,DIMY-1-y) )
-            #flip y-axis
-            sz = (255-val)/255.0
-            
-            PREVAIL_COL_RATIO = (sz/gt)*coef
-            
-    #            print 'size=' + str(round(sz,3)) + '; PCR=' + str(round(PREVAIL_COL_RATIO,2)) # DEBUG PRINT
-            
-            if (random.random() < PREVAIL_COL_RATIO):
-                c = cardColor
-    #                ct = ct + sz
-            else:
-                c = colIdx[random.randint(0,2)]
-    #                nt = nt + sz
-            
-            feat.setOri( 45+90*featOri )
-            if ltype == 0:
-                feat.fillColor  = colors[c]
-                feat.lineColor  = colors[c]
-                feat.size       = sz
-            elif ltype == 1:
-                feat.setColor( colors[c] )
-                feat.setHeight( sz*ltrH )
-                feat.text = feat.text
-
-            feat.draw( win )
-
-    win.flip()
-    if( SAVE_FRAMES ):
-        win.getMovieFrame()
-        win.saveMovieFrames( outdir + '%02d_%02d_%02d_%02d.png' % (iN, cardColor, fN, featOri))
-
-    #    if ltype == 1:  print feats[featN].text # DEBUG PRINT
-    #    print 'image ct=' + str(round(ct)) + '; nt=' + str(round(nt)) + '; ratio=' + str(round(ct/gt, 2)) # DEBUG PRINT
-
-#    win.close()
-
+    return colors
 
 #generator(0,0,0,True)
 #generator(0,0,1,True)
 #generator(0,1,0,True)
 #generator(0,1,1,True)
-generator(1,0,0,True)
-generator(1,0,1,True)
+#generator(1,0,0,True)
+#generator(1,0,1,True)
 #generator(1,1,0,True)
 #generator(1,1,1,True)
+
+generator(0,2,0,True)
+generator(0,2,1,True)
+generator(1,2,0,True)
+generator(1,2,1,True)
+core.quit()

@@ -10,6 +10,7 @@ import sys
 from PIL import Image
 
 #def generator(globaltype, globalcluster, filtertype, params):
+#    global1, global2, local1=params.split('_')
 
 # CONSTANTS
 SAVE_FRAMES = True
@@ -19,22 +20,24 @@ DIMX = 26
 DIMY = 26
 s = os.sep
 
+# CREATING MONITORS ---------------------------------------------------------------------------------------------------
+#lenovo
+#    myMon=monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
+#HP Elitebook 2560p
+#    myMon=monitors.Monitor('Bens', width=31.5, distance=40); myMon.setSizePix((1366, 768))
+#DELL Latitude
+myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); myMon.setSizePix((1600, 900))
+#desktop
+#    myMon=monitors.Monitor('asus', width=37.8, distance=40); myMon.setSizePix((1920, 1080))
+win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon,color=(1.0, 1.0, 1.0),colorSpace='rgb')
+
 # PARAMETER PARSING --------------------------------------------------------------------------------------------------
 globaltype = sys.argv[1]
 globalcluster = sys.argv[2]
 filtertype = sys.argv[3]
-g1 = sys.argv[4]
-g2 = sys.argv[5]
-l1 = sys.argv[6]
-#params = sys.argv[4]
-
-print 'Global ' + str(globaltype)
-print 'Cluster ' + str(globalcluster)
-print 'Filter ' + str(filtertype)
-print 'g1 ' + str(g1)
-print 'g2 ' + str(g2)
-print 'l1 ' + str(l1)
-#print 'params ' + params
+global1 = sys.argv[4]
+global2 = sys.argv[5]
+local1 = sys.argv[6]
 
 # Global type, set FACES=0 or LETTERS=1 or TEST=2
 gtype = int(globaltype)
@@ -43,32 +46,28 @@ cluster=int(globalcluster)
 # version of stim prep to use, 0=cleaner, 1=more noise
 ftype=int(filtertype)
 # paramterisation for slow local letter production
-#g1, g2, l1=params.split('_')
-g1 = int(g1)
-g2 = int(g2)
-l1 = int(l1)
+g1 = int(global1)
+g2 = int(global2)
+l1 = int(local1)
 
-# OUTPUT STIMULI ------------------------------------------------------------------------------------------------------
-tystr = ['face', 'letter', 'test']
+print 'Global ' + str(globaltype)
+print 'Cluster ' + str(globalcluster)
+print 'Filter ' + str(filtertype)
+print 'g1 ' + str(global1)
+print 'g2 ' + str(global2)
+print 'l1 ' + str(local1)
+#print 'params ' + params
+
+# PARAMETERISATION OF PATHS -------------------------------------------------------------------------------------------
+tystr = ['face', 'letter', 'blank']
 filter=[]
 filter.append(['shelimdf', 'shsmimdf'])
 filter.append(['bow', 'bowsl'])
 #    filter.append(['wob', 'wobsl'])
-outdir = '..' +s+ 'stimuli' +s+ 'output' +s+ tystr[gtype] + '_letter_' + filter[gtype][ftype]
-outdir = outdir + '_cards' + s
-if not os.path.exists(outdir):
-    os.makedirs(outdir)
-
-# CREATING MONITORS ---------------------------------------------------------------------------------------------------
-#lenovo
-#    myMon=monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
-#HP Elitebook 2560p
-myMon=monitors.Monitor('Bens', width=31.5, distance=40); myMon.setSizePix((1366, 768))
-#DELL Latitude
-#    myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); myMon.setSizePix((1600, 900))
-#desktop
-#    myMon=monitors.Monitor('asus', width=37.8, distance=40); myMon.setSizePix((1920, 1080))
-win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon,color=(1.0, 1.0, 1.0),colorSpace='rgb')
+gstims=['faces_final', 'letters_final']
+# cluster sets
+clsets=['AVXY', 'DJLU', 'CGOQ', 'HMNW']
+letter = clsets[cluster][l1]
 
 # VISUAL FEATURES -----------------------------------------------------------------------------------------------------
 
@@ -85,13 +84,16 @@ colors.append( col3 )
 colors.append( col4 )
 cardColor = g2
 
-# INPUT STIMULI 
-gstims=['faces_final', 'letters_final']
-pth = '..'+s+ 'stimuli' +s+ gstims[gtype] +s+ 'cluster_size_4' +s+ str(cluster+1) +s+ filter[gtype][ftype] +s
-
-# cluster sets
-clsets=['AVXY', 'DJLU', 'CGOQ', 'HMNW']
-letter = clsets[cluster][l1]
+# SPECIFY PATHS
+pth = '..'+s+ 'stimuli' +s
+outdir = '..' +s+ 'stimuli' +s+ 'output' +s+ tystr[gtype] + '_letter_'
+if gtype < 2:
+    outdir = outdir + filter[gtype][ftype] + '_' + clsets[cluster] + '_cards' + s
+    pth = pth + gstims[gtype] +s+ 'cluster_size_4' +s+ str(cluster+1) +s+ filter[gtype][ftype] +s
+else:
+    outdir = outdir + clsets[cluster] + '_cards' + s
+if not os.path.exists(outdir):
+    os.makedirs(outdir)
 
 # GLOBALS
 imgs = []
@@ -102,7 +104,7 @@ if gtype == 0:
 elif gtype == 1:
     imgs = Image.open(pth + filter[gtype][ftype] + clsets[cluster][g1] + '.png')    #letters
 else:
-    imgs.append( Image.open('26x26' +s+ 'testi.png') )   #TEST!
+    imgs = Image.open(pth + 'bowlank.png')   #TEST!
 
 #LETTERS
 ltrH = (IMG_H/DIMY)+3
@@ -275,7 +277,10 @@ def createColors():
     
     return colors
 
+
 # PARAMETERISED FOR ONE SET OF GLOBAL FACES OR LETTERS AT A TIME
+generator(2, 1, 0,'00_00_00')
+
 #def multigen(glob,clst,filt)
 #    generator(glob,clst,filt,'00_00_00')
 #    generator(glob,clst,filt,'00_00_01')

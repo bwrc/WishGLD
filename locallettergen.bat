@@ -14,14 +14,14 @@ REM for %%i in (%param%) do (
  REM pause
 REM )
 
-for %%g in (0,1) do (
- for %%c in (0,1,2) do (
+for %%c in (0,1) do (
+ for %%g in (2) do (
   for %%f in (0,1) do (
    for %%i in (0,1,2,3) do (
     for %%j in (0,1,2,3) do (
 	 for %%k in (0,1,2,3) do (
 	  REM echo %%g %%c %%f %%i %%j %%k
-	  %py% %pth%\halftone_localletters_param.py %%g %%c %%f %%i %%j %%k
+	  %py% halftone_localletters_param.py %%g %%c %%f %%i %%j %%k
 	  REM pause
 	 )
 	)
