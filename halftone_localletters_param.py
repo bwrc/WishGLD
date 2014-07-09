@@ -39,9 +39,9 @@ global1 = sys.argv[4]
 global2 = sys.argv[5]
 local1 = sys.argv[6]
 
-# Global type, set FACES=0 or LETTERS=1 or TEST=2
+# Global type, set FACES=0 or LETTERS=1 or NOISE=2+
 gtype = int(globaltype)
-# cluster can be 1 to 3 for global faces, 1 to 4 for global letters
+# cluster can be 1 to 3
 cluster=int(globalcluster)
 # version of stim prep to use, 0=cleaner, 1=more noise
 ftype=int(filtertype)
@@ -59,15 +59,16 @@ print 'l1 ' + str(local1)
 #print 'params ' + params
 
 # PARAMETERISATION OF PATHS -------------------------------------------------------------------------------------------
-tystr = ['face', 'letter', 'blank']
+tystr = ['face', 'letter', 'noise']
 filter=[]
 filter.append(['shelimdf', 'shsmimdf'])
 filter.append(['bow', 'bowsl'])
 #    filter.append(['wob', 'wobsl'])
 gstims=['faces_final', 'letters_final']
 # cluster sets
-clsets=['AVXY', 'DJLU', 'CGOQ', 'HMNW']
-letter = clsets[cluster][l1]
+gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']
+lcltrsets=['ERSW', 'FGKP', 'JLTY']
+letter = lcltrsets[cluster][l1]
 
 # VISUAL FEATURES -----------------------------------------------------------------------------------------------------
 
@@ -86,12 +87,13 @@ cardColor = g2
 
 # SPECIFY PATHS
 pth = '..'+s+ 'stimuli' +s
-outdir = '..' +s+ 'stimuli' +s+ 'output' +s+ tystr[gtype] + '_letter_'
+outdir = '..' +s+ 'stimuli' +s+ 'output' +s+ tystr[gtype]
 if gtype < 2:
-    outdir = outdir + filter[gtype][ftype] + '_' + clsets[cluster] + '_cards' + s
-    pth = pth + gstims[gtype] +s+ 'cluster_size_4' +s+ str(cluster+1) +s+ filter[gtype][ftype] +s
+    outdir = outdir + str(cluster+1) + '_letter_' + filter[gtype][ftype]
+    pth = pth + gstims[gtype] +s+ 'usable' +s+ str(cluster+1) +s+ filter[gtype][ftype] +s
 else:
-    outdir = outdir + clsets[cluster] + '_cards' + s
+    outdir = outdir + '_letter'
+outdir = outdir + '_' + lcltrsets[cluster] + '_cards' + s
 if not os.path.exists(outdir):
     os.makedirs(outdir)
 
@@ -102,9 +104,9 @@ if gtype == 0:
     idx=g1+1
     imgs = Image.open(pth + 'f' + '%02d' %idx + '.png')   #faces
 elif gtype == 1:
-    imgs = Image.open(pth + filter[gtype][ftype] + clsets[cluster][g1] + '.png')    #letters
+    imgs = Image.open(pth + filter[gtype][ftype] + gbltrsets[cluster][g1] + '.png')    #letters
 else:
-    imgs = Image.open(pth + 'bowlank.png')   #TEST!
+    imgs = Image.open(pth + 'bowlank.png')   #noise
 
 #LETTERS
 ltrH = (IMG_H/DIMY)+3
@@ -155,7 +157,10 @@ for featOrientation in range( 4 ):
 #                            nt = nt + sz
 
             feats.setOri( 45+90*featOrientation )
-            feats.setColor( colors[c] )
+            if gtype > 1:
+                feats.setColor( colors[(x*y)%4] )
+            else:
+                feats.setColor( colors[c] )
             feats.setHeight( sz*ltrH )
             feats.text = feats.text
             feats.draw( win )
@@ -279,7 +284,7 @@ def createColors():
 
 
 # PARAMETERISED FOR ONE SET OF GLOBAL FACES OR LETTERS AT A TIME
-generator(2, 1, 0,'00_00_00')
+# generator(2, 1, 0,'00_00_00')
 
 #def multigen(glob,clst,filt)
 #    generator(glob,clst,filt,'00_00_00')

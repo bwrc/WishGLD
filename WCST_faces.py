@@ -1,8 +1,20 @@
 
-#import numpy as np
-#from random import randint
+"""
+WCST experiment / ReKnow
+
+TODO:
+    - check the parallel port triggering, the logic is there (commented, search for 'add this for parallel triggering') but untested since lacking a parallel port + drivers
+      for driver installation, check http://psychopy.wmwikis.net/Triggering+the+Parallel+Port+(EEG)
+    - check the paths to the image files, also create a .\logs\ folder for logs
+    - if working from a csv file for rule sequences: check path, and delimiter
+    - check globals for configuring the test
+
+
+
+"""
+
 from random import randint, random, seed
-from psychopy import visual,core,monitors,event,gui, logging
+from psychopy import visual,core,monitors,event,gui, logging#, parallel
 from copy import deepcopy
 import csv
 from datetime import datetime #for date
@@ -12,11 +24,13 @@ import NewDlg #allows setting the length of textfields
 # - GLOBALS -------------------------------------------------------------------------------------------
 global DEBUG; DEBUG = True
 global RANDOMIZE_CATEGORY_CARDS; RANDOMIZE_CATEGORY_CARDS = False
-global USE_RANDOM_RULES; USE_RANDOM_RULES = True
+global USE_RANDOM_RULES; USE_RANDOM_RULES = False # True
 global RULE_COUNT; RULE_COUNT = 20 #if read from file, this will be overridden
 global SEPARATE_STIM; SEPARATE_STIM = True
 global SEP_STIM_DURATION; SEP_STIM_DURATION = 20 #n of frames (16ms)
-global N_OF_CARDS; N_OF_CARDS = 18
+global N_OF_CARDS; N_OF_CARDS = 16
+
+global PRESENTATION_MODE; PRESENTATION_MODE = 0
 
 global portCodes;
 portCodes = {'clear' : 0x00,\
@@ -49,33 +63,39 @@ responses
 use: writePort( respRight | rule1 )
 
 """
+#parallel.setPortAddress(0x0378) #<-- add this for parallel triggering
 
 def SelectCardSubset( subSetCount, deckSize ):
+    """Selects a random set of subSetCount cards from a deck of deckSize cards."""
     cards =[]
     for i in range( subSetCount ):
         cards.append( randint(0, deckSize-1) )
     return cards
 
 #setup paths
-global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\facecards\\'
-global ruleFile; ruleFile = 'sets.csv'
+#global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\facecards\\'
+#global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\shinned\\letters\\'
+global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\shinned\\faces\\'
+global ruleFile; ruleFile = '.\\sets.csv'
 
 #setup rules
 global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face, color, shape, orientation
-global currentRule; currentRule = rules[randint(0,3)]
-global ruleList; ruleList = [] #rules (0, 1, 2, 3) and required n of correct repeats (5, 6, 7)
+global currentRule; #currentRule = rules[randint(0,3)]
+global ruleList; ruleList = [] #a list of tuples containing the sequence of sorting rules (0, 1, 2, 3) and required n of correct repeats per set(5, 6, 7)
 
 #setup deck of four cards from the whole deck
 deck = SelectCardSubset( 4, N_OF_CARDS )
 
-#ruleList is a list of sorting rules and their 'durations'
+#ruleList is a list of sorting rules and their durations
 if USE_RANDOM_RULES == False: #load from ruleFile
-    rf = open( rulefile, 'rb' )
+    rf = open( ruleFile, 'rb' )
     reader = csv.reader( rf, delimiter=';' )
-    RULE_COUNT = row.count()
+
     for row in reader:
         ruleList.append( ( int(row[0])-1, int(row[1]) ) )
     rf.close()
+    RULE_COUNT = len( ruleList )
+    
     
 else: #generate random set of RULE_COUNT tuples
     for i in range( RULE_COUNT ):
@@ -84,7 +104,6 @@ else: #generate random set of RULE_COUNT tuples
 global currentTgt; currentTgt = (-1, -1, -1, -1)
 
 # - FUNCTION DEFS -------------------------------------------------------------------------------------
-#def SetupParams( ):
 
 def randomizeOrder( lst ):
     return sorted(lst, key=lambda k: random())
@@ -92,7 +111,7 @@ def randomizeOrder( lst ):
 def SetupCategoryCards( cards, randomOrder = True ):
     order = [0, 1, 2, 3]
 
-    # should the order of features be randomized
+    # should the order of features be randomized?
     print order
     if randomOrder:
         feat1 = randomizeOrder( order )
@@ -125,9 +144,6 @@ def SetupCategoryCards( cards, randomOrder = True ):
 
     return True
 
-#def CheckForEndConditions():
-    #
-
 def DebugMsg( msg ):
     txt = visual.TextStim( win, text=msg, pos=(150, 480), color=(1.0, 0.0, 0.0), colorSpace='rgb')
     txt.draw()
@@ -147,25 +163,33 @@ def NextTrial():
     if DEBUG:
         print 'stim: ' + fn
 
-    if SEPARATE_STIM: #first show stimcard for a short period, then the target cards
+    if SEPARATE_STIM: #first show stimcard for a short period of SEP_STIM_DURATION (in refresh frames, x 16ms), then the target cards
         win.clearBuffer()
         for i in range( SEP_STIM_DURATION ): #accurate timing trick
             tgtCard.draw(win)
-            win.flip()# clearBuffer = False )
+            win.flip()
             if i == 0:
-                logThis('STIM ' + currentTgt )#trig & log
+                triggerAndLog( portCodes['cue'], 'STIM ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) )
+                #logThis('STIM ' + currentTgt )#trig & log
 
         win.flip() #clear
 
     else: # show all cards at the same time
         tgtCard.draw(win)
-        logThis('STIM ' + str(currentTgt[0]) + ',' + str(currentTgt[1]) + ',' + str(currentTgt[2]) + ',' + str(currentTgt[3]) )#trig & log
+
+#logThis('STIM ' + str(currentTgt[0]) + ',' + str(currentTgt[1]) + ',' + str(currentTgt[2]) + ',' + str(currentTgt[3]) )#trig & log
     
     for c in stimCards:
         c.draw(win)
 
+    if DEBUG:
+        logThis( 'cr: ' + str(currentRule) )
+        DebugMsg( 'current rule ' + str(currentRule) )
+
     win.flip()
-    logThis('TGT ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+    
+    triggerAndLog( portCodes['tgtOn'], \
+            'TGT ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
                    + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
                    + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
                    + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
@@ -225,13 +249,18 @@ myDlg.addField('Age:', 18)
 
 myDlg.addText('Experiment Info')
 myDlg.addField('Randomize Category Cards:', choices=["No", "Yes"])
-myDlg.addField('Show Stim separate from Cat cards:', choices=["Yes", "No"])
+myDlg.addField('Select presentation mode', choices=["Sequential, Feedback:R/W", \
+                                                     "Sequential, Feedback: stimcard",\
+                                                     "Sequential, Feedback: framed target",\
+                                                     "Concurrent",\
+                                                     ])
 myDlg.addField('Group:', choices=["Test", "Control"])
 
 myDlg.show()  # show dialog and wait for OK or Cancel
 
 if myDlg.OK:  # then the user pressed OK
     confInfo = myDlg.data
+    print confInfo
 else:
     print 'user cancelled'
     win.close()
@@ -252,7 +281,13 @@ logThis('Subj ID: ' + confInfo[0] )
 logThis('Run: ' + str(datetime.utcnow()) )
 logThis('Age: ' + str(confInfo[1]) )
 
-if confInfo[4] == 0:
+def triggerAndLog( trigCode, msg, trigDuration=10 ):
+    #parallel.setData( trigCode ) #<-- add this for parallel triggering
+    logThis( msg )
+    #core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
+    #parallel.setData( portCodes['clear'] ) #<-- add this for parallel triggering
+
+if confInfo[4] == 'Test':
     logThis('Group: Test')
 else:
     logThis('Group: Control')
@@ -267,15 +302,15 @@ logThis('--------------------------------------------------------')
 logThis('\n')
 
 # SETUP TEST PARAMS
-if confInfo[2] == 0:
+if confInfo[2] == 'No':
     RANDOMIZE_CATEGORY_CARDS = False
 else:
     RANDOMIZE_CATEGORY_CARDS = True
 
-if confInfo[3] == 0:
-    SEPARATE_STIM = True
-else:
+if confInfo[3] == 'No':
     SEPARATE_STIM = False
+else:
+    SEPARATE_STIM = True
 
 #rendering window setup
 #myMon = monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
@@ -300,10 +335,22 @@ tgtCards = (deepcopy(cardPrototype), \
 SetupCategoryCards( tgtCards )
 
 #552 = 2*256 + 40
+# cards in clockwise order: up, right, down, left
+
+# TARGET CARD POSITIONS
+"""
+#cross formation
 stimCards = ( visual.ImageStim( win, pos=( 0, 552) ), \
-              visual.ImageStim( win, pos=( -552, 0) ), \
+              visual.ImageStim( win, pos=( 552, 0) ), \
               visual.ImageStim( win, pos=( 0, -552) ), \
-              visual.ImageStim( win, pos=( 552, 0) ))
+              visual.ImageStim( win, pos=( -552, 0) ))
+"""
+#tight form
+stimCards = ( visual.ImageStim( win, pos=( 0, 266) ), \
+              visual.ImageStim( win, pos=( 522, 0) ), \
+              visual.ImageStim( win, pos=( 0, -266) ), \
+              visual.ImageStim( win, pos=( -522, 0) ))
+
 
 stimCards[0].setImage( tgtCards[0]['fn'] )
 stimCards[1].setImage( tgtCards[1]['fn'] )
@@ -325,16 +372,23 @@ ruleCount=0
 
 while ruleCount < RULE_COUNT: #True: #not CheckForEndCondition() :
 
+    currentRule = rules[ ruleList[ ruleCount ][0] ]
+    ruleRepeats = int( ruleList[ruleCount][1] )
+
     #get a random set for every round, if wanted
     if RANDOMIZE_CATEGORY_CARDS:
         SetupCategoryCards( tgtCards )
+        stimCards[0].setImage( tgtCards[0]['fn'] )
+        stimCards[1].setImage( tgtCards[1]['fn'] )
+        stimCards[2].setImage( tgtCards[2]['fn'] )
+        stimCards[3].setImage( tgtCards[3]['fn'] )
         
     NextTrial()
 
     cardCount +=1
     
     if DEBUG:
-        DebugMsg( 'CurRule: ' + currentRule )
+        DebugMsg( 'CurRule: ' + str(currentRule) )
     
 #    ClockTimes()
 #    WaitKeyEvents()
@@ -353,49 +407,71 @@ while ruleCount < RULE_COUNT: #True: #not CheckForEndCondition() :
 
 #    win.flip() -> moved to nextTrial
 
+    answerCorrect = False
+
     keys = event.waitKeys()
     if keys[0]=='escape':
         break
     elif keys[0] == 'up':
         if CheckCard( 0, currentRule, currentTgt ):
+            answerCorrect = True
             ShowInstruction('RIGHT', 1)
+            #frameCard( up )
             rightAnswers += 1
         else:
             ShowInstruction('WROOONG', 1)
-    elif keys[0] == 'left':
+    elif keys[0] == 'right':
         if CheckCard( 1, currentRule, currentTgt ):
+            answerCorrect = True
             ShowInstruction('RIGHT', 1)
             rightAnswers += 1
         else:
             ShowInstruction('WROOONG', 1)
     elif keys[0] == 'down':
         if CheckCard( 2, currentRule, currentTgt ):
+            answerCorrect = True
             ShowInstruction('RIGHT', 1)
             rightAnswers += 1
         else:
             ShowInstruction('WROOONG', 1)
-    elif keys[0] == 'right':
+    elif keys[0] == 'left':
         if CheckCard( 3, currentRule, currentTgt ):
+            answerCorrect = True
             ShowInstruction('RIGHT', 1)
             rightAnswers += 1
         else:
             ShowInstruction('WROOONG', 1)
 
-    if rightAnswers % 5 == 0:
-        rightAnswers = 0
-        currentRule = rules[randint(0,3)]
+    if answerCorrect:
+        if currentRule == 'G1':
+            triggerAndLog( portCodes['respRight'] | portCodes['rule1'], 'RESP 1 ' + currentRule )
+        if currentRule == 'G2':
+            triggerAndLog( portCodes['respRight'] | portCodes['rule2'], 'RESP 1 ' + currentRule )
+        if currentRule == 'L1':
+            triggerAndLog( portCodes['respRight'] | portCodes['rule3'], 'RESP 1 ' + currentRule )
+        if currentRule == 'L2':
+            triggerAndLog( portCodes['respRight'] | portCodes['rule4'], 'RESP 1 ' + currentRule )
+    else:
+        if currentRule == 'G1':
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule1'], 'RESP 0 ' + currentRule )
+        if currentRule == 'G2':
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule2'], 'RESP 0 ' + currentRule )
+        if currentRule == 'L1':
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule3'], 'RESP 0 ' + currentRule )
+        if currentRule == 'L2':
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule4'], 'RESP 0 ' + currentRule )
 
-#elif keys[0]=='1':
-#    rightAnswers += 1
-#    nextTrial()
-#else:
-#print keys
 
-#end test
-
-#SyncPort()
-#ShowInstruction( thanks )
-#SaveResults()
+    #if enough right answers given, update rule
+    logThis( 'repeats: ' + str( rightAnswers ) + '/' + str( ruleRepeats ) )
+#    if rightAnswers % ruleList[ruleCount][1] == 0:
+    if answerCorrect:
+        if rightAnswers % ruleRepeats == 0:
+            logThis( 'changing rule from ' + currentRule ) 
+            ruleCount += 1
+            rightAnswers = 0
+            currentRule = rules[ruleList[ruleCount][0]]
+            logThis( '...to ' + currentRule ) 
 
 # - CLEANUP -------------------------------------------------------------------------------------
 
