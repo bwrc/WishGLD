@@ -32,17 +32,23 @@ for i in range(16):
 #    faces.append( Image.open('C:\\Kride\\Projects\\ReKnow\\WCST\\shinedef1by1\\ltr' + '%01d' % (i+1,) + ' (Custom).png') )
 
 #equiluminant colors
-col1 = (35/255.0, 197/255.0, 79/255.0)
-col2 = (196/255.0, 171/255.0, 3/255.0) # NOT APPENDED
-col3 = (255/255.0, 114/255.0, 75/255.0)
-col4 = (222/255.0, 134/255.0, 255/255.0)
-col5 = (0/255.0, 191/255.0, 187/255.0) 
+#col1 = (35/255.0, 197/255.0, 79/255.0)
+#col2 = (196/255.0, 171/255.0, 3/255.0) # NOT APPENDED
+#col3 = (255/255.0, 114/255.0, 75/255.0)
+#col4 = (222/255.0, 134/255.0, 255/255.0)
+#col5 = (0/255.0, 191/255.0, 187/255.0) 
+
+#new equiluminant colors based on the paper
+col1 = '#DB9D85'
+col2 = '#86B875'
+col3 = '#4cB9CC'
+col4 = '#CD99D8'
 
 colors = []
 colors.append( col1 )
+colors.append( col2 )
 colors.append( col3 )
 colors.append( col4 )
-colors.append( col5 )
 
 #SHAPES
 featTriangle = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
@@ -64,6 +70,8 @@ featArrow = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lin
                          fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
                          vertices=((0, 10), (8, 0), (4,0), (4, -10), (-4,-10), (-4, 0), (-8, 0), (0,10)), 
                          closeShape=True )
+
+featBlob = visual.GratingStim(win, tex='sin', mask='gauss', sf=.01, size=26, color=(0.0, 0.0, 0.0), colorSpace='rgb') #BLOB
 
 #not used
 #featDrop = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
@@ -89,11 +97,13 @@ feats.append( featDiamond )
 feats.append( featHouse )
 feats.append( featArrow )
 
+#feats.append( featBlob ) # BLOB
+
 step = IMG_W/DIMX
 half = -1*IMG_W/2 #image coords are centered
 
 PREVAIL_COL_RATIO = 0.5
-N_OF_FACES = 18
+N_OF_FACES = 16
 N_OF_FEATS = 4
 SAVE_FRAMES = True
 N_OF_BINS = 26
@@ -142,9 +152,9 @@ for faceN in range( N_OF_FACES ):
 
             colPerBin.append( colInBin )
 
-        for featN in range( 4):# N_OF_FEATS ):
+        for featN in range( 4):#,5):# N_OF_FEATS ): #BLOB should be range(4) -> blob on viides feature
 
-            for featOrientation in range( 4 ): 
+            for featOrientation in range( 4 ):# BLOB ->1, should be 4 ): 
 
                 currentPixel = 0
 
@@ -173,8 +183,9 @@ for faceN in range( N_OF_FACES ):
 
                     feats[featN].fillColor = colors[c]
                     feats[featN].lineColor = colors[c]
+                    #feats[featN].color = colors[c] #BLOB
                     feats[featN].ori = 45+ 90*featOrientation
-                    feats[featN].size = (sz, sz)
+                    feats[featN].size = (sz, sz)#(26*sz, 26*sz) #BLOB needs the size in pixels -> no blob, kerroin pois
                     feats[featN].draw( win )
 
                     currentPixel += 1

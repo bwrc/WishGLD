@@ -38,8 +38,10 @@ portCodes = {'clear' : 0x00,\
              'rule2' : 0x02,\
              'rule3' : 0x04,\
              'rule4' : 0x08,\
-             'cue'   : 0x10,\
-             'tgtOn' : 0x20,\
+             'cue'   : 0xf0,\
+             'feedback'   : 0x0f,\
+             'stimOn'   : 0x10,\
+             'refsOn' : 0x20,\
              'respRight' : 0x40,\
              'respWrong' : 0x80,\
              'start': 0xfe,\
@@ -50,26 +52,40 @@ portCodes = {'clear' : 0x00,\
 0xfe start
 0xff stop
 
-0x10 cue
-0x01 .. 0x08 stim on/off? + stim category
-
+0x10 stimulus card on 
 0x20 targets on (only if stim presented separately)
 
 responses
 
-0x40 + 0x01..0x08 right + rule
-0x80 + 0x01..0x08 wrong + guess
+0x40 + 0x01..0x04 right + rule
+0x80 + 0x01..0x04 wrong + guess
 
-use: writePort( respRight | rule1 )
+use: 
+    writePort( tgtOn | rule1 )
+    writePort( respRight | rule1 )
+    writePort( respWrong | rule2 ) #where rule2 would be impossible to deduce, since we don't know what the user meant?
 
 """
 
 #parallel.setPortAddress(0x0378) #<-- add this for parallel triggering
+
 def SelectCardSubset( subSetCount, deckSize ):
+
+    if( subSetCount > deckSize ):
+        print('Trying to select %1d cards out of %1d cards. NOT POSSIBLE!')
+        return []
+
     """Selects a random set of subSetCount cards from a deck of deckSize cards."""
     cards =[]
-    for i in range( subSetCount ):
-        cards.append( randint(0, deckSize-1) )
+
+    for i in range(subSetCount):
+        cn = randint( 0, deckSize-1)
+        while cn in cards:
+            #print 'omg: %01d:%01d' % (i, cn)
+            cn = randint( 0, deckSize-1)
+            
+        cards.append( cn )
+
     return cards
 
 #selects a random value [0..n-1], where the value != skip
@@ -173,6 +189,12 @@ def SetupCategoryCards( cards, randomOrder = True ):
             if DEBUG:
                 print cards[idx]['fn']
 
+    cardstr = ''
+    for idx in range(4):
+        cardstr += '%01d: %01d,%01d,%01d,%01d | ' % ( idx, deck[ feat1[idx]], feat2[idx], feat3[idx], feat4[idx]) 
+
+    logThis( 'Using deck: ' + cardstr );
+
     return True
 
 def DebugMsg( msg ):
@@ -187,8 +209,10 @@ def SetupTrial( ):
     global tgtCards
     
     currentRule = rules[ ruleList[ ruleCount ][0] ]
-    print 'CURRENTRULE = ' + currentRule
     ruleRepeats = int( ruleList[ruleCount][1] )
+
+    if DEBUG:
+        print 'CURRENTRULE = ' + currentRule
 
     #get a random set for every round, if wanted
     if RANDOMIZE_CATEGORY_CARDS:
@@ -200,15 +224,20 @@ def SetupTrial( ):
 
 def GetStimCard( tgtCards ):
     
-    print tgtCards
+    #if DEBUG:
+    #    print tgtCards
     
     match = [0, 1, 2, 3]
     match = randomizeOrder( match )
     
-    sc = [ tgtCards[0][rules[match[0]]],\
-           tgtCards[1][rules[match[1]]],\
-           tgtCards[2][rules[match[2]]],\
-           tgtCards[3][rules[match[3]]] ]
+#    sc = [ tgtCards[0][rules[match[0]]],\
+#           tgtCards[1][rules[match[1]]],\
+#           tgtCards[2][rules[match[2]]],\
+#           tgtCards[3][rules[match[3]]] ]
+    sc = [ tgtCards[match[0]][rules[0]],\
+           tgtCards[match[1]][rules[1]],\
+           tgtCards[match[2]][rules[2]],\
+           tgtCards[match[3]][rules[3]] ]
            
     return sc
 
@@ -219,82 +248,75 @@ def GetResponse():
     #answerCorrect = False
 
     retVal = 0 #if not modified, breaks the task
+    answerPressed = -1 # which card was selected?
 
     keys = event.waitKeys()
     if keys[0]=='escape':
         retVal = 0
     elif keys[0] == 'up':
         if CheckCard( 0, currentRule, currentTgt ):
-            #answerCorrect = True
-            #ShowInstruction('RIGHT', 1)
             rightAnswers += 1
             retVal = 1
         else:
             retVal = -1
-            #ShowInstruction('WROOONG', 1)
     elif keys[0] == 'right':
         if CheckCard( 1, currentRule, currentTgt ):
-            #answerCorrect = True
-            #ShowInstruction('RIGHT', 1)
             rightAnswers += 1
             retVal = 2
         else:
             retVal = -2
-            #ShowInstruction('WROOONG', 1)
     elif keys[0] == 'down':
         if CheckCard( 2, currentRule, currentTgt ):
-            #answerCorrect = True
-            #ShowInstruction('RIGHT', 1)
             rightAnswers += 1
             retVal = 3
         else:
             retVal = -3
-            #ShowInstruction('WROOONG', 1)
     elif keys[0] == 'left':
         if CheckCard( 3, currentRule, currentTgt ):
-            #answerCorrect = True
-            #ShowInstruction('RIGHT', 1)
             rightAnswers += 1
             retVal = 4
         else:
-            #ShowInstruction('WROOONG', 1)
             retVal = -4
             
     if retVal > 0:
         gameScore += 1
         if currentRule == 'G1':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule1'], 'RESP 1 ' + currentRule )
+           triggerAndLog( portCodes['respRight'] | portCodes['rule1'], 'RESP   1 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'G2':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule2'], 'RESP 1 ' + currentRule )
+            triggerAndLog( portCodes['respRight'] | portCodes['rule2'], 'RESP   1 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'L1':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule3'], 'RESP 1 ' + currentRule )
+            triggerAndLog( portCodes['respRight'] | portCodes['rule3'], 'RESP   1 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'L2':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule4'], 'RESP 1 ' + currentRule )
+            triggerAndLog( portCodes['respRight'] | portCodes['rule4'], 'RESP   1 ' + currentRule + ' ANSWER ' + str(retVal) )
     elif retVal < 0:
         gameScore -= 1
         if currentRule == 'G1':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule1'], 'RESP 0 ' + currentRule )
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule1'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'G2':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule2'], 'RESP 0 ' + currentRule )
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule2'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'L1':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule3'], 'RESP 0 ' + currentRule )
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule3'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'L2':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule4'], 'RESP 0 ' + currentRule )
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule4'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
 
-    #if enough right answers given, update rule
-    logThis( 'repeats: ' + str( rightAnswers ) + '/' + str( ruleRepeats ) )
-#    if rightAnswers % ruleList[ruleCount][1] == 0:
-    if retVal > 0:
-        if rightAnswers % ruleRepeats == 0: # rightAnswers can't be 0 here since retVal wouldn't be > 0
-            logThis( 'changing rule from ' + currentRule ) 
-            ruleCount += 1
-            rightAnswers = 0
-            currentRule = rules[ruleList[ruleCount][0]]
-            logThis( '...to ' + currentRule ) 
+#    #if enough right answers given, update rule
+#    if retVal > 0:
+#        if rightAnswers % ruleRepeats == 0: # rightAnswers can't be 0 here since retVal wouldn't be > 0
+#            #logThis( 'changing rule from ' + currentRule ) 
+#            ruleCount += 1
+#            rightAnswers = 0
+#            currentRule = rules[ruleList[ruleCount][0]]
+#            #logThis( '...to ' + currentRule ) 
     
     return retVal
 
 def GiveFeedback( taskType, fbVal ):
+
+    if fbVal > 0:
+        triggerAndLog( portCodes['feedback'], 'FEEDB  CORRECT ' + str(rightAnswers) + ' of ' + str(ruleRepeats) );
+    else:
+        triggerAndLog( portCodes['feedback'], 'FEEDB  FAIL ' + str(rightAnswers) + ' of ' + str(ruleRepeats) );
+        
     if taskType == 1:
         if fbVal > 0:
             ShowInstruction('RIGHT', 1)
@@ -361,6 +383,7 @@ def fixCross(duration):
     fc.pos = (0, 0)
     fc.draw( win )
     win.flip()
+    triggerAndLog( portCodes['cue'], 'CUE' ) 
     core.wait(duration)
     #win.flip()
 
@@ -375,8 +398,21 @@ def NextTrial( tasktype ):
     #               randint(0, 3) )
 
     currentTgt = GetStimCard( tgtCards )
-    print 'stimcard'
-    print currentTgt
+    #major debug
+    for t in tgtCards:
+        count = 0
+        for i in range(4):
+            if currentTgt[i] == t[rules[i]]:
+                count += 1
+        if count > 1:
+            print 'VITTUSAATANA-----------------------------------------------'
+            print currentTgt
+            print tgtCards
+            print '-----------------------------------------------------------'
+
+    if DEBUG:
+        print 'stimcard'
+        print currentTgt
 
     fn = stimPath + '%02d_%02d_%02d_%02d.png' % (deck[currentTgt[0]], currentTgt[1], currentTgt[2], currentTgt[3]) 
     tgtCard.setImage( fn )
@@ -394,7 +430,7 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['cue'], 'STIM ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) )
+                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule )
 
         win.flip() #clear
 
@@ -405,13 +441,12 @@ def NextTrial( tasktype ):
             c.draw(win)
 
         if DEBUG:
-            logThis( 'cr: ' + str(currentRule) )
             DebugMsg( 'current rule ' + str(currentRule) )
 
         win.flip()
 
-        triggerAndLog( portCodes['tgtOn'], \
-                'TGT ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+        triggerAndLog( portCodes['refsOn'], \
+                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
                        + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
                        + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
                        + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
@@ -426,7 +461,7 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['cue'], 'STIM ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) )
+                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule)
 
         win.flip() #clear
 
@@ -437,13 +472,12 @@ def NextTrial( tasktype ):
             c.draw(win)
 
         if DEBUG:
-            logThis( 'cr: ' + str(currentRule) )
             DebugMsg( 'current rule ' + str(currentRule) )
 
         win.flip()
 
-        triggerAndLog( portCodes['tgtOn'], \
-                'TGT ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+        triggerAndLog( portCodes['refsOn'], \
+                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
                        + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
                        + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
                        + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
@@ -459,7 +493,7 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['cue'], 'STIM ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) )
+                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule)
 
         win.flip() #clear
 
@@ -467,13 +501,12 @@ def NextTrial( tasktype ):
             c.draw(win)
 
         if DEBUG:
-            logThis( 'cr: ' + str(currentRule) )
             DebugMsg( 'current rule ' + str(currentRule) )
 
         win.flip( clearBuffer= False ) # keep the cards in the backbuffer for feedback
 
-        triggerAndLog( portCodes['tgtOn'], \
-                'TGT ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+        triggerAndLog( portCodes['refsOn'], \
+                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
                        + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
                        + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
                        + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
@@ -486,13 +519,13 @@ def NextTrial( tasktype ):
             c.draw(win)
 
         if DEBUG:
-            logThis( 'cr: ' + str(currentRule) )
             DebugMsg( 'current rule ' + str(currentRule) )
 
         win.flip( ) # keep the cards in the backbuffer for feedback
 
-        triggerAndLog( portCodes['tgtOn'], \
-                'TGT ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+    # TODO concurrent presentation not compatible with logging scheme?
+        triggerAndLog( portCodes['stimOn'], \
+                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
                        + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
                        + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
                        + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
@@ -514,7 +547,7 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['cue'], 'STIM ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) )
+                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule )
 
         win.flip() #clear
 
@@ -522,13 +555,12 @@ def NextTrial( tasktype ):
             c.draw(win)
 
         if DEBUG:
-            logThis( 'cr: ' + str(currentRule) )
             DebugMsg( 'current rule ' + str(currentRule) )
 
         win.flip( clearBuffer= False ) # keep the cards in the backbuffer for feedback
 
-        triggerAndLog( portCodes['tgtOn'], \
-                'TGT ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+        triggerAndLog( portCodes['refsOn'], \
+                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
                        + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
                        + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
                        + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
@@ -556,7 +588,33 @@ def ShowInstruction( txt, duration, col=(0.0, 0.0, 0.0) ):
 
     win.flip() #clear screen
     
+def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 
+    instr = visual.TextStim( win, text=txt, pos=(0,-50), color=col, colorSpace='rgb', height=50 )
+
+    pic = visual.ImageStim( win );
+    pic.setImage( picFile );
+
+    h = pic.size
+
+    picpos = ( 0, h[1]/2 + 20 )
+    textpos = ( 0, -1* instr.height/2 - 10)
+
+    pic.setPos( picpos );
+    pic.draw( win );
+
+    instr.setPos( textpos )
+    instr.draw(win)
+
+
+    win.flip()
+    if duration < 0:
+        event.waitKeys()
+    else:
+        core.wait( duration )
+
+    win.flip() #clear screen
+    
 
 def CheckCard( stimNum, currentRule, currentTgt ):
     cardOK = False
@@ -582,6 +640,17 @@ def CheckCard( stimNum, currentRule, currentTgt ):
     else:
         return False
 
+def ShowTestInstructions():
+    instr = open('.\instructions.txt')
+    txt = instr.read()
+    lines = txt.splitlines()
+    
+    for i in range( len(lines) ):
+#        print '<' + lines[i] + '>'
+        if( i % 2 == 0 ):
+                ShowPicInstruction( lines[i], -1, lines[i+1], 1)
+    
+    #ShowPicInstruction( 'here be\ntext\nbe text\nbe text', -1, tgtCards[0]['fn'], 1)
 
 # - MAIN PROG -------------------------------------------------------------------------------------
 
@@ -604,6 +673,8 @@ myDlg.addField('Select presentation mode', choices=["1 :: Sequential, Feedback:R
                                                      "5 :: Gamify"\
                                                      ])
 myDlg.addField('Group:', choices=["Test", "Control"])
+
+myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 
 myDlg.show()  # show dialog and wait for OK or Cancel
 
@@ -632,12 +703,18 @@ if confInfo[4] == 0:
 else:
     logThis('Group: Control')
 
+startWithInstructions = False
+if confInfo[5] == 'Yes':
+    startWithInstructions = True
+
 logThis('--------------------------------------------------------')
 
 logThis('INFO')
-logThis('timestamp STIM state for each rule G1 G2 L1 L2 : 0,1,2,3')
-logThis('timestamp TGT states for each card / Up, Right, Down, Left: 0,1,2,3; 0,1,2,3;...') 
-logThis('timestamp RESP correct: 1, 0; rule used: G1, G2, L1, L2 ')
+logThis('timestamp CUE')
+logThis('timestamp STIM  [state for each rule G1 G2 L1 L2 : 0,1,2,3] RULE [current rule]')
+logThis('timestamp TGT   [states for each card / Up, Right, Down, Left: 0,1,2,3; 0,1,2,3;...]') 
+logThis('timestamp RESP  [correct: 1/0] [current rule: G1, G2, L1, L2] ANSWER [card selected: 1(up), 2(right), 3(down), 4(left)]')
+logThis('timestamp FEEDB [correct/fail] [correct answers] of [series length]')
 logThis('--------------------------------------------------------')
 logThis('\n')
 
@@ -660,7 +737,7 @@ myMon=monitors.Monitor('dell', width=37.8, distance=50); myMon.setSizePix((1920,
 
 #pygame detects screen size correctly, but draws on a 1280x720 surface??
 #pyglet reports the screen size as 1280x720
-win = visual.Window( winType='pyglet', size=(1920, 1080),units='pix',fullscr=True, monitor=myMon, rgb=(1,1,1))
+win = visual.Window( winType='pyglet', size=(1920, 1080),units='pix',fullscr=True, monitor=myMon, rgb=(1,1,1)) # set screen=1 for multiple monitors
 #win = visual.Window( winType='pyglet', size=(1920, 1200),units='pix',fullscr=True, monitor=myMon, rgb=(1,1,1))
 #win = visual.Window( winType='pyglet', size=(3200, 1800),units='pix',fullscr=True, monitor=myMon, rgb=(1,1,1))
 
@@ -726,8 +803,11 @@ tgtCard = visual.ImageStim( win, pos=( 0, 0 ) )
 
 # - BEGIN -------------------------------------------------------------------------
 
-ShowInstruction( 'start', -1 )
-
+if( startWithInstructions == True ):
+    ShowTestInstructions()
+else:
+    ShowInstruction( 'start', -1 )
+    
 #start test
 
 global cardCount; cardCount = 0
@@ -739,18 +819,28 @@ global lastScore; lastScore = 0
 
 #run test type based on confInfo
 
-while ruleCount < RULE_COUNT: #True: #not CheckForEndCondition() :
+while ruleCount < (RULE_COUNT-1): #-1 because ruleCount gets upped before setting currentRule
 
     SetupTrial()
     NextTrial( taskType )
     answer = GetResponse()
+
     if answer == 0:
         break
     else:
         GiveFeedback( taskType, answer )
 
-    cardCount +=1
+    #if enough right answers given, update rule
+    #moved from getresponse
+    if answer > 0:
+        if rightAnswers % ruleRepeats == 0: # rightAnswers can't be 0 here since retVal wouldn't be > 0
+            #logThis( 'changing rule from ' + currentRule ) 
+            ruleCount += 1
+            rightAnswers = 0
+            currentRule = rules[ruleList[ruleCount][0]]
+            #logThis( '...to ' + currentRule ) 
 
+    cardCount +=1
 
 # - CLEANUP -------------------------------------------------------------------------------------
 
