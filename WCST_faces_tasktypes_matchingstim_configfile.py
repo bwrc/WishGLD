@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 """
 WCST experiment / ReKnow
@@ -9,90 +10,112 @@ TODO:
     - if working from a csv file for rule sequences: check path, and delimiter
     - check globals for configuring the test
 
-
+    - replace parallel with Marco's code!
 
 """
-
 from random import randint, random, seed
 from psychopy import visual,core,monitors,event,gui, logging#, parallel
 from copy import deepcopy
 import csv
-from datetime import datetime #for date
+from datetime import datetime
 import json
 import NewDlg #allows setting the length of textfields
 
 # - GLOBALS -------------------------------------------------------------------------------------------
 global DEBUG; DEBUG = True
 global RANDOMIZE_CATEGORY_CARDS; RANDOMIZE_CATEGORY_CARDS = False
-global USE_RANDOM_RULES; USE_RANDOM_RULES = False # True
 global RULE_COUNT; RULE_COUNT = 20 #if read from file, this will be overridden
-global SEPARATE_STIM; SEPARATE_STIM = True
 global SEP_STIM_DURATION; SEP_STIM_DURATION = 20 #n of frames (16ms)
-global N_OF_CARDS; N_OF_CARDS = 16
-
-global PRESENTATION_MODE; PRESENTATION_MODE = 0
-
+global N_OF_CARDS; N_OF_CARDS = 4 #this is now fixed for each stim folder!
+global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face, color, shape, orientation
 global portCodes;
-portCodes = {'clear' : 0x00,\
-             'rule1' : 0x01,\
-             'rule2' : 0x02,\
-             'rule3' : 0x04,\
-             'rule4' : 0x08,\
-             'cue'   : 0xf0,\
-             'feedback'   : 0x0f,\
-             'stimOn'   : 0x10,\
-             'refsOn' : 0x20,\
-             'respRight' : 0x40,\
-             'respWrong' : 0x80,\
-             'start': 0xfe,\
-             'stop': 0xff}
-             
+
 """
-0x00 clear
-0xfe start
-0xff stop
-
-0x10 stimulus card on 
-0x20 targets on (only if stim presented separately)
-
-responses
-
-0x40 + 0x01..0x04 right + rule
-0x80 + 0x01..0x04 wrong + guess
+'clear'     : 0
+'rule1'     : 1
+'rule2'     : 2
+'rule3'     : 3
+'rule4'     : 4
+'start'     : 10
+'stop'      : 20
+'cue'       : 30
+'feedback'  : 40
+'stimOn'    : 50
+'refsOn'    : 60
+'respRight' : 100
+'respWrong' : 200
 
 use: 
-    writePort( tgtOn | rule1 )
-    writePort( respRight | rule1 )
+    writePort( stimOn | rule1 ) -> 51 
+    writePort( respRight | rule1 ) -> 101
     writePort( respWrong | rule2 ) #where rule2 would be impossible to deduce, since we don't know what the user meant?
 
 """
+portCodes = {'clear' : 0x00,\
+             'rule1' : 0x01,\
+             'rule2' : 0x02,\
+             'rule3' : 0x03,\
+             'rule4' : 0x04,\
+             'cue'   : 0x1e,\
+             'feedback'   : 0x28,\
+             'stimOn'   : 0x32,\
+             'refsOn' : 0x3c,\
+             'respRight' : 0x64,\
+             'respWrong' : 0xC8,\
+             'start': 0x0a,\
+             'stop': 0x14}
 
 #parallel.setPortAddress(0x0378) #<-- add this for parallel triggering
 
-def ShowInstructionSequence( instrFile ):
-    print instrFile
-    
-def RunSequence( seqFile ):
-    print seqFile
+def ShowInstructionSequence( instrSequence ):
+    for item in instrSequence['pages']:
+        ShowPicInstruction( unicode(item['text']),-1, item['pic'], 1)
 
+def RunSequence( sequence ):
+    #setup rules
+    global rules
+    global currentRule
+    global ruleList; ruleList = [] #a list of tuples containing the sequence of sorting rules (0, 1, 2, 3) and required n of correct repeats per set(5, 6, 7)
+    for item in sequence['segments']:
+        ruleList.append( (int(item['rule']), int(item['reps'])) )
+    global RULE_COUNT; RULE_COUNT = len( ruleList )
+    global ruleCount, cardCount, rightAnswers;
 
+    ShowInstruction( u'Aloita painamalla jotain näppäintä', -1 )
+
+    while ruleCount < RULE_COUNT: 
+        currentRule = rules[ruleList[ruleCount][0]]
+        SetupTrial()
+        NextTrial( taskType )
+        answer = GetResponse()
+
+        if answer == 0: #ESC
+            break
+        else:
+            GiveFeedback( taskType, answer )
+
+        #if enough right answers given, update rule
+        if answer > 0:
+            if rightAnswers % ruleRepeats == 0: # rightAnswers can't be 0 here since retVal wouldn't be > 0
+                ruleCount += 1
+                rightAnswers = 0
+                logging.flush() #now with every rule change!
+
+        cardCount +=1
+
+#Selects a random set of subSetCount cards from a deck of deckSize cards.
 def SelectCardSubset( subSetCount, deckSize ):
-
     if( subSetCount > deckSize ):
-        print('Trying to select %1d cards out of %1d cards. NOT POSSIBLE!')
+        print('Trying to select %1d cards out of %1d cards. NOT POSSIBLE!' % (subSetCount, deckSize))
         return []
 
-    """Selects a random set of subSetCount cards from a deck of deckSize cards."""
     cards =[]
 
     for i in range(subSetCount):
         cn = randint( 0, deckSize-1)
         while cn in cards:
-            #print 'omg: %01d:%01d' % (i, cn)
             cn = randint( 0, deckSize-1)
-            
         cards.append( cn )
-
     return cards
 
 #selects a random value [0..n-1], where the value != skip
@@ -104,6 +127,7 @@ def randomValue( n, skip ):
 
 #selects a reference card that 
 #given a target card [A, B, C, D] only matches on one feature
+#NOT USED
 def selectRefCard( tgtCard, matchFeat ):
     if matchFeat == 0:
         rc = ( tgt[0],\
@@ -126,39 +150,6 @@ def selectRefCard( tgtCard, matchFeat ):
                randomValue( 4, tgtCard[2] ),\
                tgt[3] )
     return rc
-
-#setup paths
-#global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\facecards\\'
-#global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\shinned\\letters\\'
-global stimPath; stimPath = 'c:\\Kride\\Projects\\ReKnow\\WCST\\shinned\\faces\\'
-global ruleFile; ruleFile = '.\\sets.csv'
-
-#setup rules
-global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face, color, shape, orientation
-global currentRule; #currentRule = rules[randint(0,3)]
-global ruleList; ruleList = [] #a list of tuples containing the sequence of sorting rules (0, 1, 2, 3) and required n of correct repeats per set(5, 6, 7)
-
-#setup deck of four cards from the whole deck
-deck = SelectCardSubset( 4, N_OF_CARDS )
-
-#ruleList is a list of sorting rules and their durations
-if USE_RANDOM_RULES == False: #load from ruleFile
-    rf = open( ruleFile, 'rb' )
-    reader = csv.reader( rf, delimiter=';' )
-
-    for row in reader:
-        ruleList.append( ( int(row[0])-1, int(row[1]) ) )
-    rf.close()
-    RULE_COUNT = len( ruleList )
-    
-    
-else: #generate random set of RULE_COUNT tuples
-    for i in range( RULE_COUNT ):
-        ruleList.append( (randint(0, 3), randint(5, 7)) )
-
-global currentTgt; currentTgt = (-1, -1, -1, -1)
-
-# - FUNCTION DEFS -------------------------------------------------------------------------------------
 
 def randomizeOrder( lst ):
     return sorted(lst, key=lambda k: random())
@@ -183,9 +174,7 @@ def SetupCategoryCards( cards, randomOrder = True ):
         print 'setup card count: ' + str(len(cards))
         DebugMsg( 'You have to supply 4 cards for setup' )
         return False
-        
     else:
-
         for idx in range(4):
             cards[idx]['G1'] = feat1[idx]
             cards[idx]['G2'] = feat2[idx]
@@ -199,7 +188,6 @@ def SetupCategoryCards( cards, randomOrder = True ):
     cardstr = ''
     for idx in range(4):
         cardstr += '%01d: %01d,%01d,%01d,%01d | ' % ( idx, deck[ feat1[idx]], feat2[idx], feat3[idx], feat4[idx]) 
-
     logThis( 'Using deck: ' + cardstr );
 
     return True
@@ -208,13 +196,11 @@ def DebugMsg( msg ):
     txt = visual.TextStim( win, text=msg, pos=(150, 480), color=(1.0, 0.0, 0.0), colorSpace='rgb')
     txt.draw()
 
-def SetupTrial( ):
-
-# selects a stimcard matching one of each target card features
+def SetupTrial():
     global currentRule
     global ruleRepeats
     global tgtCards
-    
+
     currentRule = rules[ ruleList[ ruleCount ][0] ]
     ruleRepeats = int( ruleList[ruleCount][1] )
 
@@ -229,18 +215,12 @@ def SetupTrial( ):
         stimCards[2].setImage( tgtCards[2]['fn'] )
         stimCards[3].setImage( tgtCards[3]['fn'] )
 
+# selects a stim card that matches one of each feature of tgtCards
 def GetStimCard( tgtCards ):
-    
-    #if DEBUG:
-    #    print tgtCards
-    
+        
     match = [0, 1, 2, 3]
     match = randomizeOrder( match )
     
-#    sc = [ tgtCards[0][rules[match[0]]],\
-#           tgtCards[1][rules[match[1]]],\
-#           tgtCards[2][rules[match[2]]],\
-#           tgtCards[3][rules[match[3]]] ]
     sc = [ tgtCards[match[0]][rules[0]],\
            tgtCards[match[1]][rules[1]],\
            tgtCards[match[2]][rules[2]],\
@@ -252,12 +232,12 @@ def GetResponse():
     global currentRule, currentTgt, ruleCount, rightAnswers, gameScore
 
     event.clearEvents()
-    #answerCorrect = False
 
     retVal = 0 #if not modified, breaks the task
     answerPressed = -1 # which card was selected?
 
     keys = event.waitKeys()
+
     if keys[0]=='escape':
         retVal = 0
     elif keys[0] == 'up':
@@ -305,15 +285,6 @@ def GetResponse():
             triggerAndLog( portCodes['respWrong'] | portCodes['rule3'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'L2':
             triggerAndLog( portCodes['respWrong'] | portCodes['rule4'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
-
-#    #if enough right answers given, update rule
-#    if retVal > 0:
-#        if rightAnswers % ruleRepeats == 0: # rightAnswers can't be 0 here since retVal wouldn't be > 0
-#            #logThis( 'changing rule from ' + currentRule ) 
-#            ruleCount += 1
-#            rightAnswers = 0
-#            currentRule = rules[ruleList[ruleCount][0]]
-#            #logThis( '...to ' + currentRule ) 
     
     return retVal
 
@@ -392,34 +363,15 @@ def fixCross(duration):
     win.flip()
     triggerAndLog( portCodes['cue'], 'CUE' ) 
     core.wait(duration)
-    #win.flip()
 
 def NextTrial( tasktype ):
-
-    # select next random stimcard
     global currentTgt
     global currentRule
-    #currentTgt = ( randint(0, 3),\
-    #               randint(0, 3),\
-    #               randint(0, 3),\
-    #               randint(0, 3) )
 
     currentTgt = GetStimCard( tgtCards )
-    #major debug
-    for t in tgtCards:
-        count = 0
-        for i in range(4):
-            if currentTgt[i] == t[rules[i]]:
-                count += 1
-        if count > 1:
-            print 'VITTUSAATANA-----------------------------------------------'
-            print currentTgt
-            print tgtCards
-            print '-----------------------------------------------------------'
 
     if DEBUG:
-        print 'stimcard'
-        print currentTgt
+        print 'stimcard', currentTgt
 
     fn = stimPath + '%02d_%02d_%02d_%02d.png' % (deck[currentTgt[0]], currentTgt[1], currentTgt[2], currentTgt[3]) 
     tgtCard.setImage( fn )
@@ -431,7 +383,6 @@ def NextTrial( tasktype ):
 
         fixCross( 1 )
 
-#        if SEPARATE_STIM: #first show stimcard for a short period of SEP_STIM_DURATION (in refresh frames, x 16ms), then the target cards
         win.clearBuffer()
         for i in range( SEP_STIM_DURATION ): #accurate timing trick
             tgtCard.draw(win)
@@ -440,15 +391,9 @@ def NextTrial( tasktype ):
                 triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule )
 
         win.flip() #clear
-
-        #else: # show all cards at the same time
-        #        tgtCard.draw(win)
             
         for c in stimCards:
             c.draw(win)
-
-        if DEBUG:
-            DebugMsg( 'current rule ' + str(currentRule) )
 
         win.flip()
 
@@ -462,7 +407,6 @@ def NextTrial( tasktype ):
 
         fixCross( 1 )
 
-#        if SEPARATE_STIM: #first show stimcard for a short period of SEP_STIM_DURATION (in refresh frames, x 16ms), then the target cards
         win.clearBuffer()
         for i in range( SEP_STIM_DURATION ): #accurate timing trick
             tgtCard.draw(win)
@@ -471,15 +415,9 @@ def NextTrial( tasktype ):
                 triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule)
 
         win.flip() #clear
-
-        #else: # show all cards at the same time
-        #        tgtCard.draw(win)
             
         for c in stimCards:
             c.draw(win)
-
-        if DEBUG:
-            DebugMsg( 'current rule ' + str(currentRule) )
 
         win.flip()
 
@@ -507,9 +445,6 @@ def NextTrial( tasktype ):
         for c in stimCards:
             c.draw(win)
 
-        if DEBUG:
-            DebugMsg( 'current rule ' + str(currentRule) )
-
         win.flip( clearBuffer= False ) # keep the cards in the backbuffer for feedback
 
         triggerAndLog( portCodes['refsOn'], \
@@ -525,9 +460,6 @@ def NextTrial( tasktype ):
         for c in stimCards:
             c.draw(win)
 
-        if DEBUG:
-            DebugMsg( 'current rule ' + str(currentRule) )
-
         win.flip( ) # keep the cards in the backbuffer for feedback
 
     # TODO concurrent presentation not compatible with logging scheme?
@@ -538,8 +470,6 @@ def NextTrial( tasktype ):
                        + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
 
     elif taskType == 5: # 3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
-
-        #fixCross(0.5)
         
         global lastScore
         
@@ -561,9 +491,6 @@ def NextTrial( tasktype ):
         for c in stimCards:
             c.draw(win)
 
-        if DEBUG:
-            DebugMsg( 'current rule ' + str(currentRule) )
-
         win.flip( clearBuffer= False ) # keep the cards in the backbuffer for feedback
 
         triggerAndLog( portCodes['refsOn'], \
@@ -578,6 +505,7 @@ def NextTrial( tasktype ):
 def logThis( msg ):
     logging.log( msg, level=myLogLevel )
 
+#TODO: replace parallel stuff with Marco's solution
 def triggerAndLog( trigCode, msg, trigDuration=10 ):
     #parallel.setData( trigCode ) #<-- add this for parallel triggering
     logThis( msg )
@@ -597,7 +525,7 @@ def ShowInstruction( txt, duration, col=(0.0, 0.0, 0.0) ):
     
 def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 
-    instr = visual.TextStim( win, text=txt, pos=(0,-50), color=col, colorSpace='rgb', height=50 )
+    instr = visual.TextStim( win, text=txt, pos=(0,-50), color=col, colorSpace='rgb', height=25, wrapWidth=800, alignHoriz='center')
 
     pic = visual.ImageStim( win );
     pic.setImage( picFile );
@@ -613,7 +541,6 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
     instr.setPos( textpos )
     instr.draw(win)
 
-
     win.flip()
     if duration < 0:
         event.waitKeys()
@@ -622,7 +549,6 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 
     win.flip() #clear screen
     
-
 def CheckCard( stimNum, currentRule, currentTgt ):
     cardOK = False
 
@@ -646,18 +572,6 @@ def CheckCard( stimNum, currentRule, currentTgt ):
         return True
     else:
         return False
-
-def ShowTestInstructions():
-    instr = open('.\instructions.txt')
-    txt = instr.read()
-    lines = txt.splitlines()
-    
-    for i in range( len(lines) ):
-#        print '<' + lines[i] + '>'
-        if( i % 2 == 0 ):
-                ShowPicInstruction( lines[i], -1, lines[i+1], 1)
-    
-    #ShowPicInstruction( 'here be\ntext\nbe text\nbe text', -1, tgtCards[0]['fn'], 1)
 
 # - MAIN PROG -------------------------------------------------------------------------------------
 
@@ -693,7 +607,6 @@ if myDlg.OK:  # then the user pressed OK
     print confInfo
 else:
     print 'user cancelled'
-    win.close()
     core.quit()
 
 # SETUP LOGGING & CLOCKING
@@ -713,12 +626,7 @@ if confInfo[4] == 0:
 else:
     logThis('Group: Control')
 
-startWithInstructions = False
-if confInfo[5] == 'Yes':
-    startWithInstructions = True
-
 logThis('--------------------------------------------------------')
-
 logThis('INFO')
 logThis('timestamp CUE')
 logThis('timestamp STIM  [state for each rule G1 G2 L1 L2 : 0,1,2,3] RULE [current rule]')
@@ -732,61 +640,23 @@ logThis('\n')
 if confInfo[2] == 'No':
     RANDOMIZE_CATEGORY_CARDS = False
 else:
-    
     RANDOMIZE_CATEGORY_CARDS = True
-
-#if confInfo[3] == 'No':
-#    SEPARATE_STIM = False
-#else:
-#    SEPARATE_STIM = True
 
 #rendering window setup
 #myMon = monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
-myMon=monitors.Monitor('dell', width=37.8, distance=50); myMon.setSizePix((1920, 1080))
 #myMon=monitors.Monitor('dell', width=37.8, distance=50); myMon.setSizePix((1920, 1200))
+myMon=monitors.Monitor('dell', width=37.8, distance=50); myMon.setSizePix((1920, 1080))
 
-#pygame detects screen size correctly, but draws on a 1280x720 surface??
-#pyglet reports the screen size as 1280x720
 win = visual.Window( winType='pyglet', size=(1920, 1080),units='pix',fullscr=True, monitor=myMon, rgb=(1,1,1)) # set screen=1 for multiple monitors
 #win = visual.Window( winType='pyglet', size=(1920, 1200),units='pix',fullscr=True, monitor=myMon, rgb=(1,1,1))
 #win = visual.Window( winType='pyglet', size=(3200, 1800),units='pix',fullscr=True, monitor=myMon, rgb=(1,1,1))
 
-#init
-
-#SetupParams()
-
-#SETUP CARDS
-cardPrototype = {'G1':0, 'G2':0, 'L1':0, 'L2':0, 'fn':''}
-
-tgtCards = (deepcopy(cardPrototype), \
-            deepcopy(cardPrototype), \
-            deepcopy(cardPrototype), \
-            deepcopy(cardPrototype) )
-
-SetupCategoryCards( tgtCards )
-
-#552 = 2*256 + 40
-# cards in clockwise order: up, right, down, left
-
-# TARGET CARD POSITIONS
-"""
-#cross formation
-stimCards = ( visual.ImageStim( win, pos=( 0, 552) ), \
-              visual.ImageStim( win, pos=( 552, 0) ), \
-              visual.ImageStim( win, pos=( 0, -552) ), \
-              visual.ImageStim( win, pos=( -552, 0) ))
-"""
-
-#tight form
-#stimCards = ( visual.ImageStim( win, pos=( 0, 266) ), \
-#              visual.ImageStim( win, pos=( 522, 0) ), \
-#              visual.ImageStim( win, pos=( 0, -266) ), \
-#              visual.ImageStim( win, pos=( -522, 0) ))
-
 taskType = int( confInfo[3][0] ) # 1, 2, 3, ...
-
 global cardPos; cardPos = []
 
+# TARGET CARD POSITIONS
+#552 = 2*256 + 40
+# cards in clockwise order: up, right, down, left
 if taskType == 4: #concurrent presentation -> different format
     cardPos.append( (0, 522) )
     cardPos.append( (522, 0) )
@@ -799,70 +669,74 @@ else: # sequential -> tight format
     cardPos.append( (0, -266) )
     cardPos.append( (-522, 0) )
 
-stimCards = ( visual.ImageStim( win, pos=cardPos[0] ), \
-              visual.ImageStim( win, pos=cardPos[1] ), \
-              visual.ImageStim( win, pos=cardPos[2] ), \
-              visual.ImageStim( win, pos=cardPos[3] ) )
-
-stimCards[0].setImage( tgtCards[0]['fn'] )
-stimCards[1].setImage( tgtCards[1]['fn'] )
-stimCards[2].setImage( tgtCards[2]['fn'] )
-stimCards[3].setImage( tgtCards[3]['fn'] )
-
-tgtCard = visual.ImageStim( win, pos=( 0, 0 ) )
-
 # - BEGIN -------------------------------------------------------------------------
+global cardCount 
+global rightAnswers
+global ruleCount 
 
-confFile = open('.\\configs\\config1.json')
+global gameScore  #for the gamify mode
+global lastScore
+
+#SETUP CARDS 
+cardPrototype = {'G1':0, 'G2':0, 'L1':0, 'L2':0, 'fn':''}
+
+#setup deck of four cards from the whole deck
+deck = SelectCardSubset( 4, N_OF_CARDS )
+
+global currentTgt; currentTgt = (-1, -1, -1, -1)
+
+#TODO: ADD ERROR CHECKING! Here we trust the json files to be correctly formed and valid
+confFile = open( confInfo[6] )#'.\\configs\\config1.json')
 config = json.loads( confFile.read() )
 confFile.close()
 
+gameScore = 0
+lastScore = 0
+
 for item in config['test']:
     if( item['type'] == 'instruction'):
-        ShowInstructionSequence( item['file'] )
+        instrFile = open( item['file'] )
+        instrSequence = json.loads( instrFile.read() )
+        instrFile.close()
+        ShowInstructionSequence( instrSequence )
+        
     elif item['type'] == 'set':
-        RunSequence( item['file'] )
+        seqFile = open( item['file'] )
+        setSequence = json.loads( seqFile.read() )
+        seqFile.close()
+        logThis('Running set %s' % (item['file']) )
+
+        #run test type based on confInfo
+        global stimPath; stimPath = setSequence['set']['stimpath']
+
+        tgtCards = (deepcopy(cardPrototype), \
+                    deepcopy(cardPrototype), \
+                    deepcopy(cardPrototype), \
+                    deepcopy(cardPrototype) )
+
+        SetupCategoryCards( tgtCards )
+           
+        stimCards = ( visual.ImageStim( win, pos=cardPos[0] ), \
+                      visual.ImageStim( win, pos=cardPos[1] ), \
+                      visual.ImageStim( win, pos=cardPos[2] ), \
+                      visual.ImageStim( win, pos=cardPos[3] ) )
+
+        stimCards[0].setImage( tgtCards[0]['fn'] )
+        stimCards[1].setImage( tgtCards[1]['fn'] )
+        stimCards[2].setImage( tgtCards[2]['fn'] )
+        stimCards[3].setImage( tgtCards[3]['fn'] )
+
+        tgtCard = visual.ImageStim( win, pos=( 0, 0 ) )
+
+        cardCount = 0
+        rightAnswers = 0
+        ruleCount=0
+
+        RunSequence( setSequence['set'] )
+        
     else:
         print 'unidentified item type in config: ' + item['type']
-
-if( startWithInstructions == True ):
-    ShowTestInstructions()
-else:
-    ShowInstruction( 'start', -1 )
     
-#start test
-
-global cardCount; cardCount = 0
-global rightAnswers; rightAnswers = 0
-global ruleCount; ruleCount=0
-
-global gameScore; gameScore = 0 #for the gamify mode
-global lastScore; lastScore = 0
-
-#run test type based on confInfo
-
-while ruleCount < (RULE_COUNT-1): #-1 because ruleCount gets upped before setting currentRule
-
-    SetupTrial()
-    NextTrial( taskType )
-    answer = GetResponse()
-
-    if answer == 0:
-        break
-    else:
-        GiveFeedback( taskType, answer )
-
-    #if enough right answers given, update rule
-    #moved from getresponse
-    if answer > 0:
-        if rightAnswers % ruleRepeats == 0: # rightAnswers can't be 0 here since retVal wouldn't be > 0
-            #logThis( 'changing rule from ' + currentRule ) 
-            ruleCount += 1
-            rightAnswers = 0
-            currentRule = rules[ruleList[ruleCount][0]]
-            #logThis( '...to ' + currentRule ) 
-
-    cardCount +=1
 
 # - CLEANUP -------------------------------------------------------------------------------------
 

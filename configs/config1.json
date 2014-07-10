@@ -1,0 +1,20 @@
+{
+    "test": [
+        {"part": 1,
+         "type": "instruction",
+         "file": ".\\instructions\\start.json"
+        },
+        {"part": 2,
+         "type": "set",
+         "file": ".\\configs\\sets\\set1.json"
+        },
+        {"part": 3,
+         "type": "set",
+         "file": ".\\configs\\sets\\set2.json"
+        },		
+        {"part": 4,
+         "type": "instruction",
+         "file": ".\\instructions\\end.json"
+        }
+    ]
+}
