@@ -67,7 +67,7 @@ filter.append(['bow', 'bowsl'])
 gstims=['faces_final', 'letters_final']
 # cluster sets
 gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']
-lcltrsets=['ERSW', 'FGKP', 'JLTY']
+lcltrsets=['DERW', 'FGKP', 'JLTY']
 letter = lcltrsets[cluster][l1]
 
 # VISUAL FEATURES -----------------------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@ set pth=C:\Users\admin\OneDrive\ReKnow\PsychoPhysiology\experiment\code
 set py="C:\Program Files (x86)\PsychoPy2\python.exe"
 
 REM do the local letters for all clusters of global faces, letters, across two preprocessing modes, four colors, with four orientations
-for %%c in (0,1,2) do (
+for %%c in (0) do (
  for %%g in (0,1) do (
   for %%f in (0,1) do (
    for %%i in (0,1,2,3) do (
