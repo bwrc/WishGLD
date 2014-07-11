@@ -1,20 +1,21 @@
 {
     "test": [
-        {"part": 1,
-         "type": "instruction",
-         "file": ".\\instructions\\start.json"
-        },
         {"part": 2,
          "type": "set",
-         "file": ".\\configs\\sets\\set1.json"
+         "file": ".\\configs\\sets\\faces_of_letters_1.json"
         },
         {"part": 3,
          "type": "set",
-         "file": ".\\configs\\sets\\set2.json"
+         "file": ".\\configs\\sets\\faces_of_shapes_1.json"
         },		
         {"part": 4,
          "type": "instruction",
          "file": ".\\instructions\\end.json"
+        },
+        {"part": 1,
+         "type": "instruction",
+         "file": ".\\instructions\\baseline.json"
         }
+		
     ]
 }

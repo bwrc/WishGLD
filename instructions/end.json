@@ -1,6 +1,7 @@
 {
 	"pages" : [
-			 {"pic":  ".\\instructions\\pics\\empty.png", 
+			 {"pic":  "", 
+			  "duration": "-1",
 			  "text": "Koe päättyy\nKiitos osallistumisesta!" 
 			 }
 	]

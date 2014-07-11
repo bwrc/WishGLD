@@ -69,7 +69,7 @@ portCodes = {'clear' : 0x00,\
 
 def ShowInstructionSequence( instrSequence ):
     for item in instrSequence['pages']:
-        ShowPicInstruction( unicode(item['text']),-1, item['pic'], 1)
+        ShowPicInstruction( unicode(item['text']),int(item['duration']), item['pic'], 1)
 
 def RunSequence( sequence ):
     #setup rules
@@ -78,8 +78,10 @@ def RunSequence( sequence ):
     global ruleList; ruleList = [] #a list of tuples containing the sequence of sorting rules (0, 1, 2, 3) and required n of correct repeats per set(5, 6, 7)
     for item in sequence['segments']:
         ruleList.append( (int(item['rule']), int(item['reps'])) )
+    print 'RULELIST:', ruleList
     global RULE_COUNT; RULE_COUNT = len( ruleList )
     global ruleCount, cardCount, rightAnswers;
+    ruleCount = 0;
 
     ShowInstruction( u'Aloita painamalla jotain näppäintä', -1 )
 
@@ -525,21 +527,40 @@ def ShowInstruction( txt, duration, col=(0.0, 0.0, 0.0) ):
     
 def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 
-    instr = visual.TextStim( win, text=txt, pos=(0,-50), color=col, colorSpace='rgb', height=25, wrapWidth=800, alignHoriz='center')
+    hasPic = False; hasTxt = False
+    h = 0;
 
-    pic = visual.ImageStim( win );
-    pic.setImage( picFile );
+    if txt != "":
+        hasTxt = True
+        instr = visual.TextStim( win, text=txt, pos=(0,-50), color=col, colorSpace='rgb', height=25, wrapWidth=800, alignHoriz='center')
 
-    h = pic.size
+    if picFile != "":
+        hasPic = True
+        pic = visual.ImageStim( win );
+        pic.setImage( picFile );
+        h = pic.size
 
-    picpos = ( 0, h[1]/2 + 20 )
-    textpos = ( 0, -1* instr.height/2 - 10)
+    if hasTxt:
+        if hasPic:
+            textpos = ( 0, -1* instr.height/2 - 10)
+            picpos = ( 0, h[1]/2 + 20 )
+        else:
+            textpos = ( 0, 0 )
+            picpos = ( -2000, -2000 )
+    else:
+        picpos = (0, 0)
+        textpos = ( -2000, -2000 )
 
-    pic.setPos( picpos );
-    pic.draw( win );
+#    picpos = ( 0, h[1]/2 + 20 )
+#    textpos = ( 0, -1* instr.height/2 - 10)
 
-    instr.setPos( textpos )
-    instr.draw(win)
+    if hasPic:
+        pic.setPos( picpos );
+        pic.draw( win );
+
+    if hasTxt:
+        instr.setPos( textpos )
+        instr.draw(win)
 
     win.flip()
     if duration < 0:
