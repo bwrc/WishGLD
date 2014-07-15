@@ -8,7 +8,7 @@ import copy
 
 from PIL import Image
 
-def generator(globaltype, localtype, filtertype, cluster):
+def generator(globaltype, localtype, filtertype, cluster, sh):
 
     # CONSTANTS -------------------------------------------------------------------------------------------
     SAVE_FRAMES = True
@@ -56,10 +56,6 @@ def generator(globaltype, localtype, filtertype, cluster):
         outdir = outdir + str(cluster+1) + '_' + lctystr[ltype] + '_' + filter[gtype][ftype]
     else:
         outdir = outdir + '_' + lctystr[ltype]
-    outdir = outdir + '_cards' + s
-
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
 
     imgs = []
 
@@ -80,52 +76,94 @@ def generator(globaltype, localtype, filtertype, cluster):
     # VISUAL FEATURES ----------------------------------------------------------------------------------------------
     feats=[]
 
-    #SHAPES
+    # CONVEX SHAPES
     featTriangle = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0, 10), (8, -10), (-8, -10), (0, 10)), closeShape=True )
-                             
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(150, 200),\
+                             vertices=((0, 11), (7, -11), (-7, -11), (0, 11)), closeShape=True )
+
     featDiamond = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0, 10), (8, -6), (0,-10), (-8, -6), (0, 10)),\
-                             closeShape=True )
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(150, 150),\
+                             vertices=((0, 10), (8, -6), (0,-11), (-8, -6), (0, 10)), closeShape=True )
 
     featHouse = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0, 10), (5.7, 0), (5.7,-9), (-5.7, -9), (-5.7,0), (0, 10)), 
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(100, 150),\
+                             vertices=((0, 9.5), (6, 0), (6,-9), (-6, -9), (-6,0), (0, 9.5)), closeShape=True )
+
+    featDrop = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(100, 200),\
+                             vertices=((0, 10), (7, 0), (7, -4), (6, -6), (4, -7), (0,-9), (-4, -7), (-6, -6), (-7, -4), (-7, 0), (0, 10)), 
                              closeShape=True )
 
-    featArrow = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0, 10), (8, 0), (4,0), (4, -10), (-4,-10), (-4, 0), (-8, 0), (0,10)),\
+    # CONCAVE SHAPES
+    caveStartrek = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(25, 25),\
+                             vertices=((0, 11), (9, -11), (0,-6), (-9, -11), (0, 11)), closeShape=True )
+
+    caveSpeartip = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(25, -25),\
+                             vertices=((0, 10), (6, 2), (0, 0), (8, -6), (0,-10), (-8, -6), (0, 0), (-6, 2), (0, 10)), closeShape=True )
+
+    caveHouse = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(-25, -25),\
+                             vertices=((0, 10), (7, 0), (7,-10), (4,-10), (4,-1), (-4,-1), (-4,-10), (-7, -10), (-7,0), (0, 10)), closeShape=True )
+
+    caveArrow = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(-25, 25),\
+                             vertices=((0, 10), (8, 0), (4,0), (4, -10), (-4,-10), (-4, 0), (-8, 0), (0,10)), closeShape=True )
+
+    # SKEW SHAPES - DON'T WORK!
+    skewTriangle = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(-100, -150),\
+                             vertices=((0, 10), (5,0), (8, -10), (-8, -10), (-3,0), (0, 10)), closeShape=True )
+
+    skewDiamond = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(-100, -200),\
+                             vertices=((2, 10), (8, -6), (2,-10), (-8, -6), (2, 10)), closeShape=True )
+
+    skewHouse = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(-150, -200),\
+                             vertices=((-5, 10), (6, 0), (6, -10), (-5, -10), (-5, 10)), closeShape=True )
+
+    skewDrop = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+                             fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(-150, -150),\
+                             vertices=((6, 12), (2,-8), (-4, -6.9), (-5.65, -5.65), (-6.9, -4), (-7, 1), (6, 12)), 
                              closeShape=True )
-
-    #not used
-    #featDrop = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-    #                         fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-    #                         vertices=((0, 10), (7, 1), (6.9, -4), (5.65, -5.65), (4, -6.9), (0,-8), (-4, -6.9), (-5.65, -5.65), (-6.9, -4), (-7, 1), (0, 10)), 
-    #                         closeShape=True )
-
-    # featStarTrek = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
-                             # fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             # vertices=((0, 10), (8, -10), (0,0), (-8, -10), (0, 10)),\
-                             # closeShape=True )
 
     # PATCH
     patch = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
                              fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb',\
-                             vertices=((0,8), (6,6), (8,0), (6,-6), (0,-8), (-6,-6), (-8,0), (-6,6), (0,8)),\
+                             vertices=((0,7), (5.5,5.5), (7,0), (5.5,-5.5), (0,-7), (-5.5,-5.5), (-7,0), (-5.5,5.5), (0,7)),\
                              closeShape=True )
 
 #    patch=visual.GratingStim(win, tex='sin', mask='circle')
 
+#    sh = 1
     if ltype == 0:
-        feats.append( featTriangle )
-        feats.append( featDiamond )
-        feats.append( featHouse )
-        feats.append( featArrow )
+        if sh == 0:
+            feats.append( featTriangle )
+            feats.append( featDiamond )
+            feats.append( featHouse )
+            feats.append( featDrop )
+            outdir = outdir + '_convex'
+        else:
+            feats.append( caveStartrek )
+            feats.append( caveSpeartip )
+            feats.append( caveHouse )
+            feats.append( caveArrow )
+            outdir = outdir + '_concave'
+
+#        feats.append( skewTriangle )
+#        feats.append( skewDiamond )
+#        feats.append( skewHouse )
+#        feats.append( skewDrop )
+#        outdir = outdir + '_skewed'
     else:
         feats.append( patch )
+
+    # MAKE OUTPUT DIRECTORY
+    outdir = outdir + '_cards' + s
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     # BUILDING CARDS AS STIM/COLOR/FEATURE/ORIENTATION COMBINATIONS -------------------------------------------------------
 
@@ -133,6 +171,10 @@ def generator(globaltype, localtype, filtertype, cluster):
     N_OF_FACES = len(imgs)
     N_OF_FEATS = len(feats)
     N_CLRS = len(colors)
+    if gtype == 2 & ltype == 0:
+        colrun = 1
+    else:
+        colrun = N_CLRS
 
     #card generation
     for faceN in range( N_OF_FACES ):
@@ -145,7 +187,7 @@ def generator(globaltype, localtype, filtertype, cluster):
                 gt = gt + (255-vali)/255.0
 #        print 'image gt=' + str(round(gt)) # DEBUG PRINT
 
-        for cardColor in range(N_CLRS):
+        for cardColor in range(1,colrun):
             colIdx = range(N_CLRS)
             colIdx.remove( cardColor )
 
@@ -183,7 +225,10 @@ def cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feat, fN, img, iN, card
             #flip y-axis
             sz = (255-val)/255.0
             
-            PREVAIL_COL_RATIO = (sz/gt)*coef
+            if gtype > 1:
+                PREVAIL_COL_RATIO = 0.25
+            else:
+                PREVAIL_COL_RATIO = (sz/gt)*coef
 #            print 'size=' + str(round(sz,3)) + '; PCR=' + str(round(PREVAIL_COL_RATIO,2)) # DEBUG PRINT
             
             if (random.random() < PREVAIL_COL_RATIO):
@@ -194,12 +239,8 @@ def cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feat, fN, img, iN, card
 #                nt = nt + sz
             
             feat.setOri( 45+90*featOri )
-            if gtype > 1:
-                feat.fillColor = colors[(x*y)%4]
-                feat.lineColor = colors[(x*y)%4]
-            else:
-                feat.fillColor  = colors[c]
-                feat.lineColor  = colors[c]
+            feat.fillColor  = colors[c]
+            feat.lineColor  = colors[c]
             feat.size       = sz
             feat.draw( win )
 
@@ -326,7 +367,13 @@ def createColors():
 #                generator(g, l, f, c)
 
 # generate the global noise with with local shapes (4 orientations) and patch, with uniform color
-for l in range(2):
-    generator(2, l, 0, 0)
+#for l in range(2):
+#    generator(2, l, 0, 0)
+
+# generate something bespoke
+for f in range(2):
+    for c in range(3):
+        for s in range(2):
+            generator(1, 0, f, c, s)
 
 core.quit()

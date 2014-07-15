@@ -6,6 +6,7 @@ import os
 import colorsys
 import copy
 import sys
+import string
 
 from PIL import Image
 
@@ -29,7 +30,7 @@ s = os.sep
 myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); myMon.setSizePix((1600, 900))
 #desktop
 #    myMon=monitors.Monitor('asus', width=37.8, distance=40); myMon.setSizePix((1920, 1080))
-win = visual.Window( size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon,color=(1.0, 1.0, 1.0),colorSpace='rgb')
+win=visual.Window(size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon,color=(1.0, 1.0, 1.0),colorSpace='rgb')
 
 # PARAMETER PARSING --------------------------------------------------------------------------------------------------
 globaltype = sys.argv[1]
@@ -66,9 +67,16 @@ filter.append(['bow', 'bowsl'])
 #    filter.append(['wob', 'wobsl'])
 gstims=['faces_final', 'letters_final']
 # cluster sets
-gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']
-lcltrsets=['DERW', 'FGKP', 'JLTY']
+gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']  # clustered by ssim score
+lcltrsets=['WERQ', 'GPFK', 'UCAV', 'LTJY']  # clustered & ~ranked by luminance
+lcltrhgts=['1123', '4444', '5556', '7777']  # sizing coefficient is roughly proportional to luminance of each letter
+if cluster == 0:
+    oriOffset=[45, 45, 45, 0]
+else:
+    oriOffset=[45, 45, 45, 45]
 letter = lcltrsets[cluster][l1]
+fontface = ['Sloan']
+
 
 # VISUAL FEATURES -----------------------------------------------------------------------------------------------------
 
@@ -93,7 +101,7 @@ if gtype < 2:
     pth = pth + gstims[gtype] +s+ 'usable' +s+ str(cluster+1) +s+ filter[gtype][ftype] +s
 else:
     outdir = outdir + '_letter'
-outdir = outdir + '_' + lcltrsets[cluster] + '_cards' + s
+outdir = outdir + '_' + lcltrsets[cluster] + '_' + string.replace(fontface[0], ' ', '') + '_cards' + s
 if not os.path.exists(outdir):
     os.makedirs(outdir)
 
@@ -109,8 +117,8 @@ else:
     imgs = Image.open(pth + 'bowlank.png')   #noise
 
 #LETTERS
-ltrH = (IMG_H/DIMY)+3
-feats = visual.TextStim( win, text=letter, font='Sloan', bold=True, height=ltrH )
+ltrH = (IMG_H/DIMY)+int(lcltrhgts[cluster][l1])
+feats = visual.TextStim( win, text=letter, font=fontface, height=ltrH, fontFiles=['Sloan.ttf'] )
 
 # BUILDING CARDS AS STIM/COLOR/FEATURE/ORIENTATION COMBINATIONS -------------------------------------------------------
 
@@ -126,41 +134,30 @@ for xi in range(DIMX):
     for yi in range(DIMY):
         vali = imgs.getpixel( (xi,DIMY-1-yi) )
         gt = gt + (255-vali)/255.0
-#        print 'image gt=' + str(round(gt)) # DEBUG PRINT
-#    maxsz = max(max(imgsz))
 
 colIdx = range(len(colors))
 colIdx.remove( cardColor )
 
 for featOrientation in range( 4 ):
-
-#        ct = 0  # color total - to collect how much of the total coloured area is dominant
-#        nt = 0  # other colors
-
     for x in range(DIMX):
         for y in range(DIMY):
             # SET LOCAL VALUES
             val = imgs.getpixel( (x,DIMY-1-y) )
             sz = (255-val)/255.0    #flip y-axis
-            PREVAIL_COL_RATIO = (sz/gt)*coef
+            if gtype > 1:
+                PREVAIL_COL_RATIO = 0.25
+            else:
+                PREVAIL_COL_RATIO = (sz/gt)*coef
             
             feats.pos = (half+(x+1)*step, half+(y+1)*step)
 
-#                print 'size=' + str(round(sz,3)) + '; PCR=' + str(round(PREVAIL_COL_RATIO,2)) # DEBUG PRINT
-#                print 'idxi=' + str(idxi)
-
             if (random.random() < PREVAIL_COL_RATIO):
                 c = cardColor
-#                            ct = ct + sz
             else:
                 c = colIdx[random.randint(0,2)]
-#                            nt = nt + sz
 
-            feats.setOri( 45+90*featOrientation )
-            if gtype > 1:
-                feats.setColor( colors[(x*y)%4] )
-            else:
-                feats.setColor( colors[c] )
+            feats.setOri( oriOffset[l1]+90*featOrientation )
+            feats.setColor( colors[c] )
             feats.setHeight( sz*ltrH )
             feats.text = feats.text
             feats.draw( win )
@@ -284,7 +281,10 @@ def createColors():
 
 
 # PARAMETERISED FOR ONE SET OF GLOBAL FACES OR LETTERS AT A TIME
-# generator(2, 1, 0,'00_00_00')
+#generator(2, 0, 0,'00_00_00')
+#generator(2, 0, 0,'00_00_01')
+#generator(2, 0, 0,'00_00_02')
+#generator(2, 0, 0,'00_00_03')
 
 #def multigen(glob,clst,filt)
 #    generator(glob,clst,filt,'00_00_00')
