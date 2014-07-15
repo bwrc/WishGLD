@@ -1,0 +1,52 @@
+{
+	"pages" : [
+			 {"pic":  ".\\instructions\\pics\\fixcross.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\selectedStims\\noise_patch_cards\\00_00_00_00.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\instructions\\pics\\noisetargets.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\instructions\\pics\\fixcross.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\selectedStims\\noise_patch_cards\\00_00_00_00.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\instructions\\pics\\noisetargets.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\instructions\\pics\\fixcross.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\selectedStims\\noise_patch_cards\\00_00_00_00.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\instructions\\pics\\noisetargets.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\instructions\\pics\\fixcross.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\selectedStims\\noise_patch_cards\\00_00_00_00.png", 
+			  "duration": "5",
+			  "text": ""
+			 },
+			 {"pic":  ".\\instructions\\pics\\noisetargets.png", 
+			  "duration": "5",
+			  "text": ""
+			 }
+	]
+}

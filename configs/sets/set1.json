@@ -1,0 +1,10 @@
+{
+    "set": {
+        "stimpath": ".\\stims\\faces\\",
+        "segments": [
+            { "rule": "1", "reps": "2" },
+            { "rule": "2", "reps": "2" },
+            { "rule": "3", "reps": "2" }
+        ]
+    }
+}
