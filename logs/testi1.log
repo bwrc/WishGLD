@@ -1,0 +1,16 @@
+0.0011 	 	Subj ID: testi1
+0.0011 	 	Run: 2014-07-16 11:00:38.202000
+0.0011 	 	Age: 18
+0.0011 	 	Group: Control
+0.0011 	 	--------------------------------------------------------
+0.0012 	 	INFO
+0.0012 	 	timestamp CUE
+0.0012 	 	timestamp STIM  [state for each rule G1 G2 L1 L2 : 0,1,2,3] RULE [current rule]
+0.0012 	 	timestamp TGT   [states for each card / Up, Right, Down, Left: 0,1,2,3; 0,1,2,3;...]
+0.0012 	 	timestamp RESP  [correct: 1/0] [current rule: G1, G2, L1, L2] ANSWER [card selected: 1(up), 2(right), 3(down), 4(left)]
+0.0012 	 	timestamp FEEDB [correct/fail] [correct answers] of [series length]
+0.0012 	 	--------------------------------------------------------
+0.0012 	 	
+
+63.3457 	 	Running set .\configs\sets\noise_of_letters_2.json
+63.3460 	 	Using deck: 0: 0,3,1,2 | 1: 1,1,2,1 | 2: 3,0,3,0 | 3: 2,2,0,3 | 

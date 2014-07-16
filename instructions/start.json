@@ -1,6 +1,6 @@
 {
 	"pages" : [
-			 {"pic":  ".\\instructions\\pics\\empty.png", 
+			 {"pic":  "", 
 			  "duration": "-1",
 			  "text": "Tervetuloa kokeeseen.\n\nOta mukava asento ja rentoudu.\nVältä kokeen aikana turhaa liikkumista, silmien räpyttelyä tai kasvojen liikuttamista - nämä aiheuttavat helposti artefaktoja rekisteröityihin signaaleihin." 
 			 },

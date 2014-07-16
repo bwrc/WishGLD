@@ -1,21 +1,24 @@
 {
-    "test": [
+    "blocks": [
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\start.json"
+        },
         {"part": 2,
          "type": "set",
-         "file": ".\\configs\\sets\\faces_of_letters_1.json"
+         "file": ".\\configs\\sets\\faces_of_letters_1i.json"
         },
         {"part": 3,
          "type": "set",
-         "file": ".\\configs\\sets\\faces_of_shapes_1.json"
-        },		
+         "file": ".\\configs\\sets\\faces_of_shapes_1i.json"
+        },
         {"part": 4,
+         "type": "set",
+         "file": ".\\configs\\sets\\faces_of_shapes_2i.json"
+        },
+        {"part": 5,
          "type": "instruction",
          "file": ".\\instructions\\end.json"
-        },
-        {"part": 1,
-         "type": "instruction",
-         "file": ".\\instructions\\baseline.json"
         }
-		
     ]
 }

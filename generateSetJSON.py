@@ -1,14 +1,18 @@
 import json, random
 from psychopy import gui
 import NewDlg
+import os
+import string
 
 # JUST MODIFY THESE
-setpath = '.\\stims\\letters\\'
+s = os.sep
+setpath = '.'+s+'stims'+s+'letters'+s
 rules = [0, 1, 2, 3]
 repeatNs =  [5, 6, 7]
-#how many time each rule should be repeated (MUST BE divisible by 3 to match with repeat counts!)
-rulerepeats = 6
-#how many time each repetition count gets repeated within a rule <- MUST BE rulerepeats / 3 (as there are 3 rules per rule category)
+# how many time each rule should be repeated (MUST BE multiple of 3 to match with repeat counts!)
+rulerepeats = 3
+# how many time each repetition count gets repeated within a rule <- 
+# MUST BE rulerepeats / 3 (as there are 3 rules per rule category)
 reprepeats = rulerepeats / 3
 
 setDlg = NewDlg.NewDlg( title='Set Params' )
@@ -20,6 +24,31 @@ if setDlg.OK:
     rulerepeats = int(setDlg.data[1])
     reprepeats = rulerepeats / 3
 
+# PATH CHECKING & SHAPING
+thispth=os.path.realpath(__file__)
+root=string.find(setpath, thispth)
+while root == -1:
+    thispth=thispth[0:len(thispth)-1]
+    root=string.find(setpath, thispth)
+setpath = string.replace(setpath, thispth, '')
+
+pl=len(setpath)
+if setpath[pl-1] != s:
+    setpath = setpath + s
+
+if setpath[0] != '.':
+    if setpath[0] != s:
+        setpath = '.' + s + setpath
+    else:
+        setpath = '.' + setpath
+
+if not os.path.exists(setpath):
+    setpath = '.' + setpath
+    if not os.path.exists(setpath):
+        print 'FAILED TO FIND STIMULUS PATH - ' + setpath
+        exit()
+
+# CONTROLLED RANDOMISATION OF TRIALS
 def randomize_carefully(elems, n_repeat=2):
     s = set(elems)
     res = []
@@ -84,7 +113,7 @@ jsontext = json.dumps(data)
 
 print jsontext
 
-saveFile = gui.fileSaveDlg(initFilePath='.\\configs\\sets\\', allowed='JSON | .json' )
+saveFile = gui.fileSaveDlg(initFilePath='.'+s+'configs'+s+'sets'+s, allowed='JSON | .json' )
 if saveFile:
    sf = open( saveFile, 'w' )
    sf.write( jsontext )

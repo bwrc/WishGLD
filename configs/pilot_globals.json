@@ -1,0 +1,52 @@
+{
+    "blocks": [
+        {"part": 1,
+         "type": "instruction",
+         "file": ".\\instructions\\baseline.json"
+        },
+        {"part": 2,
+         "type": "set",
+         "file": ".\\configs\\sets\\faces_of_patches_2.json"
+        },
+        {"part": 3,
+         "type": "set",
+         "file": ".\\configs\\sets\\letters_of_patches_1.json"
+        },
+        {"part": 4,
+         "type": "instruction",
+         "file": ".\\instructions\\short_break.json"
+        },
+        {"part": 5,
+         "type": "set",
+         "file": ".\\configs\\sets\\letters_of_patches_2.json"
+        },
+        {"part": 6,
+         "type": "set",
+         "file": ".\\configs\\sets\\faces_of_patches_1.json"
+        },
+        {"part": 7,
+         "type": "instruction",
+         "file": ".\\instructions\\short_break.json"
+        },
+        {"part": 8,
+         "type": "set",
+         "file": ".\\configs\\sets\\faces_of_patches_3.json"
+        },
+        {"part": 9,
+         "type": "set",
+         "file": ".\\configs\\sets\\letters_of_patches_3.json"
+        },
+        {"part": 10,
+         "type": "instruction",
+         "file": ".\\instructions\\short_break.json"
+        },
+        {"part": 11,
+         "type": "set",
+         "file": ".\\configs\\sets\\letters_of_patches_4.json"
+        },
+        {"part": 12,
+         "type": "instruction",
+         "file": ".\\instructions\\end.json"
+        }
+    ]
+}

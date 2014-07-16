@@ -86,7 +86,7 @@ def RunSequence( sequence ):
     global ruleCount, cardCount, rightAnswers;
     ruleCount = 0;
 
-    ShowInstruction( u'Aloita painamalla jotain n√§pp√§int√§', -1 )
+    ShowInstruction( u'Aloita painamalla jotain n‰pp‰int‰', -1 )
 
     while ruleCount < RULE_COUNT: 
         currentRule = rules[ruleList[ruleCount][0]]
@@ -133,28 +133,28 @@ def randomValue( n, skip ):
 #selects a reference card that 
 #given a target card [A, B, C, D] only matches on one feature
 #NOT USED
-#def selectRefCard( tgtCard, matchFeat ):
-#    if matchFeat == 0:
-#        rc = ( tgt[0],\
-#               randomValue( 4, tgtCard[1] ),\
-#               randomValue( 4, tgtCard[2] ),\
-#               randomValue( 4, tgtCard[3] ) )
-#    elif matchFeat == 1:
-#        rc = ( randomValue( 4, tgtCard[0] ),\
-#               tgt[1],\
-#               randomValue( 4, tgtCard[2] ),\
-#               randomValue( 4, tgtCard[3] ) )
-#    elif matchFeat == 2:
-#        rc = ( randomValue( 4, tgtCard[0] ),\
-#               randomValue( 4, tgtCard[1] ),\
-#               tgt[2],\
-#               randomValue( 4, tgtCard[3] ) )
-#    elif matchFeat == 3:
-#        rc = ( randomValue( 4, tgtCard[0] ),\
-#               randomValue( 4, tgtCard[1] ),\
-#               randomValue( 4, tgtCard[2] ),\
-#               tgt[3] )
-#    return rc
+def selectRefCard( tgtCard, matchFeat ):
+    if matchFeat == 0:
+        rc = ( tgt[0],\
+               randomValue( 4, tgtCard[1] ),\
+               randomValue( 4, tgtCard[2] ),\
+               randomValue( 4, tgtCard[3] ) )
+    elif matchFeat == 1:
+        rc = ( randomValue( 4, tgtCard[0] ),\
+               tgt[1],\
+               randomValue( 4, tgtCard[2] ),\
+               randomValue( 4, tgtCard[3] ) )
+    elif matchFeat == 2:
+        rc = ( randomValue( 4, tgtCard[0] ),\
+               randomValue( 4, tgtCard[1] ),\
+               tgt[2],\
+               randomValue( 4, tgtCard[3] ) )
+    elif matchFeat == 3:
+        rc = ( randomValue( 4, tgtCard[0] ),\
+               randomValue( 4, tgtCard[1] ),\
+               randomValue( 4, tgtCard[2] ),\
+               tgt[3] )
+    return rc
 
 def randomizeOrder( lst ):
     return sorted(lst, key=lambda k: random())
