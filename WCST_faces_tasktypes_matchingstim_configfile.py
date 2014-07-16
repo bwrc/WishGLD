@@ -29,7 +29,7 @@ global RANDOMIZE_CATEGORY_CARDS; RANDOMIZE_CATEGORY_CARDS = False
 global RULE_COUNT; RULE_COUNT = 20 #if read from file, this will be overridden
 global SEP_STIM_DURATION; SEP_STIM_DURATION = 20 #n of frames (16ms)
 global N_OF_CARDS; N_OF_CARDS = 4 #this is now fixed for each stim folder!
-global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face, color, shape, orientation
+global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face/letter, color, shape/letter, orientation
 global portCodes;
 global s; s=os.sep
 
@@ -734,10 +734,11 @@ for item in config['blocks']:
 # ###########################################################################################################################
         # RESTRICT CARD SETS FOR REDUCED FEATURE SETS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # ###########################################################################################################################
+        active_rules = [1,1,1,1]
         if string.find(stimPath, 'noise') != -1:
-            noise = True
+            active_rules = [0,0,1,1]
         elif string.find(stimPath, 'patch') != -1:
-            patch = True
+            active_rules = [1,1,0,0]
 
         tgtCards = (deepcopy(cardPrototype), \
                     deepcopy(cardPrototype), \
