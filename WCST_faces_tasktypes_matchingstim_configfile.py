@@ -300,7 +300,7 @@ def GiveFeedback( taskType, fbVal ):
     else:
         triggerAndLog( portCodes['feedback'], 'FEEDB  FAIL ' + str(rightAnswers) + ' of ' + str(ruleRepeats) );
         
-    if taskType == 1:
+    if taskType == 3:
         if fbVal > 0:
             ShowInstruction('RIGHT', 1)
         else:
@@ -312,7 +312,7 @@ def GiveFeedback( taskType, fbVal ):
         else:
             frameCard( (0,0), 'red', 1 )
             
-    elif (taskType == 3) | (taskType == 4) | (taskType==5):
+    elif (taskType == 1) | (taskType == 4) | (taskType==5):
 
         #up
         if fbVal == 1: #up
@@ -386,21 +386,20 @@ def NextTrial( tasktype ):
 
     if tasktype == 1: # 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
 
-        fixCross( 1 )
-
-        win.clearBuffer()
+        fixCross(0.5)
+        
         for i in range( SEP_STIM_DURATION ): #accurate timing trick
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule )
+                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule)
 
         win.flip() #clear
-            
+
         for c in stimCards:
             c.draw(win)
 
-        win.flip()
+        win.flip( clearBuffer= False ) # keep the cards in the backbuffer for feedback
 
         triggerAndLog( portCodes['refsOn'], \
                 'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
@@ -437,20 +436,21 @@ def NextTrial( tasktype ):
 
     elif taskType == 3: # 3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
 
-        fixCross(0.5)
-        
+        fixCross( 1 )
+
+        win.clearBuffer()
         for i in range( SEP_STIM_DURATION ): #accurate timing trick
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule)
+                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule )
 
         win.flip() #clear
-
+            
         for c in stimCards:
             c.draw(win)
 
-        win.flip( clearBuffer= False ) # keep the cards in the backbuffer for feedback
+        win.flip()
 
         triggerAndLog( portCodes['refsOn'], \
                 'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
@@ -730,7 +730,10 @@ for item in config['blocks']:
 
         #run test type based on confInfo
         global stimPath; stimPath = setSequence['set']['stimpath']
-        # Restrict card sets for reduced feature sets
+
+# ###########################################################################################################################
+        # RESTRICT CARD SETS FOR REDUCED FEATURE SETS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# ###########################################################################################################################
         if string.find(stimPath, 'noise') != -1:
             noise = True
         elif string.find(stimPath, 'patch') != -1:
