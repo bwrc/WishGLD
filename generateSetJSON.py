@@ -7,7 +7,7 @@ import string
 # JUST MODIFY THESE
 s = os.sep
 setpath = '.'+s+'stims'+s+'letters'+s
-rules = [0, 1, 2, 3]
+rules = [2, 3]
 repeatNs =  [5, 6, 7]
 # how many time each rule should be repeated (MUST BE multiple of 3 to match with repeat counts!)
 rulerepeats = 3
@@ -69,7 +69,7 @@ def randomize_carefully(elems, n_repeat=2):
 
 rows = []
 
-ruleset = randomize_carefully( rules, rulerepeats)
+ruleset = randomize_carefully(rules, rulerepeats)
 
 reps = []
 reps.append( [] ) #per rule repeats

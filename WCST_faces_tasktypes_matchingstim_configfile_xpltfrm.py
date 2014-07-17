@@ -561,6 +561,7 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
         instr = visual.TextStim( win, text=txt, pos=(0,-50), color=col, colorSpace='rgb', height=25, wrapWidth=800, alignHoriz='center')
 
     if picFile != "":
+        picFile = string.replace( picFile, '\\', s )
         hasPic = True
         pic = visual.ImageStim( win );
         pic.setImage( picFile );
@@ -741,19 +742,22 @@ lastScore = 0
 
 for item in config['blocks']:
     if( item['type'] == 'instruction'):
-        instrFile = open( item['file'] )
+        temp=string.replace( item['file'], '\\', s )
+        instrFile = open( temp )
         instrSequence = json.loads( instrFile.read() )
         instrFile.close()
         ShowInstructionSequence( instrSequence )
         
     elif item['type'] == 'set':
-        seqFile = open( item['file'] )
+        temp=string.replace( item['file'], '\\', s )
+        seqFile = open( temp )
         setSequence = json.loads( seqFile.read() )
         seqFile.close()
         logThis('Running set %s' % (item['file']) )
 
         #run test type based on confInfo
         global stimPath; stimPath = setSequence['set']['stimpath']
+        stimPath=string.replace( stimPath, '\\', s )
 
 # ###########################################################################################################################
         # RESTRICT CARD SETS FOR REDUCED FEATURE SETS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -769,7 +773,7 @@ for item in config['blocks']:
                     deepcopy(cardPrototype), \
                     deepcopy(cardPrototype) )
 
-        SetupCategoryCards( tgtCards, active_rules )
+        SetupCategoryCards( tgtCards )
            
         stimCards = ( visual.ImageStim( win, pos=cardPos[0] ), \
                       visual.ImageStim( win, pos=cardPos[1] ), \

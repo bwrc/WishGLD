@@ -2,15 +2,15 @@
     "blocks": [
         {"part": 1,
          "type": "instruction",
-         "file": ".\\instructions\\baseline.json"
+         "file": ".\\instructions\\qwikbase.json"
         },
         {"part": 2,
          "type": "set",
-         "file": ".\\configs\\sets\\noise_of_letters_2.json"
+         "file": ".\\configs\\sets\\noise_of_letters_2-test.json"
         },
         {"part": 3,
          "type": "set",
-         "file": ".\\configs\\sets\\noise_of_shapes_1.json"
+         "file": ".\\configs\\sets\\noise_of_shapes_1-test.json"
         },
         {"part": 4,
          "type": "instruction",
@@ -18,11 +18,11 @@
         },
         {"part": 5,
          "type": "set",
-         "file": ".\\configs\\sets\\noise_of_letters_1.json"
+         "file": ".\\configs\\sets\\noise_of_letters_1-test.json"
         },
         {"part": 6,
          "type": "set",
-         "file": ".\\configs\\sets\\noise_of_shapes_2.json"
+         "file": ".\\configs\\sets\\noise_of_shapes_2-test.json"
         },
         {"part": 7,
          "type": "instruction",
