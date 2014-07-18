@@ -23,13 +23,13 @@ s = os.sep
 
 # CREATING MONITORS ---------------------------------------------------------------------------------------------------
 #lenovo
-#    myMon=monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
+#myMon=monitors.Monitor('yoga', width=29.3, distance=40); myMon.setSizePix((3200, 1800))
 #HP Elitebook 2560p
-#    myMon=monitors.Monitor('Bens', width=31.5, distance=40); myMon.setSizePix((1366, 768))
+myMon=monitors.Monitor('Bens', width=31.5, distance=40); myMon.setSizePix((1366, 768))
 #DELL Latitude
-myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); myMon.setSizePix((1600, 900))
+#myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); myMon.setSizePix((1600, 900))
 #desktop
-#    myMon=monitors.Monitor('asus', width=37.8, distance=40); myMon.setSizePix((1920, 1080))
+#myMon=monitors.Monitor('asus', width=37.8, distance=40); myMon.setSizePix((1920, 1080))
 win=visual.Window(size=(IMG_W, IMG_H),units='pix',fullscr=False,monitor=myMon,color=(1.0, 1.0, 1.0),colorSpace='rgb')
 
 # PARAMETER PARSING --------------------------------------------------------------------------------------------------
@@ -67,9 +67,11 @@ filter.append(['bow', 'bowsl'])
 #    filter.append(['wob', 'wobsl'])
 gstims=['faces_final', 'letters_final']
 # cluster sets
-gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']  # clustered by ssim score
-lcltrsets=['WERQ', 'GPFK', 'UCAV', 'LTJY']  # clustered & ~ranked by luminance
-lcltrhgts=['1123', '4444', '5556', '7777']  # sizing coefficient is roughly proportional to luminance of each letter
+gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']  # clustered by ssim score - order fixed to file organisation
+lcltrsets=['ERPF', 'ERPF', 'ERPF', 'ERPF']  # clustered & ~ranked by luminance
+lcltrhgts=['1244', '1244', '1244', '1244']  # sizing coefficient is roughly proportional to luminance of each letter
+#lcltrsets=['WERQ', 'GPFK', 'UCAV', 'LTJY']  # clustered & ~ranked by luminance
+#lcltrhgts=['1123', '4444', '5556', '7777']  # sizing coefficient is roughly proportional to luminance of each letter
 if cluster == 0:
     oriOffset=[45, 45, 45, 0]
 else:
@@ -125,7 +127,7 @@ feats = visual.TextStim( win, text=letter, font=fontface, height=ltrH, fontFiles
 PREVAIL_COL_RATIO = 0.5
 step = IMG_W/DIMX
 half = -1*IMG_W/2 #image coords are centered
-coef = (DIMX * DIMY) / 3
+coef = (DIMX * DIMY) / 3.5
 
 # CARD GENERATION -----------------------------------------------------------------------------------------------------
 # Build color probabilities by observation

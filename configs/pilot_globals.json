@@ -14,7 +14,7 @@
         },
         {"part": 4,
          "type": "instruction",
-         "file": ".\\instructions\\short_break-test.json"
+         "file": ".\\instructions\\short_break.json"
         },
         {"part": 5,
          "type": "set",
@@ -26,7 +26,7 @@
         },
         {"part": 7,
          "type": "instruction",
-         "file": ".\\instructions\\short_break-test.json"
+         "file": ".\\instructions\\short_break.json"
         },
         {"part": 8,
          "type": "set",
@@ -38,7 +38,7 @@
         },
         {"part": 10,
          "type": "instruction",
-         "file": ".\\instructions\\short_break-test.json"
+         "file": ".\\instructions\\short_break.json"
         },
         {"part": 11,
          "type": "set",
@@ -46,7 +46,7 @@
         },
         {"part": 12,
          "type": "instruction",
-         "file": ".\\instructions\\end-test.json"
+         "file": ".\\instructions\\end.json"
         }
     ]
 }
