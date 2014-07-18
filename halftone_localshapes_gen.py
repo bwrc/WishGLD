@@ -8,7 +8,7 @@ import copy
 
 from PIL import Image
 
-def generator(globaltype, localtype, filtertype, cluster, sh):
+def generator(globaltype, localtype, filtertype, cluster):
 
     # CONSTANTS -------------------------------------------------------------------------------------------
     SAVE_FRAMES = True
@@ -137,26 +137,26 @@ def generator(globaltype, localtype, filtertype, cluster, sh):
 
 #    patch=visual.GratingStim(win, tex='sin', mask='circle')
 
-#    sh = 1
     if ltype == 0:
-        if sh == 0:
+        feats.append( caveStartrek )
+        feats.append( caveSpeartip )
+        feats.append( caveHouse )
+        feats.append( caveArrow )
+        outdir = outdir + '_concave'
+
+        sh = 0
+        if sh == 1:
             feats.append( featTriangle )
             feats.append( featDiamond )
             feats.append( featHouse )
             feats.append( featDrop )
             outdir = outdir + '_convex'
-        else:
-            feats.append( caveStartrek )
-            feats.append( caveSpeartip )
-            feats.append( caveHouse )
-            feats.append( caveArrow )
-            outdir = outdir + '_concave'
-
-#        feats.append( skewTriangle )
-#        feats.append( skewDiamond )
-#        feats.append( skewHouse )
-#        feats.append( skewDrop )
-#        outdir = outdir + '_skewed'
+        elif sh == 2:
+            feats.append( skewTriangle )
+            feats.append( skewDiamond )
+            feats.append( skewHouse )
+            feats.append( skewDrop )
+            outdir = outdir + '_skewed'
     else:
         feats.append( patch )
 
@@ -187,7 +187,7 @@ def generator(globaltype, localtype, filtertype, cluster, sh):
                 gt = gt + (255-vali)/255.0
 #        print 'image gt=' + str(round(gt)) # DEBUG PRINT
 
-        for cardColor in range(1,colrun):
+        for cardColor in range(1):
             colIdx = range(N_CLRS)
             colIdx.remove( cardColor )
 
@@ -215,7 +215,7 @@ def cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feat, fN, img, iN, card
     ltrH = (IMG_H/DIMY)+3
     step = IMG_W/DIMX
     half = -1*IMG_W/2 #image coords are centered
-    coef = (DIMX * DIMY) / 3
+    coef = (DIMX * DIMY) / 3.5
     for x in range(DIMX):
         for y in range(DIMY):
 
@@ -371,9 +371,7 @@ def createColors():
 #    generator(2, l, 0, 0)
 
 # generate something bespoke
-#for f in range(2):
-#    for c in range(3):
-#        for s in range(2):
-#            generator(1, 0, f, 3, s)
+for f in range(2):
+        generator(1, 0, f, 3)
 
 core.quit()

@@ -187,7 +187,7 @@ def generator(globaltype, localtype, filtertype, cluster):
                 gt = gt + (255-vali)/255.0
 #        print 'image gt=' + str(round(gt)) # DEBUG PRINT
 
-        for cardColor in range(1,colrun):
+        for cardColor in range(1):
             colIdx = range(N_CLRS)
             colIdx.remove( cardColor )
 
@@ -371,8 +371,7 @@ def createColors():
 #    generator(2, l, 0, 0)
 
 # generate something bespoke
-#for f in range(2):
-#    for c in range(3):
-#        generator(1, 0, f, 3)
+for f in range(2):
+        generator(1, 0, f, 3)
 
 core.quit()
