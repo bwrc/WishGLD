@@ -641,8 +641,8 @@ myDlg.addField('Group:', choices=["Test", "Control"])
 
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 
-confjson = ['config1', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1']
-myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[1]+'.json', width=30);
+confjson = ['config1', 'pilot_locals', 'pilot_globals', 'pilot_global_stim_comparison']
+myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[3]+'.json', width=30);
 
 
 myDlg.show()  # show dialog and wait for OK or Cancel

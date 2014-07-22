@@ -19,9 +19,10 @@ from copy import deepcopy
 import csv
 from datetime import datetime
 import json
-import os
-import string
-import NewDlg #allows setting the length of textfields
+import NewDlg   # allows setting the length of textfields
+import os       # to get path separator for platform independence
+import string   # to find test type from pathstrings (noise, patch)
+#import numpy    # easy arrays
 
 # - GLOBALS -------------------------------------------------------------------------------------------
 global DEBUG; DEBUG = True
@@ -29,7 +30,7 @@ global RANDOMIZE_CATEGORY_CARDS; RANDOMIZE_CATEGORY_CARDS = False
 global RULE_COUNT; RULE_COUNT = 20 #if read from file, this will be overridden
 global SEP_STIM_DURATION; SEP_STIM_DURATION = 20 #n of frames (16ms)
 global N_OF_CARDS; N_OF_CARDS = 4 #this is now fixed for each stim folder!
-global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face, color, shape, orientation
+global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face/letter, color, shape/letter, orientation
 global portCodes;
 global s; s=os.sep
 
@@ -117,10 +118,19 @@ def SelectCardSubset( subSetCount, deckSize ):
     cards =[]
 
     for i in range(subSetCount):
-        cn = randint( 0, deckSize-1)
+        cn = randint(0, deckSize-1)
         while cn in cards:
-            cn = randint( 0, deckSize-1)
+            cn = randint(0, deckSize-1)
         cards.append( cn )
+    if DEBUG:
+        print 'selectCardSubset = ' + str(cards)
+    return cards
+
+# Selects a randomly ordered set of subSetCount cards from a given deck of cards.
+def indexCardSubset( subSetCount, deck ):
+
+    cards =[]
+
     return cards
 
 #selects a random value [0..n-1], where the value != skip
@@ -159,7 +169,7 @@ def randomValue( n, skip ):
 def randomizeOrder( lst ):
     return sorted(lst, key=lambda k: random())
 
-def SetupCategoryCards( cards, randomOrder = True ):
+def SetupCategoryCards( cards, active_rule, randomOrder = True ):
     order = [0, 1, 2, 3]
 
     # should the order of features be randomized?
@@ -173,7 +183,22 @@ def SetupCategoryCards( cards, randomOrder = True ):
         feat2 = order
         feat3 = order
         feat4 = order
-        
+    
+    # adjust the feature values for controlled cases
+    feat1 = [x*active_rule[0] for x in feat1]
+    feat2 = [x*active_rule[1] for x in feat2]
+    feat3 = [x*active_rule[2] for x in feat3]
+    feat4 = [x*active_rule[3] for x in feat4]
+#    feat1 = map(lambda x, y: x*y, active_rule, feat1)
+#    feat2 = map(lambda x, y: x*y, active_rule, feat2)
+#    feat3 = map(lambda x, y: x*y, active_rule, feat3)
+#    feat4 = map(lambda x, y: x*y, active_rule, feat4)
+    if DEBUG:
+        print str(feat1)
+        print str(feat2)
+        print str(feat3)
+        print str(feat4)
+
     #fill card parameters
     if len(cards) <> 4:
         print 'setup card count: ' + str(len(cards))
@@ -186,13 +211,13 @@ def SetupCategoryCards( cards, randomOrder = True ):
             cards[idx]['L1'] = feat3[idx]
             cards[idx]['L2'] = feat4[idx]
 
-            cards[idx]['fn'] = stimPath +'%02d_%02d_%02d_%02d.png' % (deck[ feat1[idx]], feat2[idx], feat3[idx], feat4[idx]) 
+            cards[idx]['fn'] = stimPath +'%02d_%02d_%02d_%02d.png' % (deck[feat1[idx]], feat2[idx], feat3[idx], feat4[idx]) 
             if DEBUG:
                 print cards[idx]['fn']
 
     cardstr = ''
     for idx in range(4):
-        cardstr += '%01d: %01d,%01d,%01d,%01d | ' % ( idx, deck[ feat1[idx]], feat2[idx], feat3[idx], feat4[idx]) 
+        cardstr += '%01d: %01d,%01d,%01d,%01d | ' % ( idx, deck[feat1[idx]], feat2[idx], feat3[idx], feat4[idx]) 
     logThis( 'Using deck: ' + cardstr );
 
     return True
@@ -300,7 +325,7 @@ def GiveFeedback( taskType, fbVal ):
     else:
         triggerAndLog( portCodes['feedback'], 'FEEDB  FAIL ' + str(rightAnswers) + ' of ' + str(ruleRepeats) );
         
-    if taskType == 1:
+    if taskType == 3:
         if fbVal > 0:
             ShowInstruction('RIGHT', 1)
         else:
@@ -312,7 +337,7 @@ def GiveFeedback( taskType, fbVal ):
         else:
             frameCard( (0,0), 'red', 1 )
             
-    elif (taskType == 3) | (taskType == 4) | (taskType==5):
+    elif (taskType == 1) | (taskType == 4) | (taskType==5):
 
         #up
         if fbVal == 1: #up
@@ -618,7 +643,8 @@ myDlg.addField('Group:', choices=["Test", "Control"])
 
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 
-myDlg.addField('Config File:', '.'+s+'configs'+s+'config1.json', width=30);
+confjson = ['config1', 'pilot_locals', 'pilot_globals']
+myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[1]+'.json', width=30);
 
 
 myDlg.show()  # show dialog and wait for OK or Cancel
@@ -734,17 +760,20 @@ for item in config['blocks']:
 # ###########################################################################################################################
         # RESTRICT CARD SETS FOR REDUCED FEATURE SETS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # ###########################################################################################################################
+        active_rules = [1,1,1,1]
         if string.find(stimPath, 'noise') != -1:
-            noise = True
+            active_rules = [0,0,1,1]
+            N_OF_CARDS = 2
         elif string.find(stimPath, 'patch') != -1:
-            patch = True
+            active_rules = [1,1,0,0]
+            N_OF_CARDS = 2
 
         tgtCards = (deepcopy(cardPrototype), \
                     deepcopy(cardPrototype), \
                     deepcopy(cardPrototype), \
                     deepcopy(cardPrototype) )
 
-        SetupCategoryCards( tgtCards )
+        SetupCategoryCards( tgtCards, active_rules )
            
         stimCards = ( visual.ImageStim( win, pos=cardPos[0] ), \
                       visual.ImageStim( win, pos=cardPos[1] ), \

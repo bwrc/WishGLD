@@ -7,7 +7,7 @@ import string
 # JUST MODIFY THESE
 s = os.sep
 setpath = '.'+s+'stims'+s+'letters'+s
-rules = [2, 3]
+rules = [0, 1]
 repeatNs =  [5, 6, 7]
 # how many time each rule should be repeated (MUST BE multiple of 3 to match with repeat counts!)
 rulerepeats = 3

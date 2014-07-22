@@ -39,8 +39,9 @@ def generator(globaltype, localtype, filtertype, cluster):
     ftype=filtertype
     gstims=['faces_final', 'letters_final']
     filter=[]
-    filter.append(['shelimdf', 'shsmimdf'])
-    filter.append(['bow', 'bowsl'])
+    filter.append(['shsmimdf', 'shelimdf'])
+    filter.append(['sbw', 'sbs'])
+#    filter.append(['bow', 'bowsl'])
 #    filter.append(['wob', 'wobsl'])
     # cluster sets
     gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']
@@ -99,9 +100,9 @@ def generator(globaltype, localtype, filtertype, cluster):
                              fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(25, 25),\
                              vertices=((0, 11), (9, -11), (0,-6), (-9, -11), (0, 11)), closeShape=True )
 
-    caveSpeartip = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+    caveXmastree = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
                              fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(25, -25),\
-                             vertices=((0, 10), (6, 2), (0, 0), (8, -6), (0,-10), (-8, -6), (0, 0), (-6, 2), (0, 10)), closeShape=True )
+                             vertices=((0,11), (0,14), (0, 11), (6, 2), (0, 0), (8, -6), (0,-8), (-8, -6), (0, 0), (-6, 2), (0, 11)), closeShape=True )
 
     caveHouse = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
                              fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(-25, -25),\
@@ -139,7 +140,7 @@ def generator(globaltype, localtype, filtertype, cluster):
 
     if ltype == 0:
         feats.append( caveStartrek )
-        feats.append( caveSpeartip )
+        feats.append( caveXmastree )
         feats.append( caveHouse )
         feats.append( caveArrow )
         outdir = outdir + '_concave'
@@ -169,9 +170,9 @@ def generator(globaltype, localtype, filtertype, cluster):
 
     PREVAIL_COL_RATIO = 0.5
     N_OF_FACES = len(imgs)
-    N_OF_FEATS = len(feats)
+    N_OF_FEATS = 1 #len(feats)
     N_CLRS = len(colors)
-    if gtype == 2 & ltype == 0:
+    if gtype == 2 and ltype == 0:
         colrun = 1
     else:
         colrun = N_CLRS
@@ -187,12 +188,12 @@ def generator(globaltype, localtype, filtertype, cluster):
                 gt = gt + (255-vali)/255.0
 #        print 'image gt=' + str(round(gt)) # DEBUG PRINT
 
-        for cardColor in range(1):
+        for cardColor in range(colrun):
             colIdx = range(N_CLRS)
             colIdx.remove( cardColor )
 
             for featN in range( N_OF_FEATS ):
-                
+                featN=1
                 if ltype == 1:
                     cardMaker(win, outdir, DIMX, DIMY, IMG_W, IMG_H, gt, feats[featN], featN, imgs[faceN], faceN,\
                             cardColor, colIdx, colors, 0, SAVE_FRAMES, gtype)
@@ -358,9 +359,13 @@ def createColors():
     #colors.append( orange )
     return colors
 
-# generate the global faces and letters with local shapes and patch, with 4 colors, 4 orientations, 
-# from 2 preprocessing modes and 3 clusters
-#for g in range(2):
+# generate 
+# g = global faces, letters and noise; 
+# l = local shapes and patch; 
+# f = 2 preprocessing filters; 
+# c = 3 clusters
+# with 4 colors, 4 orientations
+#for g in range(3):
 #    for l in range(2):
 #        for f in range(2):
 #            for c in range(3):
@@ -370,8 +375,23 @@ def createColors():
 #for l in range(2):
 #    generator(2, l, 0, 0)
 
-# generate something bespoke
-for f in range(2):
-        generator(1, 0, f, 3)
+# generate faces from cluster 1
+#for i in range(2):
+#    generator(0, i, 0, 3)
+# generate letters from cluster 4
+#for i in range(2):
+#    for f in range(2):
+#        generator(1, i, f, 1)
+#for i in range(2):
+#    for f in range(2):
+#        generator(1, i, f, 3)
+# generate noise
+#for i in range(2):
+#    generator(2, i, 0, 0)
+
+#generator(0, 0, 0, 1)
+generator(1, 0, 1, 1)
+#generator(1, 0, 0, 3)
+#generator(2, 0, 0, 0)
 
 core.quit()

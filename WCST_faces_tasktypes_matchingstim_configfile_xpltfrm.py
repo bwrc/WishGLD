@@ -642,8 +642,8 @@ myDlg.addField('Group:', choices=["Test", "Control"])
 
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 
-confjson = ['config1', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1']
-myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[1]+'.json', width=30);
+confjson = ['config1', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1', 'pilot_global_stim_short_comparison']
+myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[4]+'.json', width=30);
 
 
 myDlg.show()  # show dialog and wait for OK or Cancel
@@ -688,8 +688,10 @@ else:
     RANDOMIZE_CATEGORY_CARDS = True
 
 #rendering window setup
+#Dynamite Mac
+myMon=monitors.Monitor('Mac', width=50, distance=90); monW=1920; monH=1200
 #HP Elitebook 2560p
-myMon=monitors.Monitor('Bens', width=31.5, distance=40); monW=1366; monH=768
+#myMon=monitors.Monitor('Bens', width=31.5, distance=40); monW=1366; monH=768
 #DELL Latitude
 #myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); monW=1600; monH=900
 #myMon=monitors.Monitor('yoga', width=29.3, distance=40); monW=3200; monH=1800

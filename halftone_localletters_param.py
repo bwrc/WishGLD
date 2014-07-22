@@ -62,20 +62,26 @@ print 'l1 ' + str(local1)
 # PARAMETERISATION OF PATHS -------------------------------------------------------------------------------------------
 tystr = ['face', 'letter', 'noise']
 filter=[]
-filter.append(['shelimdf', 'shsmimdf'])
-filter.append(['bow', 'bowsl'])
-#    filter.append(['wob', 'wobsl'])
+filter.append(['shsmimdf', 'shelimdf'])
+filter.append(['sbw', 'sbs'])
+#   filter.append(['bow', 'bowsl'])
+#   filter.append(['wob', 'wobsl'])
 gstims=['faces_final', 'letters_final']
 # cluster sets
-gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']  # clustered by ssim score - order fixed to file organisation
-lcltrsets=['ERPF', 'ERPF', 'ERPF', 'ERPF']  # clustered & ~ranked by luminance
-lcltrhgts=['1244', '1244', '1244', '1244']  # sizing coefficient is roughly proportional to luminance of each letter
+gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']  # clustered by ssim score - ORDER IS FIXED TO FILE ORGANISATION!
+lcltrsets=['ERPF', 'WERP', 'ERPF', 'WERP']  # clustered & ~ranked by luminance
+lcltrhgts=[]
+lcltrhgts.append([0.8, 1.2, 2.8, 3])
+lcltrhgts.append([0, 0.8, 1.2, 2.8])
+lcltrhgts.append([1, 2, 4, 4])
+lcltrhgts.append([0, 0.8, 1.2, 2.8])
+#lcltrhgts=['1233', '1244', '1244', '1244']  # sizing coefficient is roughly proportional to luminance of each letter
 #lcltrsets=['WERQ', 'GPFK', 'UCAV', 'LTJY']  # clustered & ~ranked by luminance
 #lcltrhgts=['1123', '4444', '5556', '7777']  # sizing coefficient is roughly proportional to luminance of each letter
 if cluster == 0:
-    oriOffset=[45, 45, 45, 0]
-else:
     oriOffset=[45, 45, 45, 45]
+else:
+    oriOffset=[135, 45, 45, 45]
 letter = lcltrsets[cluster][l1]
 fontface = ['Sloan']
 
@@ -102,7 +108,7 @@ if gtype < 2:
     outdir = outdir + str(cluster+1) + '_letter_' + filter[gtype][ftype]
     pth = pth + gstims[gtype] +s+ 'usable' +s+ str(cluster+1) +s+ filter[gtype][ftype] +s
 else:
-    outdir = outdir + '_letter'
+    outdir = outdir + '_letterbold'
 outdir = outdir + '_' + lcltrsets[cluster] + '_' + string.replace(fontface[0], ' ', '') + '_cards' + s
 if not os.path.exists(outdir):
     os.makedirs(outdir)
@@ -119,8 +125,8 @@ else:
     imgs = Image.open(pth + 'bowlank.png')   #noise
 
 #LETTERS
-ltrH = (IMG_H/DIMY)+int(lcltrhgts[cluster][l1])
-feats = visual.TextStim( win, text=letter, font=fontface, height=ltrH, fontFiles=['Sloan.ttf'] )
+ltrH = (IMG_H/DIMY)+lcltrhgts[cluster][l1]-2
+feats = visual.TextStim( win, text=letter, font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'] )
 
 # BUILDING CARDS AS STIM/COLOR/FEATURE/ORIENTATION COMBINATIONS -------------------------------------------------------
 

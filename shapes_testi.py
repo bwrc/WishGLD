@@ -49,13 +49,13 @@ featDrop = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), line
 #caveTriangle = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
 #                         fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(25, 25),\
 #                         vertices=((0, 10), (6,0), (8, -10), (-8, -10), (0, -8), (0, 10)) )
-caveTriangle = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+caveStartrek = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
                          fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(25, 25),\
                          vertices=((0, 11), (9, -11), (0,-6), (-9, -11), (0, 11)), closeShape=True )
 
-caveDiamond = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
+caveXmastree = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
                          fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(25, -25),\
-                         vertices=((0, 10), (6, 2), (0, 0), (8, -6), (0,-10), (-8, -6), (0, 0), (-6, 2), (0, 10)), closeShape=True )
+                         vertices=((0,11), (0,15), (0, 11), (6, 2), (0, 0), (8, -6), (0,-9), (-8, -6), (0, 0), (-6, 2), (0, 11)), closeShape=True )
 
 caveHouse = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), lineColorSpace='rgb',\
                          fillColor=(0.0, 0.0, 0.0), fillColorSpace='rgb', pos=(-25, -25),\
@@ -85,20 +85,39 @@ skewDrop = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), line
 #patch=visual.GratingStim(win, tex='sin', mask='circle', pos=(0, 0), size=(50, 50), color=(1.0,0.0,0.0))
 #patch.draw(win)
 
+fontface = ['Sloan']
+ltrH = (IMG_H/DIMY)-2
+W = visual.TextStim( win, text='W', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-100, -150), color=(0.0, 0.0, 0.0), ori=90 )
+
+ltrH = (IMG_H/DIMY)-1.2
+E = visual.TextStim( win, text='E', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-100, -200), color=(0.0, 0.0, 0.0) )
+
+ltrH = (IMG_H/DIMY)-0.8
+R = visual.TextStim( win, text='R', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-150, -200), color=(0.0, 0.0, 0.0) )
+
+ltrH = (IMG_H/DIMY)+0.8
+P = visual.TextStim( win, text='P', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-150, -150), color=(0.0, 0.0, 0.0) )
+
+
 featTriangle.draw(win)
 featDiamond.draw(win)
 featHouse.draw(win)
 featDrop.draw(win)
 
-caveTriangle.draw(win)
-caveDiamond.draw(win)
+caveStartrek.draw(win)
+caveXmastree.draw(win)
 caveHouse.draw(win)
 caveArrow.draw(win)
 
-skewTriangle.draw(win)
-skewDiamond.draw(win)
-skewHouse.draw(win)
-skewDrop.draw(win)
+#skewTriangle.draw(win)
+#skewDiamond.draw(win)
+#skewHouse.draw(win)
+#skewDrop.draw(win)
+
+W.draw(win)
+E.draw(win)
+R.draw(win)
+P.draw(win)
 
 win.flip()
 
