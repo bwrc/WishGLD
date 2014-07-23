@@ -110,30 +110,30 @@ def RunSequence( sequence ):
         cardCount +=1
 
 #Selects a random set of subSetCount cards from a deck of deckSize cards.
-def SelectCardSubset( subSetCount, deckSize ):
-    if( subSetCount > deckSize ):
-        print('Trying to select %1d cards out of %1d cards. NOT POSSIBLE!' % (subSetCount, deckSize))
-        return []
-
-    cards =[]
-
-    for i in range(subSetCount):
-        cn = randint(0, deckSize-1)
-        while cn in cards:
-            cn = randint(0, deckSize-1)
-        cards.append( cn )
-    if DEBUG:
-        print 'selectCardSubset = ' + str(cards)
-    return cards
+#def SelectCardSubset( subSetCount, deckSize ):
+#    if( subSetCount > deckSize ):
+#        print('Trying to select %1d cards out of %1d cards. NOT POSSIBLE!' % (subSetCount, deckSize))
+#        return []
+#
+#    cards =[]
+#
+#    for i in range(subSetCount):
+#        cn = randint(0, deckSize-1)
+#        while cn in cards:
+#            cn = randint(0, deckSize-1)
+#        cards.append( cn )
+#    if DEBUG:
+#        print 'selectCardSubset = ' + str(cards)
+#    return cards
 
 # Selects a randomly ordered set of subSetCount cards from a given deck of cards.
-def indexCardSubset( subSetCount, deck ):
-    cards =[]
-
-    for i in range(subSetCount):
-        cards.append(deck())
-
-    return cards
+#def indexCardSubset( subSetCount, deck ):
+#    cards =[]
+#
+#    for i in range(subSetCount):
+#        cards.append(deck())
+#
+#    return cards
 
 #selects a random value [0..n-1], where the value != skip
 #def randomValue( n, skip ):
@@ -209,14 +209,16 @@ def SetupCategoryCards( cards, randomOrder = True ):
             cards[idx]['L1'] = feat3[idx]
             cards[idx]['L2'] = feat4[idx]
 
-            cards[idx]['fn'] = stimPath +'%02d_%02d_%02d_%02d.png' % (deck[feat1[idx]]*active_rules[0], feat2[idx], feat3[idx], feat4[idx])
+            cards[idx]['fn'] = stimPath +'%02d_%02d_%02d_%02d.png' % (feat1[idx], feat2[idx], feat3[idx], feat4[idx])
+#            cards[idx]['fn'] = stimPath +'%02d_%02d_%02d_%02d.png' % (deck[feat1[idx]]*active_rules[0], feat2[idx], feat3[idx], feat4[idx])
             if DEBUG:
                 print cards[idx]['fn']
 
     cardstr = ''
     for idx in range(4):
-        cardstr += '%01d: %01d,%01d,%01d,%01d | ' % ( idx, deck[feat1[idx]]*active_rules[0], feat2[idx], feat3[idx], feat4[idx]) 
-    logThis( 'Using deck: ' + cardstr[0:len(cardstr)-2] );
+        cardstr += '%01d: %01d,%01d,%01d,%01d | ' % ( idx, feat1[idx], feat2[idx], feat3[idx], feat4[idx])
+#        cardstr += '%01d: %01d,%01d,%01d,%01d | ' % ( idx, deck[feat1[idx]]*active_rules[0], feat2[idx], feat3[idx], feat4[idx]) 
+#    logThis( 'Using deck: ' + cardstr[0:len(cardstr)-2] );
 
     return True
 
@@ -401,7 +403,8 @@ def NextTrial( tasktype ):
     if DEBUG:
         print 'stimcard', currentTgt
 
-    fn = stimPath + '%02d_%02d_%02d_%02d.png' % (deck[currentTgt[0]]*active_rules[0], currentTgt[1], currentTgt[2], currentTgt[3]) 
+    fn = stimPath + '%02d_%02d_%02d_%02d.png' % (currentTgt[0], currentTgt[1], currentTgt[2], currentTgt[3])
+#    fn = stimPath + '%02d_%02d_%02d_%02d.png' % (deck[currentTgt[0]]*active_rules[0], currentTgt[1], currentTgt[2], currentTgt[3]) 
     tgtCard.setImage( fn )
 
     if DEBUG:
@@ -730,7 +733,7 @@ global lastScore
 cardPrototype = {'G1':0, 'G2':0, 'L1':0, 'L2':0, 'fn':''}
 
 #setup deck of four cards from the whole deck
-deck = SelectCardSubset( 4, N_OF_CARDS )
+#deck = SelectCardSubset( 4, N_OF_CARDS )
 
 global currentTgt; currentTgt = (-1, -1, -1, -1)
 
