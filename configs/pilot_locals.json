@@ -1,30 +1,22 @@
 {
     "blocks": [
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\start.json"
+        },
         {"part": 1,
          "type": "instruction",
-         "file": ".\\instructions\\qwikbase.json"
-        },
-        {"part": 2,
-         "type": "set",
-         "file": ".\\configs\\sets\\noise_of_letters_2-test.json"
+         "file": ".\\instructions\\NasaTLX.json"
         },
         {"part": 3,
          "type": "set",
-         "file": ".\\configs\\sets\\noise_of_shapes_1-test.json"
+         "file": ".\\configs\\sets\\noise_shape.json"
         },
-        {"part": 4,
-         "type": "instruction",
-         "file": ".\\instructions\\short_break.json"
-        },
-        {"part": 5,
+        {"part": 15,
          "type": "set",
-         "file": ".\\configs\\sets\\noise_of_letters_1-test.json"
+         "file": ".\\configs\\sets\\noise_letterWERP.json"
         },
-        {"part": 6,
-         "type": "set",
-         "file": ".\\configs\\sets\\noise_of_shapes_2-test.json"
-        },
-        {"part": 7,
+        {"part": 17,
          "type": "instruction",
          "file": ".\\instructions\\end.json"
         }

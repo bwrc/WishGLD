@@ -556,11 +556,16 @@ def ShowInstruction( txt, duration, col=(0.0, 0.0, 0.0) ):
     
 def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 
-    hasPic = False; hasTxt = False
+    hasPic = False; hasTxt = False; logTxt=False
     h = 0;
 
     if txt != "":
         hasTxt = True
+        if txt[0]=='*':
+            logTxt=True
+            offset=txt.find('*',1)
+            txt_to_log=txt[1:offset]+': '
+            txt=string.replace(txt, '*', '')
         instr = visual.TextStim( win, text=txt, pos=(0,-50), color=col, colorSpace='rgb', height=25, wrapWidth=800, alignHoriz='center')
 
     if picFile != "":
@@ -594,7 +599,11 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 
     win.flip()
     if duration < 0:
-        event.waitKeys()
+        if logTxt:
+            keys = event.waitKeys(keyList=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
+            logThis(txt_to_log + str(keys[0]))
+        else:
+            event.waitKeys()
     else:
         core.wait( duration )
 
@@ -645,8 +654,8 @@ myDlg.addField('Group:', choices=["Test", "Control"])
 
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 
-confjson = ['config1', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1', 'pilot_global_stim_short_comparison']
-myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[4]+'.json', width=30);
+confjson = ['config1', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1']
+myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[1]+'.json', width=30);
 
 
 myDlg.show()  # show dialog and wait for OK or Cancel
@@ -692,9 +701,9 @@ else:
 
 #rendering window setup
 #Dynamite Mac
-myMon=monitors.Monitor('Mac', width=50, distance=90); monW=1920; monH=1200
+#myMon=monitors.Monitor('Mac', width=50, distance=90); monW=1920; monH=1200
 #HP Elitebook 2560p
-#myMon=monitors.Monitor('Bens', width=31.5, distance=40); monW=1366; monH=768
+myMon=monitors.Monitor('Bens', width=31.5, distance=40); monW=1366; monH=768
 #DELL Latitude
 #myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); monW=1600; monH=900
 #myMon=monitors.Monitor('yoga', width=29.3, distance=40); monW=3200; monH=1800

@@ -1,50 +1,30 @@
 {
     "blocks": [
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\start.json"
+        },
+        {"part": 1,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_patch.json"
+        },
+        {"part": 1,
+         "type": "set",
+         "file": ".\\configs\\sets\\face2_patch.json"
+        },
         {"part": 1,
          "type": "instruction",
-         "file": ".\\instructions\\qwikbase.json"
-        },
-        {"part": 2,
-         "type": "set",
-         "file": ".\\configs\\sets\\faces_of_patches_2-test.json"
-        },
-        {"part": 3,
-         "type": "set",
-         "file": ".\\configs\\sets\\letters_of_patches_1-test.json"
-        },
-        {"part": 4,
-         "type": "instruction",
          "file": ".\\instructions\\short_break.json"
-        },
-        {"part": 5,
-         "type": "set",
-         "file": ".\\configs\\sets\\letters_of_patches_2-test.json"
-        },
-        {"part": 6,
-         "type": "set",
-         "file": ".\\configs\\sets\\faces_of_patches_1-test.json"
         },
         {"part": 7,
-         "type": "instruction",
-         "file": ".\\instructions\\short_break.json"
-        },
-        {"part": 8,
          "type": "set",
-         "file": ".\\configs\\sets\\faces_of_patches_3-test.json"
-        },
-        {"part": 9,
-         "type": "set",
-         "file": ".\\configs\\sets\\letters_of_patches_3-test.json"
-        },
-        {"part": 10,
-         "type": "instruction",
-         "file": ".\\instructions\\short_break.json"
+         "file": ".\\configs\\sets\\face4_patch.json"
         },
         {"part": 11,
          "type": "set",
-         "file": ".\\configs\\sets\\letters_of_patches_4-test.json"
+         "file": ".\\configs\\sets\\letterCGOQ_patch.json"
         },
-        {"part": 12,
+        {"part": 17,
          "type": "instruction",
          "file": ".\\instructions\\end.json"
         }

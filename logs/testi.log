@@ -1,102 +1,52 @@
-0.0005 	 	Subj ID: testi
-0.0006 	 	Run: 2014-07-22 12:08:36.068000
-0.0006 	 	Age: 18
-0.0006 	 	Group: Control
-0.0006 	 	--------------------------------------------------------
-0.0006 	 	INFO
-0.0006 	 	timestamp CUE
-0.0006 	 	timestamp STIM  [state for each rule G1 G2 L1 L2 : 0,1,2,3] RULE [current rule]
-0.0006 	 	timestamp TGT   [states for each card / Up, Right, Down, Left: 0,1,2,3; 0,1,2,3;...]
-0.0006 	 	timestamp RESP  [correct: 1/0] [current rule: G1, G2, L1, L2] ANSWER [card selected: 1(up), 2(right), 3(down), 4(left)]
-0.0006 	 	timestamp FEEDB [correct/fail] [correct answers] of [series length]
-0.0006 	 	--------------------------------------------------------
-2.9235 	 	Running set .\configs\sets\letterDJLU_patch.json
-2.9237 	 	Using deck: 0: 3,1,0,0 | 1: 2,0,0,0 | 2: 1,2,0,0 | 3: 0,3,0,0 
-3.5491 	 	CUE
-4.0494 	 	STIM   1, 0, 0, 0 RULE G1
-4.3524 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-7.0025 	 	RESP   0 G1 ANSWER -3
-7.0026 	 	FEEDB  FAIL 0 of 5
-8.0210 	 	CUE
-8.5216 	 	STIM   0, 0, 0, 0 RULE G1
-8.8279 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-11.4344 	 	RESP   1 G1 ANSWER 3
-11.4344 	 	FEEDB  CORRECT 1 of 5
-12.4527 	 	CUE
-12.9528 	 	STIM   1, 0, 0, 0 RULE G1
-13.2702 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-13.6984 	 	RESP   1 G1 ANSWER 4
-13.6984 	 	FEEDB  CORRECT 2 of 5
-14.7214 	 	CUE
-15.2218 	 	STIM   1, 2, 0, 0 RULE G1
-15.5245 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-15.8663 	 	RESP   1 G1 ANSWER 4
-15.8663 	 	FEEDB  CORRECT 3 of 5
-16.8862 	 	CUE
-17.3869 	 	STIM   2, 0, 0, 0 RULE G1
-17.6956 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-18.2262 	 	RESP   1 G1 ANSWER 1
-18.2263 	 	FEEDB  CORRECT 4 of 5
-19.2445 	 	CUE
-19.7450 	 	STIM   3, 3, 0, 0 RULE G1
-20.0505 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-20.6183 	 	RESP   1 G1 ANSWER 2
-20.6183 	 	FEEDB  CORRECT 5 of 5
-21.6395 	 	CUE
-22.1401 	 	STIM   2, 0, 0, 0 RULE G2
-22.4551 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-23.0822 	 	RESP   0 G2 ANSWER -1
-23.0822 	 	FEEDB  FAIL 0 of 6
-24.1012 	 	CUE
-24.6013 	 	STIM   2, 2, 0, 0 RULE G2
-24.9100 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-25.5542 	 	RESP   0 G2 ANSWER -1
-25.5542 	 	FEEDB  FAIL 0 of 6
-26.5741 	 	CUE
-27.0744 	 	STIM   2, 2, 0, 0 RULE G2
-27.3817 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-29.7380 	 	RESP   1 G2 ANSWER 3
-29.7380 	 	FEEDB  CORRECT 1 of 6
-30.7568 	 	CUE
-31.2575 	 	STIM   1, 0, 0, 0 RULE G2
-31.5734 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-32.9140 	 	RESP   1 G2 ANSWER 2
-32.9140 	 	FEEDB  CORRECT 2 of 6
-33.9344 	 	CUE
-34.4347 	 	STIM   2, 0, 0, 0 RULE G2
-34.7463 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-36.0579 	 	RESP   1 G2 ANSWER 2
-36.0579 	 	FEEDB  CORRECT 3 of 6
-37.0773 	 	CUE
-37.5777 	 	STIM   0, 0, 0, 0 RULE G2
-37.8860 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-38.5458 	 	RESP   1 G2 ANSWER 2
-38.5458 	 	FEEDB  CORRECT 4 of 6
-39.5644 	 	CUE
-40.0649 	 	STIM   3, 3, 0, 0 RULE G2
-40.3744 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-41.7537 	 	RESP   1 G2 ANSWER 4
-41.7537 	 	FEEDB  CORRECT 5 of 6
-42.7723 	 	CUE
-43.2730 	 	STIM   2, 2, 0, 0 RULE G2
-43.5808 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-45.0656 	 	RESP   1 G2 ANSWER 3
-45.0656 	 	FEEDB  CORRECT 6 of 6
-46.0847 	 	CUE
-46.5852 	 	STIM   1, 1, 0, 0 RULE G1
-46.8874 	 	TGT    2,1,0,0; 3,0,0,0; 0,2,0,0; 1,3,0,0
-47.4098 	 	Running set .\configs\sets\face2_patch.json
-47.4100 	 	Using deck: 0: 2,0,0,0 | 1: 3,2,0,0 | 2: 0,3,0,0 | 3: 1,1,0,0 
-48.4006 	 	CUE
-48.9013 	 	STIM   3, 1, 0, 0 RULE G1
-49.2087 	 	TGT    3,0,0,0; 2,2,0,0; 1,3,0,0; 0,1,0,0
-49.5781 	 	Running set .\configs\sets\face4_patch.json
-49.5783 	 	Using deck: 0: 0,2,0,0 | 1: 2,0,0,0 | 2: 1,3,0,0 | 3: 3,1,0,0 
-49.8971 	 	CUE
-50.3973 	 	STIM   0, 0, 0, 0 RULE G2
-50.7116 	 	TGT    1,2,0,0; 3,0,0,0; 0,3,0,0; 2,1,0,0
-50.8817 	 	Running set .\configs\sets\letterCGOQ_patch.json
-50.8819 	 	Using deck: 0: 0,1,0,0 | 1: 1,0,0,0 | 2: 3,2,0,0 | 3: 2,3,0,0 
-51.1295 	 	CUE
-51.6303 	 	STIM   2, 3, 0, 0 RULE G1
-51.9475 	 	TGT    1,1,0,0; 0,0,0,0; 2,2,0,0; 3,3,0,0
+0.0007 	 	Subj ID: testi
+0.0008 	 	Run: 2014-07-24 09:32:34.309000
+0.0008 	 	Age: 18
+0.0008 	 	Group: Control
+0.0008 	 	--------------------------------------------------------
+0.0008 	 	INFO
+0.0008 	 	timestamp CUE
+0.0008 	 	timestamp STIM  [state for each rule G1 G2 L1 L2 : 0,1,2,3] RULE [current rule]
+0.0008 	 	timestamp TGT   [states for each card / Up, Right, Down, Left: 0,1,2,3; 0,1,2,3;...]
+0.0008 	 	timestamp RESP  [correct: 1/0] [current rule: G1, G2, L1, L2] ANSWER [card selected: 1(up), 2(right), 3(down), 4(left)]
+0.0008 	 	timestamp FEEDB [correct/fail] [correct answers] of [series length]
+0.0008 	 	--------------------------------------------------------
+7.6602 	 	Mental Demand: 1
+8.2842 	 	Effort: 2
+8.2849 	 	Running set .\configs\sets\noise_shape.json
+9.4270 	 	CUE
+9.9272 	 	STIM   0, 0, 1, 2 RULE L2
+10.2367 	 	TGT    0,0,1,1; 0,0,2,3; 0,0,0,2; 0,0,3,0
+11.4761 	 	RESP   1 L2 ANSWER 3
+11.4761 	 	FEEDB  CORRECT 1 of 7
+12.5100 	 	CUE
+13.0102 	 	STIM   0, 0, 1, 3 RULE L2
+13.3245 	 	TGT    0,0,1,1; 0,0,2,3; 0,0,0,2; 0,0,3,0
+14.5240 	 	RESP   1 L2 ANSWER 2
+14.5240 	 	FEEDB  CORRECT 2 of 7
+15.5431 	 	CUE
+16.0432 	 	STIM   0, 0, 3, 2 RULE L2
+16.3473 	 	TGT    0,0,1,1; 0,0,2,3; 0,0,0,2; 0,0,3,0
+16.9720 	 	RESP   1 L2 ANSWER 3
+16.9720 	 	FEEDB  CORRECT 3 of 7
+17.9914 	 	CUE
+18.4913 	 	STIM   0, 0, 0, 3 RULE L2
+18.8022 	 	TGT    0,0,1,1; 0,0,2,3; 0,0,0,2; 0,0,3,0
+19.8759 	 	RESP   1 L2 ANSWER 2
+19.8759 	 	FEEDB  CORRECT 4 of 7
+20.8946 	 	CUE
+21.3956 	 	STIM   0, 0, 0, 1 RULE L2
+21.7080 	 	TGT    0,0,1,1; 0,0,2,3; 0,0,0,2; 0,0,3,0
+22.8598 	 	RESP   1 L2 ANSWER 1
+22.8598 	 	FEEDB  CORRECT 5 of 7
+23.8788 	 	CUE
+24.3795 	 	STIM   0, 0, 1, 0 RULE L2
+24.6973 	 	TGT    0,0,1,1; 0,0,2,3; 0,0,0,2; 0,0,3,0
+26.1397 	 	RESP   1 L2 ANSWER 4
+26.1398 	 	FEEDB  CORRECT 6 of 7
+27.1588 	 	CUE
+27.6597 	 	STIM   0, 0, 2, 1 RULE L2
+27.9705 	 	TGT    0,0,1,1; 0,0,2,3; 0,0,0,2; 0,0,3,0
+28.3641 	 	Running set .\configs\sets\noise_letterWERP.json
+30.4475 	 	CUE
+30.9480 	 	STIM   0, 0, 3, 0 RULE L2
+31.2605 	 	TGT    0,0,3,2; 0,0,1,0; 0,0,0,3; 0,0,2,1
