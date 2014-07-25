@@ -1,0 +1,116 @@
+{
+    "blocks": [
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\start.json"
+        },
+        {"part": 1,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_patch.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 7,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_patch.json"
+        },
+        {"part": 1,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 9,
+         "type": "instruction",
+         "file": ".\\instructions\\long_break.json"
+        },
+        {"part": 2,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_letterBERP.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 4,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_letterBERP.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 6,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_letterBERP.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 3,
+         "type": "set",
+         "file": ".\\configs\\sets\\noise_letterBERP.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 4,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_letterBERP.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 9,
+         "type": "instruction",
+         "file": ".\\instructions\\long_break.json"
+        },
+        {"part": 15,
+         "type": "set",
+         "file": ".\\configs\\sets\\noise_shape.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 10,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_shape.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 12,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_shape.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 14,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_shape.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 16,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_shape.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 17,
+         "type": "instruction",
+         "file": ".\\instructions\\end.json"
+        }
+    ]
+}

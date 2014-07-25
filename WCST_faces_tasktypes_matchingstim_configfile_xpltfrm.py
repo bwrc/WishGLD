@@ -654,7 +654,7 @@ myDlg.addField('Group:', choices=["Test", "Control"])
 
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 
-confjson = ['config1', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1']
+confjson = ['config1', 'pilot_last_test', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1']
 myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[1]+'.json', width=30);
 
 

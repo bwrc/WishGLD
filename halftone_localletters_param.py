@@ -69,7 +69,7 @@ filter.append(['sbw', 'sbs'])
 gstims=['faces_final', 'letters_final']
 # cluster sets
 gbltrsets=['AVXY', 'DJLU', 'HMNW', 'CGOQ']  # clustered by ssim score - ORDER IS FIXED TO FILE ORGANISATION!
-lcltrsets=['ERPF', 'WERP', 'ERPF', 'WERP']  # clustered & ~ranked by luminance
+lcltrsets=['ERPF', 'BERP', 'ERPF', 'BERP']  # clustered & ~ranked by luminance
 lcltrhgts=[]
 lcltrhgts.append([0.8, 1.2, 2.8, 3])
 lcltrhgts.append([0, 0.8, 1.2, 2.8])
@@ -78,10 +78,9 @@ lcltrhgts.append([0, 0.8, 1.2, 2.8])
 #lcltrhgts=['1233', '1244', '1244', '1244']  # sizing coefficient is roughly proportional to luminance of each letter
 #lcltrsets=['WERQ', 'GPFK', 'UCAV', 'LTJY']  # clustered & ~ranked by luminance
 #lcltrhgts=['1123', '4444', '5556', '7777']  # sizing coefficient is roughly proportional to luminance of each letter
-if cluster == 0:
-    oriOffset=[45, 45, 45, 45]
-else:
-    oriOffset=[135, 45, 45, 45]
+oriOffset=[45, 45, 45, 45]
+#if cluster == 0:
+#    oriOffset=[45, 45, 45, 45]
 letter = lcltrsets[cluster][l1]
 fontface = ['Sloan']
 

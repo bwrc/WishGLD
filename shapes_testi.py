@@ -87,16 +87,17 @@ skewDrop = visual.ShapeStim( win, lineWidth=1.0, lineColor=(0.0, 0.0, 0.0), line
 
 fontface = ['Sloan']
 ltrH = (IMG_H/DIMY)-2
-W = visual.TextStim( win, text='W', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-100, -150), color=(0.0, 0.0, 0.0), ori=90 )
+l1 = visual.TextStim( win, text='B', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-100, -150), color=(0.0, 0.0, 0.0) )
+#l1.setOri( 90 ) # if using W as sigma
 
 ltrH = (IMG_H/DIMY)-1.2
-E = visual.TextStim( win, text='E', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-100, -200), color=(0.0, 0.0, 0.0) )
+l2 = visual.TextStim( win, text='E', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-100, -200), color=(0.0, 0.0, 0.0) )
 
 ltrH = (IMG_H/DIMY)-0.8
-R = visual.TextStim( win, text='R', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-150, -200), color=(0.0, 0.0, 0.0) )
+l3 = visual.TextStim( win, text='R', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-150, -200), color=(0.0, 0.0, 0.0) )
 
 ltrH = (IMG_H/DIMY)+0.8
-P = visual.TextStim( win, text='P', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-150, -150), color=(0.0, 0.0, 0.0) )
+l4 = visual.TextStim( win, text='P', font=fontface, height=ltrH, bold=True, fontFiles=['Sloan.ttf'], pos=(-150, -150), color=(0.0, 0.0, 0.0) )
 
 
 featTriangle.draw(win)
@@ -114,10 +115,10 @@ caveArrow.draw(win)
 #skewHouse.draw(win)
 #skewDrop.draw(win)
 
-W.draw(win)
-E.draw(win)
-R.draw(win)
-P.draw(win)
+l1.draw(win)
+l2.draw(win)
+l3.draw(win)
+l4.draw(win)
 
 win.flip()
 
