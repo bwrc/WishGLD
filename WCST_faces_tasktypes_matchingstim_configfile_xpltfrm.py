@@ -15,6 +15,7 @@ TODO:
 """
 from random import randint, random, seed
 from psychopy import visual,core,monitors,event,gui, logging#, parallel
+from ctypes import windll
 from copy import deepcopy
 import csv
 from datetime import datetime
@@ -33,6 +34,7 @@ global N_OF_CARDS; N_OF_CARDS = 4 #this is now fixed for each stim folder!
 global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face/letter, color, shape/letter, orientation
 global portCodes;
 global s; s=os.sep
+global triggers; triggers=False # flag as True when actually recording 
 
 """
 'clear'     : 0
@@ -538,10 +540,11 @@ def logThis( msg ):
 
 #TODO: replace parallel stuff with Marco's solution
 def triggerAndLog( trigCode, msg, trigDuration=10 ):
-    #parallel.setData( trigCode ) #<-- add this for parallel triggering
     logThis( msg )
-    #core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
-    #parallel.setData( portCodes['clear'] ) #<-- add this for parallel triggering
+    if triggers:
+        windll.inpout32.Out32(0x378,trigCode)
+        core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
+        windll.inpout32.Out32(0x378, portCodes['clear'] ) #<-- add this for parallel triggering
 
 def ShowInstruction( txt, duration, col=(0.0, 0.0, 0.0) ):
     instr = visual.TextStim( win, text=txt, pos=(0,0), color=col, colorSpace='rgb', height=50 )
@@ -654,7 +657,7 @@ myDlg.addField('Group:', choices=["Test", "Control"])
 
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 
-confjson = ['config1', 'pilot_last_test', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1']
+confjson = ['config1', 'pilot_ota_test', 'pilot_last_test', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1']
 myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[1]+'.json', width=30);
 
 
@@ -703,12 +706,13 @@ else:
 #Dynamite Mac
 #myMon=monitors.Monitor('Mac', width=50, distance=90); monW=1920; monH=1200
 #HP Elitebook 2560p
-myMon=monitors.Monitor('Bens', width=31.5, distance=40); monW=1366; monH=768
+#myMon=monitors.Monitor('Bens', width=31.5, distance=40); monW=1366; monH=768
 #DELL Latitude
 #myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); monW=1600; monH=900
 #myMon=monitors.Monitor('yoga', width=29.3, distance=40); monW=3200; monH=1800
 #myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1920; monH=1200
 #myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1920; monH=1080
+myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1680; monH=1050
 myMon.setSizePix((monW, monH))
 win=visual.Window(winType='pyglet', size=(monW, monH), units='pix', fullscr=True, monitor=myMon, rgb=(1,1,1))
 
