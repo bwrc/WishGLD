@@ -1,3 +1,10 @@
+''' -----------------------------------------------------------------------------------------------
+WHEN SAVING A SET.JSON, USE THE FOLLOWING NAMING CONVENTION :
+    
+    [face/letter/noise]{optional-id}_[shape/letter/patch]{optional-id}.json
+    -----------------------------------------------------------------------------------------------
+'''
+
 import json, random
 from psychopy import gui
 import NewDlg

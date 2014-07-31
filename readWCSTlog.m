@@ -56,6 +56,7 @@ function data=readonelog( fname )
     %   - cut out 'escaped' sets
     %   - cut out trials with no response
     setidx=find(~cellfun(@isempty, strfind(trig, 'Running set')));
+    setnames=trig{setidx};
     setidx=[setidx; numel(time)+1];
     badtrial=false(numel(time),1);
     for i=1:numel(setidx)-1
@@ -71,8 +72,7 @@ function data=readonelog( fname )
                 test | [test(2:end); 0] | [test(3:end); 0; 0];
         end
     end
-    time(badtrial) = [];
-    trig(badtrial) = [];
+    time(badtrial) = [];    trig(badtrial) = [];
     
     %% get header info
     data=struct;
@@ -112,16 +112,14 @@ function data=readonelog( fname )
     end
     
     %% get sets for each stimulus category
-    cats={'face', '\letter', 'noise',...
-        'shape', '_letter', 'patch'};
-%     cats={'face2', 'face4', 'letterDJLU', 'letterCGOQ', 'noise',...
-%         'shape', 'letterWERP', 'patch'};
+    cats={'\face', '\letter', '\noise',...
+        '_shape', '_letter', '_patch'};
     % combine and grab set stats for each category
     for i=1:numel(cats)
         bgns=find(~cellfun(@isempty, strfind(trig,cats{i})));
         [agg_time, agg_trig]=getaggsets(bgns, time, trig);
         if ~isempty(agg_time)
-            data.(cats{i})=getstats(agg_time, agg_trig, cats{i});
+            data.(cats{i}(2:end))=getstats(agg_time, agg_trig, cats{i});
         end
     end
     combos=[1 1 1 2 2 2 3 3;...
@@ -129,10 +127,11 @@ function data=readonelog( fname )
     for i=1:8
         bgn1=find(~cellfun(@isempty, strfind(trig,cats{combos(1,i)})));
         bgn2=find(~cellfun(@isempty, strfind(trig,cats{combos(2,i)})));
-        if (~isempty(bgn1) && ~isempty(bgn2)) && (length(bgn1)~=length(bgn2) || ~isequal(bgn1, bgn2))
+        if (~isempty(bgn1) && ~isempty(bgn2)) &&...
+                (length(bgn1)~=length(bgn2) || ~isequal(bgn1, bgn2))
             [agg_time, agg_trig]=getaggsets(intersect(bgn1, bgn2), time, trig);
             if ~isempty(agg_time)
-                name=[cats{combos(1,i)} '_' cats{combos(2,i)}];
+                name=[cats{combos(1,i)}(2:end) '_' cats{combos(2,i)}(2:end)];
                 data.(name)=getstats(agg_time, agg_trig, name);
             end
         end
@@ -304,6 +303,6 @@ function stats=getstats(time, trig, type)
 %     stats.chgtrials=ruleChg;
     stats.refcards=refcards;
     stats.targets=targets;
-    stats.NasaTLX.ponnistelu=ponnis;
-    stats.NasaTLX.turhautuminen=turhau;
+    stats.NasaTLX.ponnistelu_set_val=ponnis;
+    stats.NasaTLX.turhautuminen_set_val=turhau;
 end
