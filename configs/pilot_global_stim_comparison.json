@@ -1,5 +1,5 @@
 {
-    "blocks": [
+    "sets": [
         {"part": 0,
          "type": "instruction",
          "file": ".\\instructions\\start.json"

@@ -1,12 +1,12 @@
 {
-	"pages" : [
-			 {"pic":  "", 
-			  "duration": "-1",
-			  "text": "*Mental Demand*.\nPlease indicate how mentally demanding was the task?\n\nVery Low >\t1\t2\t3\t4\t5\t6\t7\t8\t9\t< Very High" 
-			 },
-			 {"pic":  "", 
-			  "duration": "-1",
-			  "text": "*Effort*.\nPlease indicate how hard did you have to work to achieve your level of performance?\n\nVery Low >\t1\t2\t3\t4\t5\t6\t7\t8\t9\t< Very High" 
-			 }
-	]
+    "pages" : [
+         {"pic":  "", 
+          "duration": "-1",
+          "text": "*Ponnistelu*.\nKuinka paljon sinut täytyi ponnistella henkisesti tai fyysisesti suorituksen aikana?\n\nVähän >\t1\t2\t3\t4\t5\t6\t7\t8\t9\t< Paljon" 
+         },
+         {"pic":  "", 
+          "duration": "-1",
+          "text": "*Turhautuminen*.\nOlitko rentoutunut ja tyytyväinen vaiko rasittunut, ärtynyt ja turhautunut tehtävän suorituksen aikana?\n\nVähän >\t1\t2\t3\t4\t5\t6\t7\t8\t9\t< Paljon" 
+         }
+    ]
 }

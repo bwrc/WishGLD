@@ -1,8 +1,8 @@
 {
-	"pages" : [
-			 {"pic":  "", 
-			  "duration": "-1",
-			  "text": "Have a break, relax and chill. Press any key when ready to continue." 
-			 }
-	]
+    "pages" : [
+         {"pic":  "", 
+          "duration": "-1",
+          "text": "Nyt sinulla on hetki aikaa levätä ja tyhjentää ajatuksesi.\n-\nKun painat nappia, käymme taas läpi samanlaisen koetilanteen kuin äsken.\n Tehtäväsi pysyy edelleen samana." 
+         }
+    ]
 }

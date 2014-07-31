@@ -4,17 +4,13 @@
          "type": "instruction",
          "file": ".\\instructions\\start.json"
         },
-        {"part": 1,
+        {"part": 0,
          "type": "instruction",
          "file": ".\\instructions\\NasaTLX.json"
         },
-        {"part": 3,
-         "type": "set",
-         "file": ".\\configs\\sets\\noise_shape.json"
-        },
-        {"part": 15,
-         "type": "set",
-         "file": ".\\configs\\sets\\noise_letterWERP.json"
+        {"part": 9,
+         "type": "instruction",
+         "file": ".\\instructions\\short_break.json"
         },
         {"part": 17,
          "type": "instruction",

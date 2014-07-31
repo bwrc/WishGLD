@@ -4,13 +4,7 @@
 WCST experiment / ReKnow
 
 TODO:
-    - check the parallel port triggering, the logic is there (commented, search for 'add this for parallel triggering') but untested since lacking a parallel port + drivers
-      for driver installation, check http://psychopy.wmwikis.net/Triggering+the+Parallel+Port+(EEG)
-    - check the paths to the image files, also create a .\logs\ folder for logs
-    - if working from a csv file for rule sequences: check path, and delimiter
-    - check globals for configuring the test
-
-    - replace parallel with Marco's code!
+    - create config for each counter-balancing arrangement - PENDING FINAL STIMULI CHECK: PILOT ANALYSIS
 
 """
 from random import randint, random, seed
@@ -35,43 +29,45 @@ global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face/letter, color, shape/lette
 global portCodes;
 global s; s=os.sep
 global triggers; triggers=False # flag as True when actually recording 
+global currentSet, currentTrial, currentBlock; currentSet = 0; currentTrial = 0; currentBlock = 1;
 
 """
+Additive port code scheme allows unique decoding with sparse set. Avoids any number ending in #F, 
+as that will be used to trigger the eye tracker on the four bit parallel.
+
 'clear'     : 0
-'rule1'     : 1
-'rule2'     : 2
-'rule3'     : 3
-'rule4'     : 4
+'rule1'     : 16
+'rule2'     : 32
+'rule3'     : 48
+'rule4'     : 64
 'start'     : 10
 'stop'      : 20
 'cue'       : 30
 'feedback'  : 40
 'stimOn'    : 50
-'refsOn'    : 60
+'refsOn'    : 15
 'respRight' : 100
-'respWrong' : 200
+'respWrong' : 110
 
 use: 
-    writePort( stimOn | rule1 ) -> 51 
-    writePort( respRight | rule1 ) -> 101
+    writePort( stimOn | rule1 ) -> 66 
+    writePort( respRight | rule1 ) -> 116
     writePort( respWrong | rule2 ) #where rule2 would be impossible to deduce, since we don't know what the user meant?
 
 """
 portCodes = {'clear' : 0x00,\
-             'rule1' : 0x01,\
-             'rule2' : 0x02,\
-             'rule3' : 0x03,\
-             'rule4' : 0x04,\
+             'rule1' : 0x10,\
+             'rule2' : 0x20,\
+             'rule3' : 0x30,\
+             'rule4' : 0x40,\
              'cue'   : 0x1e,\
              'feedback'   : 0x28,\
              'stimOn'   : 0x32,\
-             'refsOn' : 0x3c,\
+             'refsOn' : 0x0f,\
              'respRight' : 0x64,\
-             'respWrong' : 0xC8,\
+             'respWrong' : 0x6e,\
              'start': 0x0a,\
              'stop': 0x14}
-
-#parallel.setPortAddress(0x0378) #<-- add this for parallel triggering
 
 def ShowInstructionSequence( instrSequence ):
     for item in instrSequence['pages']:
@@ -80,9 +76,10 @@ def ShowInstructionSequence( instrSequence ):
 def RunSequence( sequence ):
     #setup rules
     global rules
-    global currentRule
-    global ruleList; ruleList = [] #a list of tuples containing the sequence of sorting rules (0, 1, 2, 3) and required n of correct repeats per set(5, 6, 7)
-    for item in sequence['segments']:
+    global currentRule, currentBlock, currentTrial
+    # list of tuples containing the sequence of sorting rules (0, 1, 2, 3) and required n of correct repeats per set(5, 6, 7)
+    global ruleList; ruleList = []
+    for item in sequence['blocks']:
         ruleList.append( (int(item['rule']), int(item['reps'])) )
     print 'RULELIST:', ruleList
     global RULE_COUNT; RULE_COUNT = len( ruleList )
@@ -107,68 +104,11 @@ def RunSequence( sequence ):
             if rightAnswers % ruleRepeats == 0: # rightAnswers can't be 0 here since retVal wouldn't be > 0
                 ruleCount += 1
                 rightAnswers = 0
+                currentBlock += 1
+                currentTrial = 0
                 logging.flush() #now with every rule change!
 
         cardCount +=1
-
-#Selects a random set of subSetCount cards from a deck of deckSize cards.
-#def SelectCardSubset( subSetCount, deckSize ):
-#    if( subSetCount > deckSize ):
-#        print('Trying to select %1d cards out of %1d cards. NOT POSSIBLE!' % (subSetCount, deckSize))
-#        return []
-#
-#    cards =[]
-#
-#    for i in range(subSetCount):
-#        cn = randint(0, deckSize-1)
-#        while cn in cards:
-#            cn = randint(0, deckSize-1)
-#        cards.append( cn )
-#    if DEBUG:
-#        print 'selectCardSubset = ' + str(cards)
-#    return cards
-
-# Selects a randomly ordered set of subSetCount cards from a given deck of cards.
-#def indexCardSubset( subSetCount, deck ):
-#    cards =[]
-#
-#    for i in range(subSetCount):
-#        cards.append(deck())
-#
-#    return cards
-
-#selects a random value [0..n-1], where the value != skip
-#def randomValue( n, skip ):
-#    c = randint( 0, n-1)
-#    while( c == skip ):
-#        c = randint( 0, n-1)
-#    return c
-
-#selects a reference card that 
-#given a target card [A, B, C, D] only matches on one feature
-#NOT USED
-#def selectRefCard( tgtCard, matchFeat ):
-#    if matchFeat == 0:
-#        rc = ( tgt[0],\
-#               randomValue( 4, tgtCard[1] ),\
-#               randomValue( 4, tgtCard[2] ),\
-#               randomValue( 4, tgtCard[3] ) )
-#    elif matchFeat == 1:
-#        rc = ( randomValue( 4, tgtCard[0] ),\
-#               tgt[1],\
-#               randomValue( 4, tgtCard[2] ),\
-#               randomValue( 4, tgtCard[3] ) )
-#    elif matchFeat == 2:
-#        rc = ( randomValue( 4, tgtCard[0] ),\
-#               randomValue( 4, tgtCard[1] ),\
-#               tgt[2],\
-#               randomValue( 4, tgtCard[3] ) )
-#    elif matchFeat == 3:
-#        rc = ( randomValue( 4, tgtCard[0] ),\
-#               randomValue( 4, tgtCard[1] ),\
-#               randomValue( 4, tgtCard[2] ),\
-#               tgt[3] )
-#    return rc
 
 def randomizeOrder( lst ):
     return sorted(lst, key=lambda k: random())
@@ -229,12 +169,13 @@ def DebugMsg( msg ):
     txt.draw()
 
 def SetupTrial():
-    global currentRule
+    global currentRule, currentTrial
     global ruleRepeats
     global tgtCards
 
     currentRule = rules[ ruleList[ ruleCount ][0] ]
     ruleRepeats = int( ruleList[ruleCount][1] )
+    currentTrial += 1
 
     if DEBUG:
         print 'CURRENTRULE = ' + currentRule
@@ -300,32 +241,42 @@ def GetResponse():
     if retVal > 0:
         gameScore += 1
         if currentRule == 'G1':
-           triggerAndLog( portCodes['respRight'] | portCodes['rule1'], 'RESP   1 ' + currentRule + ' ANSWER ' + str(retVal) )
+           triggerAndLog( portCodes['respRight'] | portCodes['rule1'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+           + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'G2':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule2'], 'RESP   1 ' + currentRule + ' ANSWER ' + str(retVal) )
+            triggerAndLog( portCodes['respRight'] | portCodes['rule2'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+            + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'L1':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule3'], 'RESP   1 ' + currentRule + ' ANSWER ' + str(retVal) )
+            triggerAndLog( portCodes['respRight'] | portCodes['rule3'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+            + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'L2':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule4'], 'RESP   1 ' + currentRule + ' ANSWER ' + str(retVal) )
+            triggerAndLog( portCodes['respRight'] | portCodes['rule4'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+            + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
     elif retVal < 0:
         gameScore -= 1
         if currentRule == 'G1':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule1'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule1'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'G2':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule2'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule2'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'L1':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule3'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule3'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
         if currentRule == 'L2':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule4'], 'RESP   0 ' + currentRule + ' ANSWER ' + str(retVal) )
+            triggerAndLog( portCodes['respWrong'] | portCodes['rule4'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
     
     return retVal
 
 def GiveFeedback( taskType, fbVal ):
 
     if fbVal > 0:
-        triggerAndLog( portCodes['feedback'], 'FEEDB  CORRECT ' + str(rightAnswers) + ' of ' + str(ruleRepeats) );
+        triggerAndLog( portCodes['feedback'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                                + '_FDB CORRECT ' + str(rightAnswers) + ' of ' + str(ruleRepeats) );
     else:
-        triggerAndLog( portCodes['feedback'], 'FEEDB  FAIL ' + str(rightAnswers) + ' of ' + str(ruleRepeats) );
+        triggerAndLog( portCodes['feedback'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                                + '_FDB FAIL ' + str(rightAnswers) + ' of ' + str(ruleRepeats) );
         
     if taskType == 3:
         if fbVal > 0:
@@ -378,7 +329,8 @@ def frameCard( pos, color, duration ):
                          closeShape=True )
 
     frame.pos = pos
-    win.flip( clearBuffer = False ) #for some odd reason without this the backbuffer is empty while drawing the frame, and then flashes the cards
+    #for some odd reason without this the backbuffer is empty while drawing the frame, and then flashes the cards
+    win.flip( clearBuffer = False )
     frame.draw(win)
     win.flip( clearBuffer = False )
     core.wait(duration)
@@ -393,7 +345,7 @@ def fixCross(duration):
     fc.pos = (0, 0)
     fc.draw( win )
     win.flip()
-    triggerAndLog( portCodes['cue'], 'CUE' ) 
+    triggerAndLog( portCodes['cue'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_CUE' ) 
     core.wait(duration)
 
 def NextTrial( tasktype ):
@@ -412,7 +364,7 @@ def NextTrial( tasktype ):
     if DEBUG:
         print 'stim: ' + fn
 
-    if tasktype == 1: # 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+    if tasktype == 1: # 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
 
         fixCross(0.5)
         
@@ -420,7 +372,9 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule)
+                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                    + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
+                    + str( currentTgt[3] ) + ' RULE ' + currentRule)
 
         win.flip() #clear
 
@@ -429,13 +383,13 @@ def NextTrial( tasktype ):
 
         win.flip( clearBuffer= False ) # keep the cards in the backbuffer for feedback
 
-        triggerAndLog( portCodes['refsOn'], \
-                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
-                       + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
-                       + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
-                       + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
+        triggerAndLog( portCodes['refsOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
+            + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+            + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
+            + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
+            + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
 
-    elif taskType == 2: # 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
+    elif taskType == 2: # 22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
 
         fixCross( 1 )
 
@@ -444,7 +398,9 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule)
+                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                    + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
+                    + str( currentTgt[3] ) + ' RULE ' + currentRule)
 
         win.flip() #clear
             
@@ -453,16 +409,16 @@ def NextTrial( tasktype ):
 
         win.flip()
 
-        triggerAndLog( portCodes['refsOn'], \
-                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
-                       + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
-                       + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
-                       + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
+        triggerAndLog( portCodes['refsOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
+            + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+            + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
+            + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
+            + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
 
         #draw stim card to back buffer for feedback -> flip in GiveFeedback, ugly but efficient
         tgtCard.draw(win)
 
-    elif taskType == 3: # 3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+    elif taskType == 3: # 3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
 
         fixCross( 1 )
 
@@ -471,7 +427,9 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule )
+                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                    + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
+                    + str( currentTgt[3] ) + ' RULE ' + currentRule )
 
         win.flip() #clear
             
@@ -480,13 +438,13 @@ def NextTrial( tasktype ):
 
         win.flip()
 
-        triggerAndLog( portCodes['refsOn'], \
-                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
-                       + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
-                       + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
-                       + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
+        triggerAndLog( portCodes['refsOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
+            + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+            + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
+            + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
+            + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
 
-    elif taskType == 4: # 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
+    elif taskType == 4: # 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
 
         tgtCard.draw(win)
 
@@ -496,13 +454,13 @@ def NextTrial( tasktype ):
         win.flip( ) # keep the cards in the backbuffer for feedback
 
     # TODO concurrent presentation not compatible with logging scheme?
-        triggerAndLog( portCodes['stimOn'], \
-                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
-                       + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
-                       + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
-                       + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
+        triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
+            + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+            + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
+            + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
+            + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
 
-    elif taskType == 5: # 3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+    elif taskType == 5: # 5555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
         
         global lastScore
         
@@ -517,7 +475,9 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], 'STIM   ' + str( currentTgt[0] ) + ', ' + str( currentTgt[1] ) + ', ' +str( currentTgt[2] ) + ', ' +str( currentTgt[3] ) + ' RULE ' + currentRule )
+                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                    + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
+                    + str( currentTgt[3] ) + ' RULE ' + currentRule )
 
         win.flip() #clear
 
@@ -526,11 +486,11 @@ def NextTrial( tasktype ):
 
         win.flip( clearBuffer= False ) # keep the cards in the backbuffer for feedback
 
-        triggerAndLog( portCodes['refsOn'], \
-                'TGT    ' + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
-                       + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
-                       + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
-                       + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
+        triggerAndLog( portCodes['refsOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
+            + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
+            + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
+            + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
+            + str(tgtCards[3]['G1']) + ',' + str(tgtCards[3]['G2'])+ ',' + str(tgtCards[3]['L1']) + ',' + str(tgtCards[3]['L2']) )
 
     else: 
         ShowInstruction("Wrong Task Type (NextTrial)", 1)
@@ -538,7 +498,7 @@ def NextTrial( tasktype ):
 def logThis( msg ):
     logging.log( msg, level=myLogLevel )
 
-#TODO: replace parallel stuff with Marco's solution
+# parallel stuff has been replaced with Marco's solution!
 def triggerAndLog( trigCode, msg, trigDuration=10 ):
     logThis( msg )
     if triggers:
@@ -604,7 +564,7 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
     if duration < 0:
         if logTxt:
             keys = event.waitKeys(keyList=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
-            logThis(txt_to_log + str(keys[0]))
+            logThis("{:02d}".format(currentSet) + '.0_' + txt_to_log + str(keys[0]))
         else:
             event.waitKeys()
     else:
@@ -633,7 +593,9 @@ def CheckCard( stimNum, currentRule, currentTgt ):
     else:
         return False
 
-# - MAIN PROG -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------#
+# - MAIN PROG -------------------------------------------------------------------------------------#
+# -------------------------------------------------------------------------------------------------#
 
 #init random seed
 seed()
@@ -657,7 +619,7 @@ myDlg.addField('Group:', choices=["Test", "Control"])
 
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 
-confjson = ['config1', 'pilot_ota_test', 'pilot_last_test', 'pilot_locals', 'pilot_globals', 'arbitrary_ordering_with_stimuli_set_1']
+confjson = ['testi', 'test_template', 'pilot_ota_test', 'pilot_last_test', 'pilot_locals', 'pilot_globals', 'config_base']
 myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[1]+'.json', width=30);
 
 
@@ -689,11 +651,11 @@ else:
 
 logThis('--------------------------------------------------------')
 logThis('INFO')
-logThis('timestamp CUE')
-logThis('timestamp STIM  [state for each rule G1 G2 L1 L2 : 0,1,2,3] RULE [current rule]')
-logThis('timestamp TGT   [states for each card / Up, Right, Down, Left: 0,1,2,3; 0,1,2,3;...]') 
-logThis('timestamp RESP  [correct: 1/0] [current rule: G1, G2, L1, L2] ANSWER [card selected: 1(up), 2(right), 3(down), 4(left)]')
-logThis('timestamp FEEDB [correct/fail] [correct answers] of [series length]')
+logThis('timestamp [block].[trial]_CUE')
+logThis('timestamp [block].[trial]_STM [state for each rule G1 G2 L1 L2 : 0,1,2,3] RULE [current rule]')
+logThis('timestamp [block].[trial]_TGT [states for each card / Up, Right, Down, Left: 0,1,2,3; 0,1,2,3;...]') 
+logThis('timestamp [block].[trial]_RSP [correct: 1/0] [current rule: G1, G2, L1, L2] ANSWER [card selected: 1(up), 2(right), 3(down), 4(left)]')
+logThis('timestamp [block].[trial]_FDB [correct/fail] [correct answers] of [series length]')
 logThis('--------------------------------------------------------')
 
 # SETUP TEST PARAMS
@@ -706,13 +668,13 @@ else:
 #Dynamite Mac
 #myMon=monitors.Monitor('Mac', width=50, distance=90); monW=1920; monH=1200
 #HP Elitebook 2560p
-#myMon=monitors.Monitor('Bens', width=31.5, distance=40); monW=1366; monH=768
+myMon=monitors.Monitor('Bens', width=31.5, distance=40); monW=1366; monH=768
 #DELL Latitude
 #myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); monW=1600; monH=900
 #myMon=monitors.Monitor('yoga', width=29.3, distance=40); monW=3200; monH=1800
 #myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1920; monH=1200
 #myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1920; monH=1080
-myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1680; monH=1050
+#myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1680; monH=1050
 myMon.setSizePix((monW, monH))
 win=visual.Window(winType='pyglet', size=(monW, monH), units='pix', fullscr=True, monitor=myMon, rgb=(1,1,1))
 
@@ -734,7 +696,9 @@ else: # sequential -> tight format
     cardPos.append( (0, -266) )
     cardPos.append( (-522, 0) )
 
-# - BEGIN -------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------#
+# - BEGIN PROG ------------------------------------------------------------------------------------#
+# -------------------------------------------------------------------------------------------------#
 global cardCount 
 global rightAnswers
 global ruleCount 
@@ -758,7 +722,7 @@ confFile.close()
 gameScore = 0
 lastScore = 0
 
-for item in config['blocks']:
+for item in config['sets']:
     if( item['type'] == 'instruction'):
         temp=string.replace( item['file'], '\\', s )
         instrFile = open( temp )
@@ -771,15 +735,14 @@ for item in config['blocks']:
         seqFile = open( temp )
         setSequence = json.loads( seqFile.read() )
         seqFile.close()
-        logThis('Running set %s' % (item['file']) )
+        currentSet += 1
+        logThis("{:02d}".format(currentSet) + '.00_' + 'Running set %s' % (item['file']) )
 
         #run test type based on confInfo
         global stimPath; stimPath = setSequence['set']['stimpath']
         stimPath=string.replace( stimPath, '\\', s )
 
-# ###########################################################################################################################
-        # RESTRICT CARD SETS FOR REDUCED FEATURE SETS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# ###########################################################################################################################
+        # RESTRICT CARD SETS FOR REDUCED FEATURE SETS ---------------------------------
         active_rules = [1,1,1,1]
         if string.find(stimPath, 'noise') != -1:
             active_rules = [0,0,1,1]

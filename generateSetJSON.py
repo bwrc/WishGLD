@@ -104,10 +104,10 @@ for item in ruleset:
 print rows
 
 #json generation
-data = {'set': {'stimpath': setpath, 'segments':[]}}
+data = {'set': {'stimpath': setpath, 'blocks':[]}}
 
 for i in rows:
-    data['set']['segments'].append( {'rule': i[0], 'reps': i[1]} )
+    data['set']['blocks'].append( {'rule': i[0], 'reps': i[1]} )
 
 jsontext = json.dumps(data)
 

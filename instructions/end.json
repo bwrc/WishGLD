@@ -1,8 +1,8 @@
 {
-	"pages" : [
-			 {"pic":  "", 
-			  "duration": "-1",
-			  "text": "Koe päättyy\nKiitos osallistumisesta!" 
-			 }
-	]
+    "pages" : [
+             {"pic":  "", 
+              "duration": "-1",
+              "text": "Koe päättyy\nKiitos osallistumisesta!" 
+             }
+    ]
 }

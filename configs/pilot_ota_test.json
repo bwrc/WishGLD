@@ -1,5 +1,5 @@
 {
-    "blocks": [
+    "sets": [
         {"part": 0,
          "type": "instruction",
          "file": ".\\instructions\\start.json"
@@ -22,7 +22,7 @@
         },
         {"part": 9,
          "type": "instruction",
-         "file": ".\\instructions\\long_break.json"
+         "file": ".\\instructions\\short_break.json"
         },
         {"part": 2,
          "type": "set",
@@ -66,7 +66,7 @@
         },
         {"part": 9,
          "type": "instruction",
-         "file": ".\\instructions\\long_break.json"
+         "file": ".\\instructions\\short_break.json"
         },
         {"part": 15,
          "type": "set",
