@@ -1,0 +1,144 @@
+{
+    "sets": [
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\start.json"
+        },
+        {"part": 50,
+         "type": "set",
+         "file": ".\\configs\\sets\\practice1.json"
+        },
+        {"part": 50,
+         "type": "set",
+         "file": ".\\configs\\sets\\practice2.json"
+        },
+        {"part": 50,
+         "type": "set",
+         "file": ".\\configs\\sets\\practice3.json"
+        },
+        {"part": 50,
+         "type": "set",
+         "file": ".\\configs\\sets\\practice4.json"
+        },
+        {"part": 50,
+         "type": "set",
+         "file": ".\\configs\\sets\\practice5.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\short_break.json"
+        },
+        {"part": 9,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_shape_ii.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 10,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_letterBERP_ii.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 8,
+         "type": "set",
+         "file": ".\\configs\\sets\\noise_letterBERP.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 11,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_shape_ii.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\short_break.json"
+        },
+        {"part": 7,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_patch.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 12,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_letterBERP_ii.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 6,
+         "type": "set",
+         "file": ".\\configs\\sets\\noise_shape.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 1,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_shape_i.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\short_break.json"
+        },
+        {"part": 5,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_patch.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 2,
+         "type": "set",
+         "file": ".\\configs\\sets\\face4_letterBERP_i.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 4,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_letterBERP_i.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 3,
+         "type": "set",
+         "file": ".\\configs\\sets\\letterDJLU_shape_i.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\end.json"
+        }
+    ]
+}

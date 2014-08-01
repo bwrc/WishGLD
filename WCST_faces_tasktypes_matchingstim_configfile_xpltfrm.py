@@ -86,7 +86,7 @@ def RunSequence( sequence ):
     global ruleCount, cardCount, rightAnswers;
     ruleCount = 0;
 
-    ShowInstruction( u'Aloita painamalla jotain näppäintä', -1 )
+    ShowInstruction( u'Aloita painamalla jotain näppäintä.\n-\nPress any key to start.', -1 )
 
     while ruleCount < RULE_COUNT: 
         currentRule = rules[ruleList[ruleCount][0]]

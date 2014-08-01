@@ -112,6 +112,11 @@ function data=readonelog( fname )
     end
     
     %% get sets for each stimulus category
+%     cats=setnames;
+%     idx=[cell2mat(strfind(cats,'\')) cell2mat(strfind(cats,'_'))];
+%     for i=1:numel(cats)
+%         cats{i}=cats{i}(idx(end-1):idx(end));
+%     end
     cats={'\face', '\letter', '\noise',...
         '_shape', '_letter', '_patch'};
     % combine and grab set stats for each category

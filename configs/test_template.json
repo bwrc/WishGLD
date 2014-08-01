@@ -32,6 +32,7 @@
          "type": "instruction",
          "file": ".\\instructions\\short_break.json"
         },
+<INSERT ACTIVE PARTS HERE>
         {"part": 17,
          "type": "instruction",
          "file": ".\\instructions\\end.json"

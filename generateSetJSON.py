@@ -1,7 +1,7 @@
 ''' -----------------------------------------------------------------------------------------------
 WHEN SAVING A SET.JSON, USE THE FOLLOWING NAMING CONVENTION :
     
-    [face/letter/noise]{optional-id}_[shape/letter/patch]{optional-id}.json
+    [face/letter/noise]{optional-id}_[shape/letter/patch]{optional-id}{_optional-enum}.json
     -----------------------------------------------------------------------------------------------
 '''
 
