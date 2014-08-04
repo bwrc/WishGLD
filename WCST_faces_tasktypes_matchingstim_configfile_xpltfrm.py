@@ -3,9 +3,6 @@
 """
 WCST experiment / ReKnow
 
-TODO:
-    - create config for each counter-balancing arrangement - PENDING FINAL STIMULI CHECK: PILOT ANALYSIS
-
 """
 from random import randint, random, seed
 from psychopy import visual,core,monitors,event,gui, logging#, parallel
@@ -20,7 +17,7 @@ import string   # to find test type from pathstrings (noise, patch)
 #import numpy    # easy arrays
 
 # - GLOBALS -------------------------------------------------------------------------------------------
-global DEBUG; DEBUG = True
+global DEBUG; DEBUG = False
 global RANDOMIZE_CATEGORY_CARDS; RANDOMIZE_CATEGORY_CARDS = False
 global RULE_COUNT; RULE_COUNT = 20 #if read from file, this will be overridden
 global SEP_STIM_DURATION; SEP_STIM_DURATION = 20 #n of frames (16ms)
@@ -95,6 +92,9 @@ def RunSequence( sequence ):
         answer = GetResponse()
 
         if answer == 0: #ESC
+            rightAnswers = 0
+            currentBlock += 1
+            currentTrial = 0
             break
         else:
             GiveFeedback( taskType, answer )
@@ -109,7 +109,7 @@ def RunSequence( sequence ):
 
         cardCount +=1
 
-    logging.flush() # flush log when set has been run - don't want flush to cause display pause!
+#    logging.flush() # flush log when set has been run - don't want flush to cause display pause!
 
 def randomizeOrder( lst ):
     return sorted(lst, key=lambda k: random())
@@ -602,27 +602,34 @@ def CheckCard( stimNum, currentRule, currentTgt ):
 seed()
 
 # Gather info / dialog
-myDlg = NewDlg.NewDlg(title="The amazing ReKnow mindfuck")
+myDlg = NewDlg.NewDlg(title="The amazing ReKnow card test")
 
 myDlg.addText('Subject info')
+# confInfo 0
 myDlg.addField('SubjID:', width=30)
+# confInfo 1
 myDlg.addField('Age:', 18)
 
 myDlg.addText('Experiment Info')
+# confInfo 2
 myDlg.addField('Randomize Category Cards:', choices=["No", "Yes"])
+# confInfo 3
 myDlg.addField('Select presentation mode', choices=["1 :: Sequential, Feedback: framed target", \
                                                      "2 :: Sequential, Feedback: stimcard",\
                                                      "3 :: Sequential, Feedback: R/W",\
                                                      "4 :: Concurrent",\
                                                      "5 :: Gamify"\
                                                      ])
+# confInfo 4
 myDlg.addField('Group:', choices=["Test", "Control"])
-
+# confInfo 5
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
-
-confjson = ['testi', 'test_template', 'pilot_ota_test', 'pilot_last_test', 'pilot_locals', 'pilot_globals', 'config_base']
-myDlg.addField('Config File:', '.'+s+'configs'+s+confjson[1]+'.json', width=30);
-
+confjson = ['config_base', 'test_latin1', 'test_latin2', 'test_latin3', 'test_latin4', 'test_latin5', 'test_latin6'\
+            , 'test_latin7', 'test_latin8', 'test_latin9', 'test_latin10', 'test_latin11', 'test_latin12']
+# confInfo 6
+myDlg.addField('Config File:', choices=confjson, width=30);
+# confInfo 7
+myDlg.addField('Choose monitor', choices=["1", "2"])
 
 myDlg.show()  # show dialog and wait for OK or Cancel
 
@@ -666,19 +673,31 @@ else:
     RANDOMIZE_CATEGORY_CARDS = True
 
 #rendering window setup
-#Dynamite Mac
-#myMon=monitors.Monitor('Mac', width=50, distance=90); monW=1920; monH=1200
+mntrs=[]
+monW=[]
+monH=[]
+# OIH experimenter's screen
+mntrs.append( monitors.Monitor('OIH1', width=37.8, distance=50) ); monW.append(1680); monH.append(1050)
+# OIH eye tracking screen
+mntrs.append( monitors.Monitor('OIH2', width=37.8, distance=50) ); monW.append(1680); monH.append(1050)
 #HP Elitebook 2560p
-myMon=monitors.Monitor('Bens', width=31.5, distance=40); monW=1366; monH=768
+mntrs.append( monitors.Monitor('Ben1', width=31.5, distance=40) ); monW.append(1366); monH.append(768)
+mntrs.append( monitors.Monitor('Ben2', width=31.5, distance=40) ); monW.append(1080); monH.append(1920)
+#Dynamite Mac
+mntrs.append( monitors.Monitor('DynMac', width=50, distance=90) ); monW.append(1920); monH.append(1200)
 #DELL Latitude
-#myMon=monitors.Monitor('BensTTL', width=31.5, distance=40); monW=1600; monH=900
-#myMon=monitors.Monitor('yoga', width=29.3, distance=40); monW=3200; monH=1800
-#myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1920; monH=1200
-#myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1920; monH=1080
-#myMon=monitors.Monitor('dell', width=37.8, distance=50); monW=1680; monH=1050
-myMon.setSizePix((monW, monH))
-win=visual.Window(winType='pyglet', size=(monW, monH), units='pix', fullscr=True, monitor=myMon, rgb=(1,1,1))
-
+mntrs.append( monitors.Monitor('bTTL', width=31.5, distance=40) ); monW.append(1600); monH.append(900)
+# kride laptop
+mntrs.append( monitors.Monitor('yoga', width=29.3, distance=40) ); monW.append(3200); monH.append(1800)
+# kride desktop 1
+mntrs.append( monitors.Monitor('dell', width=37.8, distance=50) ); monW.append(1920); monH.append(1200)
+# kride desktop 2
+mntrs.append( monitors.Monitor('dell', width=37.8, distance=50) ); monW.append(1920); monH.append(1080)
+midx=3
+myMon=mntrs[midx]
+myMon.setSizePix((monW[midx], monH[midx]))
+win=visual.Window(winType='pyglet', size=(monW[midx], monH[midx]), units='pix', fullscr=True, monitor=myMon,\
+                screen=int(confInfo[7]), rgb=(1,1,1))
 taskType = int( confInfo[3][0] ) # 1, 2, 3, ...
 global cardPos; cardPos = []
 
@@ -716,7 +735,7 @@ cardPrototype = {'G1':0, 'G2':0, 'L1':0, 'L2':0, 'fn':''}
 global currentTgt; currentTgt = (-1, -1, -1, -1)
 
 #TODO: ADD ERROR CHECKING! Here we trust the json files to be correctly formed and valid
-confFile = open( confInfo[6] )#'.\\configs\\config1.json')
+confFile = open( '.'+s+'configs'+s+confInfo[6]+'.json' )
 config = json.loads( confFile.read() )
 confFile.close()
 
