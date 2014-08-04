@@ -106,9 +106,10 @@ def RunSequence( sequence ):
                 rightAnswers = 0
                 currentBlock += 1
                 currentTrial = 0
-                logging.flush() #now with every rule change!
 
         cardCount +=1
+
+    logging.flush() # flush log when set has been run - don't want flush to cause display pause!
 
 def randomizeOrder( lst ):
     return sorted(lst, key=lambda k: random())
