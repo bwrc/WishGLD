@@ -124,7 +124,9 @@ function data=readonelog( fname )
         bgns=find(~cellfun(@isempty, strfind(trig,cats{i})));
         [agg_time, agg_trig]=getaggsets(bgns, time, trig);
         if ~isempty(agg_time)
-            data.(cats{i}(2:end))=getstats(agg_time, agg_trig, cats{i});
+            name=strrep(cats{i},'_','l_');
+            name=strrep(name,'\','g_');
+            data.(name)=getstats(agg_time, agg_trig, cats{i});
         end
     end
     combos=[1 1 1 2 2 2 3 3;...

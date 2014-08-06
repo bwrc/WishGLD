@@ -25,7 +25,6 @@ global N_OF_CARDS; N_OF_CARDS = 4 #this is now fixed for each stim folder!
 global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face/letter, color, shape/letter, orientation
 global portCodes;
 global s; s=os.sep
-global triggers; triggers=False # flag as True when actually recording 
 global currentSet, currentTrial, currentBlock; currentSet = 0; currentTrial = 0; currentBlock = 1;
 
 """
@@ -210,7 +209,7 @@ def GetResponse():
     retVal = 0 #if not modified, breaks the task
     answerPressed = -1 # which card was selected?
 
-    keys = event.waitKeys()
+    keys = event.waitKeys(keyList=['escape', 'up', 'right', 'down', 'left'])
 
     if keys[0]=='escape':
         retVal = 0
@@ -624,12 +623,14 @@ myDlg.addField('Select presentation mode', choices=["1 :: Sequential, Feedback: 
 myDlg.addField('Group:', choices=["Test", "Control"])
 # confInfo 5
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
-confjson = ['config_base', 'test_latin1', 'test_latin2', 'test_latin3', 'test_latin4', 'test_latin5', 'test_latin6'\
-            , 'test_latin7', 'test_latin8', 'test_latin9', 'test_latin10', 'test_latin11', 'test_latin12']
+myDlg.addText('IMPORTANT!! DOUBLE CHECK!')
 # confInfo 6
-myDlg.addField('Config File:', choices=confjson, width=30);
+myDlg.addField('Config File:', choices=['config_base', 'test_latin1', 'test_latin2', 'test_latin3', 'test_latin4',\
+                                        'test_latin5', 'test_latin6', 'test_latin7', 'test_latin8', 'test_latin9',\
+                                        'test_latin10', 'test_latin11', 'test_latin12'], width=30);
 # confInfo 7
 myDlg.addField('Choose monitor', choices=["1", "2"])
+myDlg.addField('Send Triggers?', choices=["True", "False"])
 
 myDlg.show()  # show dialog and wait for OK or Cancel
 
@@ -725,6 +726,7 @@ global ruleCount
 
 global gameScore  #for the gamify mode
 global lastScore
+global triggers; triggers=(confInfo[8]=='True') # flag as True when actually recording 
 
 #SETUP CARDS 
 cardPrototype = {'G1':0, 'G2':0, 'L1':0, 'L2':0, 'fn':''}
