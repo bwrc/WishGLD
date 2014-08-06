@@ -56,7 +56,7 @@ function data=readonelog( fname )
     %   - cut out 'escaped' sets
     %   - cut out trials with no response
     setidx=find(~cellfun(@isempty, strfind(trig, 'Running set')));
-    setnames=trig{setidx};
+    setnames=trig{setidx}; %#ok<NASGU>
     setidx=[setidx; numel(time)+1];
     badtrial=false(numel(time),1);
     for i=1:numel(setidx)-1
