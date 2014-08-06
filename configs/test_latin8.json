@@ -66,7 +66,7 @@
         },
         {"part": 0,
          "type": "instruction",
-         "file": ".\\instructions\\short_break.json"
+         "file": ".\\instructions\\second_break.json"
         },
         {"part": 6,
          "type": "set",
@@ -102,7 +102,7 @@
         },
         {"part": 0,
          "type": "instruction",
-         "file": ".\\instructions\\short_break.json"
+         "file": ".\\instructions\\third_break.json"
         },
         {"part": 4,
          "type": "set",
