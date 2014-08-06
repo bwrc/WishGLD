@@ -21,7 +21,6 @@ function SO = RecuMergeStruct(A,B)
     elseif isempty(B)
         return;
     end
-
     if ismatrix(A) && ismatrix(B)
         numa=numel(A);  numb=numel(B);
         for i=1:min(numa, numb)
@@ -38,7 +37,6 @@ function SO = RecuMergeStruct(A,B)
 end
 
 function SO=MergeSimple(A,B)
-
     SO=A;
     try
         fna=fieldnames(A);
@@ -52,33 +50,51 @@ function SO=MergeSimple(A,B)
                 end
             end
         end
-
         for i=1:length(fna)
             fi=fna{i};
             if isfield(B,fi)
-                    if isempty(B.(fi))
-                        continue;
-                    elseif isnumeric(B.(fi)) || islogical(B.(fi))
-                        if isvector(B.(fi)) && length(A.(fi))==length(B.(fi))
-                            if iscolumn(A.(fi))
-                                SO.(fi) = [A.(fi)'; B.(fi)'];
+                if isempty(B.(fi))
+                    continue;
+                elseif isnumeric(B.(fi)) || islogical(B.(fi))
+                    if isscalar(B.(fi)) && ~ismatrix(A.(fi))
+                        if isrow(A.(fi))
+                            SO.(fi) = [A.(fi)'; B.(fi)];
+                        else
+                            SO.(fi) = [A.(fi); B.(fi)];
+                        end
+                    elseif isvector(B.(fi))
+                        [ra,ca]=size(A.(fi));   [rb,cb]=size(B.(fi));
+                        if ra==rb
+                            SO.(fi) = [A.(fi)'; B.(fi)'];
+                        elseif ca==cb
+                            SO.(fi) = [A.(fi); B.(fi)];
+                        else
+                            if iscell(SO.(fi))
+                                SO.(fi){end+1} = B.(fi);
                             else
-                                SO.(fi) = [A.(fi); B.(fi)];
+                                SO.(fi) = {A.(fi); B.(fi)};
                             end
+                        end
+                    else
+                        if iscell(SO.(fi))
+                            SO.(fi){end+1} = B.(fi);
                         else
                             SO.(fi) = {A.(fi); B.(fi)};
                         end
-                    elseif iscell(B.(fi)) || ischar(B.(fi))
-                        SO.(fi) = {A.(fi); B.(fi)};
-                    elseif isstruct(B.(fi))
-                        temp=RecuMergeStruct(A.(fi), B.(fi));
-                        SO.(fi)=temp;
                     end
+                elseif iscell(B.(fi)) || ischar(B.(fi))
+                    if iscell(SO.(fi))
+                        SO.(fi){end+1} = B.(fi);
+                    else
+                        SO.(fi) = {A.(fi); B.(fi)};
+                    end
+                elseif isstruct(B.(fi))
+                    temp=RecuMergeStruct(A.(fi), B.(fi));
+                    SO.(fi)=temp;
+                end
             end
         end
     catch ME,
         disp([ME.message ' For: ' fi ';']);
     end
-
 end
-
