@@ -21,36 +21,34 @@ REM for %%g in (0,1) do (
  REM )
 REM )
 REM do some specific full sets
-for %%i in (0,1,2,3) do (
- for %%j in (0,1,2,3) do (
-  for %%k in (0) do (
-   %py% halftone_localletters_param.py 0 3 0 %%i %%j %%k
-  )
- )
-)
-for %%i in (0,1,2,3) do (
- for %%j in (0,1,2,3) do (
-  for %%k in (0) do (
-   %py% halftone_localletters_param.py 1 1 1 %%i %%j %%k
-  )
- )
-)
-REM do the local letters' global noise -------------------------------------------
-REM for %%g in (2) do (
- REM for %%c in (1) do (
-  REM for %%f in (0) do (
-   REM for %%i in (0) do (
-    REM for %%j in (0) do (
-	 REM for %%k in (0) do (
-	  REM REM echo %%g %%c %%f %%i %%j %%k
-	  REM %py% halftone_localletters_param.py %%g %%c %%f %%i %%j %%k
-	  REM REM pause
-	 REM )
-	REM )
-   REM )
+REM for %%i in (0,1,2,3) do (
+ REM for %%j in (0,1,2,3) do (
+  REM for %%k in (0) do (
+   REM %py% halftone_localletters_param.py 0 3 0 %%i %%j %%k
   REM )
  REM )
 REM )
+REM for %%i in (0,1,2,3) do (
+ REM for %%j in (0,1,2,3) do (
+  REM for %%k in (0) do (
+   REM %py% halftone_localletters_param.py 1 1 1 %%i %%j %%k
+  REM )
+ REM )
+REM )
+REM do the local letters' global noise -------------------------------------------
+for %%g in (2) do (
+ for %%c in (1) do (
+  for %%f in (0) do (
+   for %%i in (0) do (
+    for %%j in (0) do (
+	 for %%k in (0) do (
+	  %py% halftone_localletters_param.py %%g %%c %%f %%i %%j %%k
+	 )
+	)
+   )
+  )
+ )
+)
 
 REM do the local shapes' all globals ----------------------------------------------
 REM %py% halftone_localshapes_gen.py
