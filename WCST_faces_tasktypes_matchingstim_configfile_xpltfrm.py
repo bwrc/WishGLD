@@ -6,7 +6,6 @@ WCST experiment / ReKnow
 """
 from random import randint, random, seed
 from psychopy import visual,core,monitors,event,gui, logging#, parallel
-from ctypes import windll
 from copy import deepcopy
 import csv
 from datetime import datetime
@@ -14,7 +13,9 @@ import json
 import NewDlg   # allows setting the length of textfields
 import os       # to get path separator for platform independence
 import string   # to find test type from pathstrings (noise, patch)
-#import numpy    # easy arrays
+import sys
+if sys.platform.startswith('win'):
+    from ctypes import windll
 
 # - GLOBALS -------------------------------------------------------------------------------------------
 global DEBUG; DEBUG = False
@@ -625,12 +626,15 @@ myDlg.addField('Group:', choices=["Test", "Control"])
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 myDlg.addText('IMPORTANT!! DOUBLE CHECK!')
 # confInfo 6
-myDlg.addField('Config File:', choices=['config_base', 'test_latin1', 'test_latin2', 'test_latin3', 'test_latin4',\
+myDlg.addField('Config File:', choices=['test_latin1', 'test_latin2', 'test_latin3', 'test_latin4',\
                                         'test_latin5', 'test_latin6', 'test_latin7', 'test_latin8', 'test_latin9',\
-                                        'test_latin10', 'test_latin11', 'test_latin12'], width=30);
+                                        'test_latin10', 'test_latin11', 'test_latin12', 'config_base'], width=30);
 # confInfo 7
 myDlg.addField('Choose monitor', choices=["1", "2"])
-myDlg.addField('Send Triggers?', choices=["True", "False"])
+if sys.platform.startswith('win'):
+    myDlg.addField('Send Triggers?', choices=["True", "False"])
+else:
+    myDlg.addField('No Windows detected: Trigger status ', choices=["False"])
 
 myDlg.show()  # show dialog and wait for OK or Cancel
 
@@ -694,7 +698,7 @@ mntrs.append( monitors.Monitor('yoga', width=29.3, distance=40) ); monW.append(3
 mntrs.append( monitors.Monitor('dell', width=37.8, distance=50) ); monW.append(1920); monH.append(1200)
 # kride desktop 2
 mntrs.append( monitors.Monitor('dell', width=37.8, distance=50) ); monW.append(1920); monH.append(1080)
-midx=3
+midx=4
 myMon=mntrs[midx]
 myMon.setSizePix((monW[midx], monH[midx]))
 win=visual.Window(winType='pyglet', size=(monW[midx], monH[midx]), units='pix', fullscr=True, monitor=myMon,\
