@@ -626,9 +626,9 @@ myDlg.addField('Group:', choices=["Test", "Control"])
 myDlg.addField('Show Instructions?', choices=["No", "Yes"])
 myDlg.addText('IMPORTANT!! DOUBLE CHECK!')
 # confInfo 6
-myDlg.addField('Config File:', choices=['test_latin1', 'test_latin2', 'test_latin3', 'test_latin4',\
-                                        'test_latin5', 'test_latin6', 'test_latin7', 'test_latin8', 'test_latin9',\
-                                        'test_latin10', 'test_latin11', 'test_latin12', 'config_base'], width=30);
+myDlg.addField('Config File:', choices=['sep_latin1', 'sep_latin2', 'sep_latin3', 'sep_latin4',\
+                                        'sep_latin5', 'sep_latin6', 'sep_latin7', 'sep_latin8',\
+                                        'config_base'], width=30);
 # confInfo 7
 myDlg.addField('Choose monitor', choices=["1", "2"])
 if sys.platform.startswith('win'):
