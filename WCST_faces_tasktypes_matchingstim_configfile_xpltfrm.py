@@ -210,9 +210,13 @@ def GetResponse():
     retVal = 0 #if not modified, breaks the task
     answerPressed = -1 # which card was selected?
 
-    keys = event.waitKeys(keyList=['escape', 'up', 'right', 'down', 'left'])
+    keys = event.waitKeys(keyList=['f10', 'escape', 'up', 'right', 'down', 'left'])
 
-    if keys[0]=='escape':
+    if keys[0] == 'f10':
+        logThis('PANIC BUTTON -> OUT')
+        win.close()
+        core.quit()
+    elif keys[0] == 'escape':
         retVal = 0
     elif keys[0] == 'up':
         if CheckCard( 0, currentRule, currentTgt ):
