@@ -1,8 +1,8 @@
 {
     "pages" : [
-         {"pic":  "", 
+         {"pic":  "instructions\\pics\\practice5_example.png", 
           "duration": "-1",
-          "text": "Practice 5." 
+          "text": "Harjoitus 5/5\n\nViimeisessä harjoituksessa korteissa on käytössä kaikki neljä luokitteluperustetta:\n- kortin kasvokuva,\n- kortin väri,\n- kortissa esitetyt pienet kuviot ja\n- pienten kuvioiden osoittama suunta" 
          }
     ]
 }

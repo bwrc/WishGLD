@@ -1,8 +1,8 @@
 {
     "pages" : [
-         {"pic":  "", 
+         {"pic":  "instructions\\pics\\practice4_example.png", 
           "duration": "-1",
-          "text": "Practice 4." 
+          "text": "Harjoitus 4/5\n\nSeuraavassa osiossa korttien luokittelupiirteinä on:\n- pienet kuviot sekä\n- niiden osoittama suunta" 
          }
     ]
 }

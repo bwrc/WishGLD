@@ -1,8 +1,8 @@
 {
     "pages" : [
-         {"pic":  "", 
+         {"pic":  "instructions\\pics\\practice2_example.png", 
           "duration": "-1",
-          "text": "Practice 2." 
+          "text": "Harjoittelu 2/5\n\nSeuraavassa luokittelupiirteet ovat:\n- pieni kirjainmerkki ja\n- kirjaimen osoittama suunta" 
          }
     ]
 }

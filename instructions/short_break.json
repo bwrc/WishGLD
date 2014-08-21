@@ -2,7 +2,7 @@
     "pages" : [
         {"pic":  "", 
          "duration": "-1",
-         "text": "Nyt sinulla on hetki aikaa levätä ja tyhjentää ajatuksesi.\n-\nKun painat nappia, käymme taas läpi samanlaisen koetilanteen kuin äsken.\n Tehtäväsi pysyy edelleen samana." 
+         "text": "Nyt sinulla on hetki aikaa levätä ja tyhjentää ajatuksesi.\n\nSeuraavaksi aloitamme varsinaisen kokeen.\nTehtävä alkaa kun painat jotain painiketta." 
         }
     ]
 }

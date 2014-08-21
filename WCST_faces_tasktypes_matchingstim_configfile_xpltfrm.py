@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 
 """
 WCST experiment / ReKnow
@@ -83,7 +83,7 @@ def RunSequence( sequence ):
     global ruleCount, cardCount, rightAnswers;
     ruleCount = 0;
 
-    ShowInstruction( u'Aloita painamalla jotain näppäintä.\n-\nPress any key to start.', -1 )
+    ShowPicInstruction( u'Aloita painamalla jotain näppäintä.\n\nPress any key to start.', -1, "", 1 )
 
     while ruleCount < RULE_COUNT: 
         currentRule = rules[ruleList[ruleCount][0]]
