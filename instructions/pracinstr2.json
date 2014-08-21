@@ -2,7 +2,7 @@
     "pages" : [
          {"pic":  "instructions\\pics\\practice2_example.png", 
           "duration": "-1",
-          "text": "Harjoittelu 2/5\n\nSeuraavassa luokittelupiirteet ovat:\n- pieni kirjainmerkki ja\n- kirjaimen osoittama suunta" 
+          "text": "Harjoittelu 2/5\n\nSeuraavassa osiossa kortin luokittelupiirteet ovat:\n- pieni kirjainmerkki ja\n- kirjaimen osoittama suunta" 
          }
     ]
 }
