@@ -50,6 +50,10 @@
         },
         {"part": 0,
          "type": "instruction",
+         "file": ".\\instructions\\baseline.json"
+        },
+        {"part": 0,
+         "type": "instruction",
          "file": ".\\instructions\\short_break.json"
         },
         {"part": 1,
