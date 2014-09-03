@@ -4,15 +4,16 @@
 WCST experiment / ReKnow
 
 """
-# Create LSL outlet
 import sys
-sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
-from pylsl import StreamInfo, StreamOutlet, resolve_streams, StreamInlet, IRREGULAR_RATE, cf_int32
-global outlet
 
-
-info = StreamInfo('markerstream', 'markers', 1, 10, 'float32', 'streasdfsaamid002')
-outlet = StreamOutlet(info)
+global USE_LSL; USE_LSL = True
+# Create LSL outlet
+if USE_LSL:
+	sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
+	from pylsl import StreamInfo, StreamOutlet, resolve_streams, StreamInlet, IRREGULAR_RATE, cf_int32
+	global outlet
+	info = StreamInfo('markerstream', 'markers', 1, 10, 'float32', 'streasdfsaamid002')
+	outlet = StreamOutlet(info)
 
 
 from random import randint, random, seed
@@ -525,10 +526,12 @@ def logThis( msg ):
 def triggerAndLog( trigCode, msg, trigDuration=10 ):
     global paraport
     global outlet
+	global USE_LSL
     logThis( msg )
     if triggers:
         windll.inpout32.Out32(paraport, trigCode)
-        outlet.push_sample([trigCode])
+		if USE_LSL:
+			outlet.push_sample([trigCode])
         core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
         windll.inpout32.Out32(paraport, portCodes['clear'] ) #<-- add this for parallel triggering
 
