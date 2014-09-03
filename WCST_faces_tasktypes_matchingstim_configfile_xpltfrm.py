@@ -4,8 +4,19 @@
 WCST experiment / ReKnow
 
 """
+# Create LSL outlet
+import sys
+sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
+from pylsl import StreamInfo, StreamOutlet, resolve_streams, StreamInlet, IRREGULAR_RATE, cf_int32
+global outlet
+
+
+info = StreamInfo('markerstream', 'markers', 1, 10, 'float32', 'streasdfsaamid002')
+outlet = StreamOutlet(info)
+
+
 from random import randint, random, seed
-from psychopy import visual,core,monitors,event,gui, logging#, parallel
+from psychopy import visual,core,monitors,event,gui,logging#,parallel
 from copy import deepcopy
 import csv
 from datetime import datetime
@@ -13,9 +24,11 @@ import json
 import NewDlg   # allows setting the length of textfields
 import os       # to get path separator for platform independence
 import string   # to find test type from pathstrings (noise, patch)
-import sys
+
 if sys.platform.startswith('win'):
     from ctypes import windll
+
+
 
 # - GLOBALS -------------------------------------------------------------------------------------------
 global DEBUG; DEBUG = False
@@ -27,6 +40,8 @@ global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face/letter, color, shape/lette
 global portCodes;
 global s; s=os.sep
 global currentSet, currentTrial, currentBlock; currentSet = 0; currentTrial = 0; currentBlock = 1;
+global paraport; paraport=0xEC00    # or 0xEC00, 0xE880
+
 
 """
 Additive port code scheme allows unique decoding with sparse set. Avoids any number ending in #F, 
@@ -45,6 +60,7 @@ as that will be used to trigger the eye tracker on the four bit parallel.
 'refsOn'    : 15
 'respRight' : 100
 'respWrong' : 110
+'eda'       : 237
 
 use: 
     writePort( stimOn | rule1 ) -> 66 
@@ -64,7 +80,8 @@ portCodes = {'clear' : 0x00,\
              'respRight' : 0x64,\
              'respWrong' : 0x6e,\
              'start': 0x0a,\
-             'stop': 0x14}
+             'stop': 0x14,\
+             'eda' : 0xed}
 
 def ShowInstructionSequence( instrSequence ):
     for item in instrSequence['pages']:
@@ -216,7 +233,8 @@ def GetResponse():
         logThis('PANIC BUTTON -> OUT')
         win.close()
         core.quit()
-    elif keys[0] == 'escape':
+
+    if keys[0] == 'escape':
         retVal = 0
     elif keys[0] == 'up':
         if CheckCard( 0, currentRule, currentTgt ):
@@ -505,11 +523,14 @@ def logThis( msg ):
 
 # parallel stuff has been replaced with Marco's solution!
 def triggerAndLog( trigCode, msg, trigDuration=10 ):
+    global paraport
+    global outlet
     logThis( msg )
     if triggers:
-        windll.inpout32.Out32(0x378,trigCode)
+        windll.inpout32.Out32(paraport, trigCode)
+        outlet.push_sample([trigCode])
         core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
-        windll.inpout32.Out32(0x378, portCodes['clear'] ) #<-- add this for parallel triggering
+        windll.inpout32.Out32(paraport, portCodes['clear'] ) #<-- add this for parallel triggering
 
 def ShowInstruction( txt, duration, col=(0.0, 0.0, 0.0) ):
     instr = visual.TextStim( win, text=txt, pos=(0,0), color=col, colorSpace='rgb', height=50 )
