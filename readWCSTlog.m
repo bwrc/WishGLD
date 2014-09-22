@@ -35,22 +35,31 @@ function data=readWCSTlog( filename )
 end
 
 function data=readonelog( fname )
+% READONELONG parses a single log file: extracts trials of interest
+% and compiles various stats calling getstats(), to build 'data'.
+
     % Read file
     if exist(fname, 'file')
         fid = fopen(fname);
         data = textscan(fid, '%s%s%s', 'Delimiter', '\t');
     else
-        myReport( [fname ' does not exist. Abort'] );
-        return;
+        error( [fname ' does not exist. Abort'] );
     end
-    %% extract time and triggers
+    %% extract time and trigger columns as vectors
     time = cellfun(@str2double, data{1} );
     trig = data{3};
     % trim data sets
     thr=find(~cellfun(@isempty, strfind(trig, '------------')));
     time(1:thr(2))=[];
-    head=trig(1:thr(1)-1);
+    head=trig(1:thr(1)-1); % extract naming info
     trig(1:thr(2))=[];
+
+    %% get header info
+    data=struct;
+    data.subj = strrep(head{1}(10:end),'.','');
+    data.date = datevec(head{2}(6:end));
+    data.age = str2double(head{3}(6:end));
+    data.group = head{4}(8:end);
     
     %% extract the set headers indices and clean up:
     %   - cut out 'escaped' sets
@@ -74,13 +83,7 @@ function data=readonelog( fname )
     end
     time(badtrial) = [];    trig(badtrial) = [];
     
-    %% get header info
-    data=struct;
-    data.subj = strrep(head{1}(10:end),'.','');
-    data.date = datevec(head{2}(6:end));
-    data.age = str2double(head{3}(6:end));
-    data.group = head{4}(8:end);
-    % get full dataset stats
+    % finally, get stats for complete dataset
     data.alltrials = getstats(time, trig, 'All Trials');
     
     %% get rules-based stats
@@ -119,7 +122,7 @@ function data=readonelog( fname )
 %     end
     cats={'\face', '\letter', '\noise',...
         '_shape', '_letter', '_patch'};
-    % combine and grab set stats for each category
+    % aggregate trials and grab set stats for each category
     for i=1:numel(cats)
         bgns=find(~cellfun(@isempty, strfind(trig,cats{i})));
         [agg_time, agg_trig]=getaggsets(bgns, time, trig);
@@ -129,6 +132,7 @@ function data=readonelog( fname )
             data.(name)=getstats(agg_time, agg_trig, cats{i});
         end
     end
+    %% do combinations of each category, i.e. face_shape, face_letter, etc
     combos=[1 1 1 2 2 2 3 3;...
             4 5 6 4 5 6 4 5];
     for i=1:8
@@ -166,6 +170,9 @@ function trials=getruletrials(trig, rule)
 end
 
 function stats=getstats(time, trig, type)
+% GETSTATS parses collections of WCST log trials, extracting response
+% statistics like RTV, hit rate etc.
+
     stats=struct;
     % ---------------------------------------------------------------------
     % delete header rows --------------------------------------------------

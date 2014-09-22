@@ -33,10 +33,10 @@ Additive port code scheme allows unique decoding with sparse set. Avoids any num
 as that will be used to trigger the eye tracker on the four bit parallel.
 
 'clear'     : 0
-'rule1'     : 16
-'rule2'     : 32
-'rule3'     : 48
-'rule4'     : 64
+'rule1'     : 1
+'rule2'     : 2
+'rule3'     : 3
+'rule4'     : 4
 'start'     : 10
 'stop'      : 20
 'cue'       : 30
