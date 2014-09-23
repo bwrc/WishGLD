@@ -33,10 +33,10 @@ Additive port code scheme allows unique decoding with sparse set. Avoids any num
 as that will be used to trigger the eye tracker on the four bit parallel.
 
 'clear'     : 0
-'rule1'     : 1
-'rule2'     : 2
-'rule3'     : 3
-'rule4'     : 4
+'rule1'     : 16
+'rule2'     : 32
+'rule3'     : 48
+'rule4'     : 64
 'start'     : 10
 'stop'      : 20
 'cue'       : 30
@@ -355,7 +355,6 @@ def fixCross(duration):
 
 def NextTrial( tasktype ):
     global currentTgt
-    global currentRule
 
     currentTgt = GetStimCard( tgtCards )
 
@@ -365,6 +364,7 @@ def NextTrial( tasktype ):
     fn = stimPath + '%02d_%02d_%02d_%02d.png' % (currentTgt[0], currentTgt[1], currentTgt[2], currentTgt[3])
 #    fn = stimPath + '%02d_%02d_%02d_%02d.png' % (deck[currentTgt[0]]*active_rules[0], currentTgt[1], currentTgt[2], currentTgt[3]) 
     tgtCard.setImage( fn )
+    idx=str(rules.index(currentRule)+1)
 
     if DEBUG:
         print 'stim: ' + fn
@@ -377,7 +377,8 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                    "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule)
 
@@ -403,7 +404,8 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                    "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule)
 
@@ -432,7 +434,8 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                    "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule )
 
@@ -459,7 +462,8 @@ def NextTrial( tasktype ):
         win.flip( ) # keep the cards in the backbuffer for feedback
 
     # TODO concurrent presentation not compatible with logging scheme?
-        triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
+        triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+            "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
             + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
             + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
             + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
@@ -480,7 +484,8 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                    "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule )
 
