@@ -48,21 +48,21 @@ global paraport; paraport=0xEC00    # or 0xEC00, 0xE880
 Additive port code scheme allows unique decoding with sparse set. Avoids any number ending in #F, 
 as that will be used to trigger the eye tracker on the four bit parallel.
 
-'clear'     : 0
-'rule1'     : 16
-'rule2'     : 32
-'rule3'     : 48
-'rule4'     : 64
-'start'     : 10
-'stop'      : 20
-'cue'       : 30
-'feedback'  : 40
-'stimOn'    : 50
-'refsOn'    : 15
-'respRight' : 100
-'respWrong' : 110
-'set'       : 224
-'instr'     : 240
+'clear'     : 0     triggers the parallel port
+'rule1'     : 16    = global 1 rule, FACES or LETTERS
+'rule2'     : 32    = global 2 rule, colour
+'rule3'     : 48    = local 1 rule, shape or letter
+'rule4'     : 64    = local 2 rule, orientation
+'cue'       : 30    = fixation cross before target stimulus
+'feedback'  : 40    = red/wrong or green/correct visual feedback to a response
+'stimOn'    : 50    = target stimulus is shown
+'refsOn'    : 15    = four reference stimuli are shown
+'respRight' : 100   = correct response is received
+'respWrong' : 110   = wrong response is received
+'set'       : 224   marks the beginning of a test/practice set
+'instr'     : 240   marks the display of an instruction
+'start'     : 254   marks the start of the experiment
+'stop'      : 255   marks the end of the experiment
 
 use: 
     writePort( stimOn | rule1 ) -> 66 
@@ -81,8 +81,8 @@ portCodes = {'clear' : 0x00,\
              'refsOn' : 0x0f,\
              'respRight' : 0x64,\
              'respWrong' : 0x6e,\
-             'start': 0x0a,\
-             'stop': 0x14,\
+             'start': 0xfe,\
+             'stop': 0xff,\
              'set' : 0xe0,
              'instr':0xf0}
 
