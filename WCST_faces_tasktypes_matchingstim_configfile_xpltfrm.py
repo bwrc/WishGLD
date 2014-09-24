@@ -232,6 +232,7 @@ def GetResponse():
 
     if keys[0] == 'f10':
         logThis('PANIC BUTTON -> OUT')
+        triggerAndLog(portCodes['stop'], "STOP: aborted by F10")
         win.close()
         core.quit()
 
@@ -261,35 +262,19 @@ def GetResponse():
             retVal = 4
         else:
             retVal = -4
-            
+
+    idx=str(rules.index(currentRule)+1)
+
     if retVal > 0:
         gameScore += 1
-        if currentRule == 'G1':
-           triggerAndLog( portCodes['respRight'] | portCodes['rule1'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-           + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'G2':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule2'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'L1':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule3'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'L2':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule4'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
+        triggerAndLog( portCodes['respRight'] | portCodes['rule'+idx],\
+        "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+        + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
     elif retVal < 0:
         gameScore -= 1
-        if currentRule == 'G1':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule1'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'G2':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule2'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'L1':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule3'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'L2':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule4'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
+        triggerAndLog( portCodes['respWrong'] | portCodes['rule'+idx],\
+        "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+        + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
     
     return retVal
 
@@ -374,7 +359,6 @@ def fixCross(duration):
 
 def NextTrial( tasktype ):
     global currentTgt
-    global currentRule
 
     currentTgt = GetStimCard( tgtCards )
 
@@ -384,6 +368,7 @@ def NextTrial( tasktype ):
     fn = stimPath + '%02d_%02d_%02d_%02d.png' % (currentTgt[0], currentTgt[1], currentTgt[2], currentTgt[3])
 #    fn = stimPath + '%02d_%02d_%02d_%02d.png' % (deck[currentTgt[0]]*active_rules[0], currentTgt[1], currentTgt[2], currentTgt[3]) 
     tgtCard.setImage( fn )
+    idx=str(rules.index(currentRule)+1)
 
     if DEBUG:
         print 'stim: ' + fn
@@ -396,7 +381,8 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                    "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule)
 
@@ -422,7 +408,8 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                    "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule)
 
@@ -451,7 +438,8 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                    "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule )
 
@@ -478,7 +466,8 @@ def NextTrial( tasktype ):
         win.flip( ) # keep the cards in the backbuffer for feedback
 
     # TODO concurrent presentation not compatible with logging scheme?
-        triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
+        triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+            "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
             + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
             + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
             + str(tgtCards[2]['G1']) + ',' + str(tgtCards[2]['G2'])+ ',' + str(tgtCards[2]['L1']) + ',' + str(tgtCards[2]['L2']) + '; '\
@@ -499,7 +488,8 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                    "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule )
 
@@ -776,6 +766,8 @@ confFile.close()
 gameScore = 0
 lastScore = 0
 
+triggerAndLog(portCodes['start'], "START")
+
 for item in config['sets']:
     if( item['type'] == 'instruction'):
         temp=string.replace( item['file'], '\\', s )
@@ -832,6 +824,7 @@ for item in config['sets']:
         print 'unidentified item type in config: ' + item['type']
     
 
+triggerAndLog(portCodes['stop'], "STOP: tests completed")
 # - CLEANUP -------------------------------------------------------------------------------------
 
 win.close()

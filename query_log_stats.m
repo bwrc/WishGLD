@@ -1,15 +1,17 @@
 %% In order to pull specific aspects of the log data from the struct, you
 %   can logically query the sub-struct array of sets. E.g.
 
-% log_st=readWCSTlog('some_log_file.log');
+% log_st=readWCSTlog('some_log_file.log');    % uncomment if log_st does not exist in workspace
 rule={'G1', 'G2', 'L1', 'L2'};
-pick=2;         % create some rule criterion
-stim='\face';   % create some stimulus criterion
+pick=2;         % create some rule criterion - adjust to suit yourself
+stim='\face';   % create some stimulus criterion - adjust to suit yourself
+% get all setnames
 setnum=numel(log_st.sets);
 setname=cell(setnum,1);
 for i=1:setnum
     setname{i}=log_st.sets(i).stats.type;
 end
+% for however many sets are matching your stimulus criterion, aggregate the structs
 idx=find(~cellfun(@isempty, strfind(setname,stim)));
 numidx=numel(idx);
 if numidx>1
@@ -21,6 +23,7 @@ if numidx>1
         end
     end
 end
+% create a struct in workspace to be analysed manually.
 stim=strrep(stim,'_','l_');
 stim=strrep(stim,'\','g_');
 query_stat.(stim)=temp;
