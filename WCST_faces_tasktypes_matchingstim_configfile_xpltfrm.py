@@ -9,11 +9,11 @@ import sys
 global USE_LSL; USE_LSL = True
 # Create LSL outlet
 if USE_LSL:
-	sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
-	from pylsl import StreamInfo, StreamOutlet, resolve_streams, StreamInlet, IRREGULAR_RATE, cf_int32
-	global outlet
-	info = StreamInfo('markerstream', 'markers', 1, 10, 'float32', 'streasdfsaamid002')
-	outlet = StreamOutlet(info)
+    sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
+    from pylsl import StreamInfo, StreamOutlet, resolve_streams, StreamInlet, IRREGULAR_RATE, cf_int32
+    global outlet
+    info = StreamInfo('markerstream', 'markers', 1, 10, 'float32', 'streasdfsaamid002')
+    outlet = StreamOutlet(info)
 
 
 from random import randint, random, seed
@@ -61,7 +61,8 @@ as that will be used to trigger the eye tracker on the four bit parallel.
 'refsOn'    : 15
 'respRight' : 100
 'respWrong' : 110
-'eda'       : 237
+'set'       : 224
+'instr'     : 240
 
 use: 
     writePort( stimOn | rule1 ) -> 66 
@@ -82,7 +83,8 @@ portCodes = {'clear' : 0x00,\
              'respWrong' : 0x6e,\
              'start': 0x0a,\
              'stop': 0x14,\
-             'eda' : 0xed}
+             'set' : 0xe0,
+             'instr':0xf0}
 
 def ShowInstructionSequence( instrSequence ):
     for item in instrSequence['pages']:
@@ -775,6 +777,7 @@ for item in config['sets']:
         instrSequence = json.loads( instrFile.read() )
         instrFile.close()
         ShowInstructionSequence( instrSequence )
+        triggerAndLog(portCodes['instr'], "Showing Instruction")
         
     elif item['type'] == 'set':
         temp=string.replace( item['file'], '\\', s )
@@ -782,7 +785,7 @@ for item in config['sets']:
         setSequence = json.loads( seqFile.read() )
         seqFile.close()
         currentSet += 1
-        logThis("{:02d}".format(currentSet) + '.00_' + 'Running set %s' % (item['file']) )
+        triggerAndLog( portCodes['set'], "{:02d}".format(currentSet) + '.00_' + 'Running set %s' % (item['file']) )
 
         #run test type based on confInfo
         global stimPath; stimPath = setSequence['set']['stimpath']
