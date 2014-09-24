@@ -214,6 +214,7 @@ def GetResponse():
 
     if keys[0] == 'f10':
         logThis('PANIC BUTTON -> OUT')
+        triggerAndLog(portCodes['stop'], "STOP: aborted by F10")
         win.close()
         core.quit()
     elif keys[0] == 'escape':
@@ -242,35 +243,19 @@ def GetResponse():
             retVal = 4
         else:
             retVal = -4
-            
+
+    idx=str(rules.index(currentRule)+1)
+
     if retVal > 0:
         gameScore += 1
-        if currentRule == 'G1':
-           triggerAndLog( portCodes['respRight'] | portCodes['rule1'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-           + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'G2':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule2'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'L1':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule3'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'L2':
-            triggerAndLog( portCodes['respRight'] | portCodes['rule4'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
+        triggerAndLog( portCodes['respRight'] | portCodes['rule'+idx],\
+        "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+        + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
     elif retVal < 0:
         gameScore -= 1
-        if currentRule == 'G1':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule1'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'G2':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule2'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'L1':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule3'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
-        if currentRule == 'L2':
-            triggerAndLog( portCodes['respWrong'] | portCodes['rule4'], "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
-            + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
+        triggerAndLog( portCodes['respWrong'] | portCodes['rule'+idx],\
+        "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
+        + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
     
     return retVal
 
@@ -757,6 +742,8 @@ confFile.close()
 gameScore = 0
 lastScore = 0
 
+triggerAndLog(portCodes['start'], "START")
+
 for item in config['sets']:
     if( item['type'] == 'instruction'):
         temp=string.replace( item['file'], '\\', s )
@@ -813,6 +800,7 @@ for item in config['sets']:
         print 'unidentified item type in config: ' + item['type']
     
 
+triggerAndLog(portCodes['stop'], "STOP: tests completed")
 # - CLEANUP -------------------------------------------------------------------------------------
 
 win.close()
