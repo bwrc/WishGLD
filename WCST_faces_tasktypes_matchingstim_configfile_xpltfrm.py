@@ -526,12 +526,12 @@ def logThis( msg ):
 def triggerAndLog( trigCode, msg, trigDuration=10 ):
     global paraport
     global outlet
-	global USE_LSL
+    global USE_LSL
     logThis( msg )
     if triggers:
         windll.inpout32.Out32(paraport, trigCode)
-		if USE_LSL:
-			outlet.push_sample([trigCode])
+        if USE_LSL:
+            outlet.push_sample([trigCode])
         core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
         windll.inpout32.Out32(paraport, portCodes['clear'] ) #<-- add this for parallel triggering
 
