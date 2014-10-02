@@ -27,11 +27,20 @@ unique(df$variable)
 unique(df$channel)
 xtabs(~channel+variable, data=df)
 
-
-
-
-
-
-
-
+# Close connection
 dbDisconnect(exampledb)
+
+# Reshaping data
+require(reshape)
+head(df)
+dfw <- cast(df, channel+rule+latency~variable)
+# Note: For reshape the column "value" has a special meaning. The data loaded from SQLite adheres
+# to reshapes "melt" format, which is nice.
+# Note: if casting results in several values per table cell, cast aggregates automatically
+# using length(). Example:
+head(cast(df, channel+rule~variable))
+
+
+
+
+
