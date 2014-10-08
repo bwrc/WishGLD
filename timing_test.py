@@ -1,6 +1,6 @@
 
 from psychopy import visual, core, event, logging 
-import datetime, sys
+import datetime, time, sys
 
 #for parallel triggers
 if sys.platform.startswith('win'):
@@ -12,11 +12,16 @@ global gFrameInterval; gFrameInterval = 60
 global triggers; triggers = False
 global trigDuration; trigDuration = 10 #ms
 
-global gStartTime; gStartTime = datetime.datetime.utcnow()
+global gStartDt; gStartDt = datetime.datetime.utcnow()
+global gStartTt; gStartTt = time.time();
+global gStartTc; gStartTc = time.clock();
 
 def msTime():
-    delta = datetime.datetime.utcnow() - gStartTime
-    return delta.total_seconds()#delta#int(delta.total_seconds() * 1000)
+    deltadt = datetime.datetime.utcnow() - gStartDt
+    deltatt = time.time() - gStartTt
+    deltatc = time.clock()
+    return deltadt.total_seconds(), deltatt, deltatc 
+    #delta#int(delta.total_seconds() * 1000)
 
 #setup log
 myLogLevel = logging.CRITICAL + 1
@@ -27,7 +32,7 @@ coreClock = core.Clock()
 logging.setDefaultClock( coreClock )
 
 logging.log('Run: ' + str(datetime.datetime.utcnow()) , myLogLevel)
-
+logging.log('PP timestamp, datetime, timetime, timeclock', myLogLevel)
 #setup window
 win = visual.Window([400,400])
 msg = visual.TextStim(win, text='<esc> to quit')
@@ -41,7 +46,8 @@ while run:
         msg.draw(win)
         win.flip()
 
-    logging.log( msTime(), myLogLevel )
+    times = msTime()
+    logging.log( str(times[0]) + ', ' + str(times[1]) + ', ' + str(times[2]), myLogLevel )
     logging.flush()
 
     if triggers:
