@@ -1,14 +1,16 @@
 
 from psychopy import visual, core, event, logging 
-import datetime
+import datetime, sys
 
 #for parallel triggers
-#if sys.platform.startswith('win'):
-#    from ctypes import windll
+if sys.platform.startswith('win'):
+    from ctypes import windll
 
 global gInterval; gInterval = 1000
 global run; run = True
 global gFrameInterval; gFrameInterval = 60
+global triggers; triggers = False
+global trigDuration; trigDuration = 10 #ms
 
 global gStartTime; gStartTime = datetime.datetime.utcnow()
 
@@ -41,7 +43,12 @@ while run:
 
     logging.log( msTime(), myLogLevel )
     logging.flush()
-    
+
+    if triggers:
+        windll.inpout32.Out32(paraport, 0x10 )
+        core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
+        windll.inpout32.Out32(paraport, 0x00 ) #<-- add this for parallel triggering
+
     if 'escape' in event.getKeys():
         run = False
    
