@@ -60,6 +60,8 @@ as that will be used to trigger the eye tracker on the four bit parallel.
 'respWrong' : 110   = wrong response is received
 'set'       : 224   marks the beginning of a test/practice set
 'instr'     : 240   marks the display of an instruction
+'base'      : 244   marks the beginning or end of the baseline
+'tlx'       : 248   marks a NasaTLX feedback response
 'start'     : 254   marks the start of the experiment
 'stop'      : 255   marks the end of the experiment
 
@@ -75,15 +77,17 @@ portCodes = {'clear' : 0x00,\
              'rule3' : 0x30,\
              'rule4' : 0x40,\
              'cue'   : 0x1e,\
-             'feedback'   : 0x28,\
-             'stimOn'   : 0x32,\
+             'feedback' : 0x28,\
+             'stimOn' : 0x32,\
              'refsOn' : 0x0f,\
              'respRight' : 0x64,\
              'respWrong' : 0x6e,\
+             'set'  : 0xe0,\
+             'instr': 0xf0,\
+             'base' : 0xf4,\
+             'tlx'  : 0xf8
              'start': 0xfe,\
-             'stop': 0xff,\
-             'set' : 0xe0,
-             'instr':0xf0}
+             'stop' : 0xff}
 
 def ShowInstructionSequence( instrSequence ):
     for item in instrSequence['pages']:
@@ -179,8 +183,6 @@ def SetupCategoryCards( cards, randomOrder = True ):
     cardstr = ''
     for idx in range(4):
         cardstr += '%01d: %01d,%01d,%01d,%01d | ' % ( idx, feat1[idx], feat2[idx], feat3[idx], feat4[idx])
-#        cardstr += '%01d: %01d,%01d,%01d,%01d | ' % ( idx, deck[feat1[idx]]*active_rules[0], feat2[idx], feat3[idx], feat4[idx]) 
-#    logThis( 'Using deck: ' + cardstr[0:len(cardstr)-2] );
 
     return True
 
@@ -232,7 +234,6 @@ def GetResponse():
     keys = event.waitKeys(keyList=['f10', 'escape', 'up', 'right', 'down', 'left'])
 
     if keys[0] == 'f10':
-        logThis('PANIC BUTTON -> OUT')
         triggerAndLog(portCodes['stop'], "STOP: aborted by F10")
         win.close()
         core.quit()
@@ -513,7 +514,7 @@ def NextTrial( tasktype ):
 def logThis( msg ):
     logging.log( msg, level=myLogLevel )
 
-# parallel stuff has been replaced with Marco's solution!
+# parallel port code, LSL and test logging.
 def triggerAndLog( trigCode, msg, trigDuration=10 ):
     global paraport
     global outlet
@@ -545,12 +546,19 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
     h = 0;
 
     if txt != "":
-        hasTxt = True
-        if txt[0]=='*':
-            logTxt=True
-            offset=txt.find('*',1)
-            txt_to_log=txt[1:offset]+': '
-            txt=string.replace(txt, '*', '')
+        hasTxt=True
+        logTxt=True
+        if txt[0]=='*': # 'text' field in a NasaTLX instruction should start with asterix
+            symbol='*'
+        elif txt[0]=='£': # 'text' field in a baseline instruction should start with plus
+            symbol='£'
+            hasTxt=False
+        else:
+            logTxt=False
+        if logTxt:
+            offset=txt.find(symbol,1)
+            txt_to_log=txt[1:offset]
+            txt=string.replace(txt, symbol, '')
         instr = visual.TextStim( win, text=txt, pos=(0,-50), color=col, colorSpace='rgb', height=25, wrapWidth=800, alignHoriz='center')
 
     if picFile != "":
@@ -571,9 +579,6 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
         picpos = (0, 0)
         textpos = ( -2000, -2000 )
 
-#    picpos = ( 0, h[1]/2 + 20 )
-#    textpos = ( 0, -1* instr.height/2 - 10)
-
     if hasPic:
         pic.setPos( picpos );
         pic.draw( win );
@@ -586,10 +591,12 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
     if duration < 0:
         if logTxt:
             keys = event.waitKeys(keyList=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
-            logThis("{:02d}".format(currentSet) + '.0_' + txt_to_log + str(keys[0]))
+            triggerAndLog(portcodes['tlx'] , "{:02d}".format(currentSet) + '.0_' + txt_to_log + ': ' + str(keys[0]))
         else:
             event.waitKeys()
     else:
+        if logTxt:
+            triggerAndLog(portcodes['base'] , txt_to_log )
         core.wait( duration )
 
     win.flip() #clear screen
