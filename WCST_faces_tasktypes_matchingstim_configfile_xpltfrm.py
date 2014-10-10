@@ -6,7 +6,7 @@ WCST experiment / ReKnow
 """
 import sys
 
-global USE_LSL; USE_LSL = True
+global USE_LSL; USE_LSL = True 
 # Create LSL outlet
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
@@ -29,8 +29,6 @@ import string   # to find test type from pathstrings (noise, patch)
 if sys.platform.startswith('win'):
     from ctypes import windll
 
-
-
 # - GLOBALS -------------------------------------------------------------------------------------------
 global DEBUG; DEBUG = False
 global RANDOMIZE_CATEGORY_CARDS; RANDOMIZE_CATEGORY_CARDS = False
@@ -43,6 +41,7 @@ global s; s=os.sep
 global currentSet, currentTrial, currentBlock; currentSet = 0; currentTrial = 0; currentBlock = 1;
 global paraport; paraport=0xEC00    # or 0xEC00, 0xE880
 
+global startTime; startTime = datetime.utcnow()
 
 """
 Additive port code scheme allows unique decoding with sparse set. Avoids any number ending in #F, 
@@ -519,7 +518,9 @@ def triggerAndLog( trigCode, msg, trigDuration=10 ):
     global paraport
     global outlet
     global USE_LSL
-    logThis( msg )
+    global startTime
+
+    logThis( str( (datetime.utcnow()-startTime).total_seconds() ) + '\t' + str(trigCode) + '\t' + msg )
     if triggers:
         windll.inpout32.Out32(paraport, trigCode)
         if USE_LSL:
@@ -768,7 +769,7 @@ confFile.close()
 gameScore = 0
 lastScore = 0
 
-triggerAndLog(portCodes['start'], "START")
+triggerAndLog(portCodes['start'], "START\t" + str( startTime ) )
 
 for item in config['sets']:
     if( item['type'] == 'instruction'):
