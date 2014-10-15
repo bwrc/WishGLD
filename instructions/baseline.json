@@ -2,51 +2,51 @@
     "pages" : [
          {"pic":  ".\\instructions\\pics\\fixcross.png", 
           "duration": "5",
-          "text": "£baseline fixation£"
+          "text": "+baseline fixation+"
          },
          {"pic":  "..\\stimuli\\output\\noise_patch_cards\\00_00_00_00.png", 
           "duration": "5",
-          "text": "£baseline onecard£"
+          "text": "+baseline onecard+"
          },
          {"pic":  ".\\instructions\\pics\\noisetargets.png", 
           "duration": "5",
-          "text": "£baseline fourcards£"
+          "text": "+baseline fourcards+"
          },
          {"pic":  ".\\instructions\\pics\\fixcross.png", 
           "duration": "5",
-          "text": "£baseline fixation£"
+          "text": "+baseline fixation+"
          },
          {"pic":  "..\\stimuli\\output\\noise_patch_cards\\00_01_00_00.png", 
           "duration": "5",
-          "text": "£baseline onecard£"
+          "text": "+baseline onecard+"
          },
          {"pic":  ".\\instructions\\pics\\noisetargets.png", 
           "duration": "5",
-          "text": "£baseline fourcards£"
+          "text": "+baseline fourcards+"
          },
          {"pic":  ".\\instructions\\pics\\fixcross.png", 
           "duration": "5",
-          "text": "£baseline fixation£"
+          "text": "+baseline fixation+"
          },
          {"pic":  "..\\stimuli\\output\\noise_patch_cards\\00_02_00_00.png", 
           "duration": "5",
-          "text": "£baseline onecard£"
+          "text": "+baseline onecard+"
          },
          {"pic":  ".\\instructions\\pics\\noisetargets.png", 
           "duration": "5",
-          "text": "£baseline fourcards£"
+          "text": "+baseline fourcards+"
          },
          {"pic":  ".\\instructions\\pics\\fixcross.png", 
           "duration": "5",
-          "text": "£baseline fixation£"
+          "text": "+baseline fixation+"
          },
          {"pic":  "..\\stimuli\\output\\noise_patch_cards\\00_03_00_00.png", 
           "duration": "5",
-          "text": "£baseline onecard£"
+          "text": "+baseline onecard+"
          },
          {"pic":  ".\\instructions\\pics\\noisetargets.png", 
           "duration": "5",
-          "text": "£baseline fourcards£"
+          "text": "+baseline fourcards+"
          }
     ]
 }
