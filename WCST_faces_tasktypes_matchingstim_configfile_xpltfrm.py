@@ -25,6 +25,7 @@ import json
 import NewDlg   # allows setting the length of textfields
 import os       # to get path separator for platform independence
 import string   # to find test type from pathstrings (noise, patch)
+#import win32api,win32con, SendKeys # for keyboard states
 
 if sys.platform.startswith('win'):
     from ctypes import windll
@@ -92,7 +93,7 @@ portCodes = {'clear' : 0,\
              'feedback' : 60,\
              'base' : 70,\
              'instr': 80,\
-             'tlx'  : 90
+             'tlx'  : 90,\
              'set'  : 100,\
              'start': 254,\
              'stop' : 255}
@@ -114,7 +115,7 @@ def RunSequence( sequence ):
     global ruleCount, cardCount, rightAnswers;
     ruleCount = 0;
 
-    ShowPicInstruction( u'Aloita painamalla jotain näppäintä.\n\nPress any key to start.', -1, "", 1 )
+    ShowPicInstruction( u'Aloita painamalla jotain näppäintä.', -1, "", 1 )
 
     while ruleCount < RULE_COUNT: 
         currentRule = rules[ruleList[ruleCount][0]]
@@ -142,6 +143,10 @@ def RunSequence( sequence ):
 
 #    logging.flush() # flush log when set has been run - don't want flush to cause display pause!
 
+#def IsNumLockOn():
+#    # return 1 if NUMLOCK is ON
+#    return win32api.GetKeyState(win32con.VK_NUMLOCK)
+    
 def randomizeOrder( lst ):
     return sorted(lst, key=lambda k: random())
 
@@ -239,7 +244,9 @@ def GetResponse():
     retVal = 0 #if not modified, breaks the task
     answerPressed = -1 # which card was selected?
 
-    keys = event.waitKeys(keyList=['f10', 'escape', 'up', 'right', 'down', 'left'])
+    keylist = { 'down': ['down', '2'], 'left': ['left', '4'], 'up': ['up', '8'], 'right': ['right', '6']}
+
+    keys = event.waitKeys(keyList=['f10', 'escape', 'up', 'right', 'down', 'left', '2', '4', '6', '8'])
 
     if keys[0] == 'f10':
         triggerAndLog(portCodes['stop'], "STOP: aborted by F10")
@@ -248,25 +255,29 @@ def GetResponse():
 
     if keys[0] == 'escape':
         retVal = 0
-    elif keys[0] == 'up':
+    #elif keys[0] == 'up':
+    elif keys[0] in keylist['up']:
         if CheckCard( 0, currentRule, currentTgt ):
             rightAnswers += 1
             retVal = 1
         else:
             retVal = -1
-    elif keys[0] == 'right':
+    #elif keys[0] == 'right':
+    elif keys[0] in keylist['right']:
         if CheckCard( 1, currentRule, currentTgt ):
             rightAnswers += 1
             retVal = 2
         else:
             retVal = -2
-    elif keys[0] == 'down':
+    #elif keys[0] == 'down':
+    elif keys[0] in keylist['down']:
         if CheckCard( 2, currentRule, currentTgt ):
             rightAnswers += 1
             retVal = 3
         else:
             retVal = -3
-    elif keys[0] == 'left':
+    #elif keys[0] == 'left':
+    elif keys[0] in keylist['left']:
         if CheckCard( 3, currentRule, currentTgt ):
             rightAnswers += 1
             retVal = 4
@@ -600,13 +611,13 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
         if logTxt:
             triggerAndLog(portCodes['tlx'] + portCodes['segStart'] , "{:02d}".format(currentSet) + '.0_' + txt_to_log + " TLX start")
             keys = event.waitKeys(keyList=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
-            triggerAndLog(portcodes['tlx'] + portCodes['segStop'], "{:02d}".format(currentSet) + '.0_' + txt_to_log + ' TLX : ' + str(keys[0]))
+            triggerAndLog(portCodes['tlx'] + portCodes['segStop'], "{:02d}".format(currentSet) + '.0_' + txt_to_log + ' TLX : ' + str(keys[0]))
         else:
             event.waitKeys()
     else:
         if logTxt:
             #Ben, I'm not quite sure of how the portcodes (segStart, segStop) for a baseline section should be played?
-            triggerAndLog(portcodes['base'] , txt_to_log )
+            triggerAndLog(portCodes['base'] , txt_to_log )
         core.wait( duration )
 
     win.flip() #clear screen
@@ -637,7 +648,7 @@ def CheckCard( stimNum, currentRule, currentTgt ):
 # -------------------------------------------------------------------------------------------------#
 
 #init random seed
-seed()
+seed(42)
 
 # Gather info / dialog
 myDlg = NewDlg.NewDlg(title="The amazing ReKnow card test")
@@ -666,7 +677,7 @@ myDlg.addText('IMPORTANT!! DOUBLE CHECK!')
 # confInfo 6
 myDlg.addField('Config File:', choices=['sep_latin1', 'sep_latin2', 'sep_latin3', 'sep_latin4',\
                                         'sep_latin5', 'sep_latin6', 'sep_latin7', 'sep_latin8',\
-                                        'config_base'], width=30);
+                                        'config_base', 'test_set_no_practice_no_baseline'], width=30);
 # confInfo 7
 myDlg.addField('Choose monitor', choices=["1", "2"])
 if sys.platform.startswith('win'):
@@ -787,6 +798,8 @@ gameScore = 0
 lastScore = 0
 
 triggerAndLog(portCodes['start'], "START\t" + str( startTime ) )
+
+win.setMouseVisible( False )
 
 for item in config['sets']:
     if( item['type'] == 'instruction'):
