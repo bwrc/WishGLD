@@ -44,50 +44,58 @@ global paraport; paraport=0xEC00    # or 0xEC00, 0xE880
 global startTime; startTime = datetime.utcnow()
 
 """
-Additive port code scheme allows unique decoding with sparse set. Avoids any number ending in #F, 
-as that will be used to trigger the eye tracker on the four bit parallel.
+
+Additive port code scheme allows unique decoding with sparse set. 
 
 'clear'     : 0     triggers the parallel port
-'rule1'     : 16    = global 1 rule, FACES or LETTERS
-'rule2'     : 32    = global 2 rule, colour
-'rule3'     : 48    = local 1 rule, shape or letter
-'rule4'     : 64    = local 2 rule, orientation
-'cue'       : 30    = fixation cross before target stimulus
-'feedback'  : 40    = red/wrong or green/correct visual feedback to a response
-'stimOn'    : 50    = target stimulus is shown
-'refsOn'    : 15    = four reference stimuli are shown
-'respRight' : 100   = correct response is received
-'respWrong' : 110   = wrong response is received
-'set'       : 224   marks the beginning of a test/practice set
-'instr'     : 240   marks the display of an instruction
-'base'      : 244   marks the beginning or end of the baseline
-'tlx'       : 248   marks a NasaTLX feedback response
+
+'rule1'     : 1    = global 1 rule, FACES or LETTERS
+'rule2'     : 2    = global 2 rule, colour
+'rule3'     : 3    = local 1 rule, shape or letter
+'rule4'     : 4    = local 2 rule, orientation
+
+'segStart' : 8    = marks the start of a segment when combined with [baseline, instr, tlx, set]
+'segStop'  : 9    = marks the end of a segment when combined with -"-
+
+'cue'       : 10   = fixation cross before target stimulus
+'stimOn'    : 20   = target stimulus is shown
+'refsOn'    : 30   = four reference stimuli are shown
+'respRight' : 40   = correct response is received
+'respWrong' : 50   = wrong response is received
+'feedback'  : 60   = red/wrong or green/correct visual feedback to a response
+'baseline'  : 70   = baseline start
+'instr'     : 80   = marks the display of an instruction
+'tlx'       : 90   = marks the display of a questionnaire
+
+'set'       : 100   marks the beginning of a test/practice set
 'start'     : 254   marks the start of the experiment
 'stop'      : 255   marks the end of the experiment
 
 use: 
-    writePort( stimOn | rule1 ) -> 66 
-    writePort( respRight | rule1 ) -> 116
-    writePort( respWrong | rule2 ) #where rule2 would be impossible to deduce, since we don't know what the user meant?
+    writePort( stimOn + rule1 ) -> 21
+    writePort( respRight + rul4 ) -> 44
+    writePort( baseline + segStart ) -> 78
 
 """
-portCodes = {'clear' : 0x00,\
-             'rule1' : 0x10,\
-             'rule2' : 0x20,\
-             'rule3' : 0x30,\
-             'rule4' : 0x40,\
-             'cue'   : 0x1e,\
-             'feedback' : 0x28,\
-             'stimOn' : 0x32,\
-             'refsOn' : 0x0f,\
-             'respRight' : 0x64,\
-             'respWrong' : 0x6e,\
-             'set'  : 0xe0,\
-             'instr': 0xf0,\
-             'base' : 0xf4,\
-             'tlx'  : 0xf8
-             'start': 0xfe,\
-             'stop' : 0xff}
+portCodes = {'clear' : 0,\
+             'rule1' : 1,\
+             'rule2' : 2,\
+             'rule3' : 3,\
+             'rule4' : 4,\
+             'segStart' : 8,\
+             'segStop' : 9,\
+             'cue'   : 10,\
+             'stimOn' : 20,\
+             'refsOn' : 30,\
+             'respRight' : 40,\
+             'respWrong' : 50,\
+             'feedback' : 60,\
+             'base' : 70,\
+             'instr': 80,\
+             'tlx'  : 90
+             'set'  : 100,\
+             'start': 254,\
+             'stop' : 255}
 
 def ShowInstructionSequence( instrSequence ):
     for item in instrSequence['pages']:
@@ -269,12 +277,12 @@ def GetResponse():
 
     if retVal > 0:
         gameScore += 1
-        triggerAndLog( portCodes['respRight'] | portCodes['rule'+idx],\
+        triggerAndLog( portCodes['respRight'] + portCodes['rule'+idx],\
         "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
         + '_RSP 1 ' + currentRule + ' ANSWER ' + str(retVal) )
     elif retVal < 0:
         gameScore -= 1
-        triggerAndLog( portCodes['respWrong'] | portCodes['rule'+idx],\
+        triggerAndLog( portCodes['respWrong'] + portCodes['rule'+idx],\
         "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
         + '_RSP 0 ' + currentRule + ' ANSWER ' + str(retVal) )
     
@@ -383,7 +391,7 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                triggerAndLog( portCodes['stimOn'] + portCodes['rule'+idx],\
                     "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule)
@@ -410,7 +418,7 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                triggerAndLog( portCodes['stimOn'] + portCodes['rule'+idx],\
                     "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule)
@@ -440,7 +448,7 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                triggerAndLog( portCodes['stimOn'] + portCodes['rule'+idx],\
                     "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule )
@@ -468,7 +476,7 @@ def NextTrial( tasktype ):
         win.flip( ) # keep the cards in the backbuffer for feedback
 
     # TODO concurrent presentation not compatible with logging scheme?
-        triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+        triggerAndLog( portCodes['stimOn'] + portCodes['rule'+idx],\
             "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial) + '_TGT '\
             + str(tgtCards[0]['G1']) + ',' + str(tgtCards[0]['G2'])+ ',' + str(tgtCards[0]['L1']) + ',' + str(tgtCards[0]['L2']) + '; '\
             + str(tgtCards[1]['G1']) + ',' + str(tgtCards[1]['G2'])+ ',' + str(tgtCards[1]['L1']) + ',' + str(tgtCards[1]['L2']) + '; '\
@@ -490,7 +498,7 @@ def NextTrial( tasktype ):
             tgtCard.draw(win)
             win.flip()
             if i == 0:
-                triggerAndLog( portCodes['stimOn']|portCodes['rule'+idx],\
+                triggerAndLog( portCodes['stimOn'] + portCodes['rule'+idx],\
                     "{:02d}".format(currentBlock) + '.' + "{:02d}".format(currentTrial)\
                     + '_STM ' + str( currentTgt[0] ) + ',' + str( currentTgt[1] ) + ',' +str( currentTgt[2] ) + ','\
                     + str( currentTgt[3] ) + ' RULE ' + currentRule )
@@ -590,12 +598,14 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
     win.flip()
     if duration < 0:
         if logTxt:
+            triggerAndLog(portCodes['tlx'] + portCodes['segStart'] , "{:02d}".format(currentSet) + '.0_' + txt_to_log + " TLX start")
             keys = event.waitKeys(keyList=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
-            triggerAndLog(portcodes['tlx'] , "{:02d}".format(currentSet) + '.0_' + txt_to_log + ': ' + str(keys[0]))
+            triggerAndLog(portcodes['tlx'] + portCodes['segStop'], "{:02d}".format(currentSet) + '.0_' + txt_to_log + ' TLX : ' + str(keys[0]))
         else:
             event.waitKeys()
     else:
         if logTxt:
+            #Ben, I'm not quite sure of how the portcodes (segStart, segStop) for a baseline section should be played?
             triggerAndLog(portcodes['base'] , txt_to_log )
         core.wait( duration )
 
@@ -784,8 +794,9 @@ for item in config['sets']:
         instrFile = open( temp )
         instrSequence = json.loads( instrFile.read() )
         instrFile.close()
+        triggerAndLog(portCodes['instr'] + portCodes['segStart'], "Showing Instruction")
         ShowInstructionSequence( instrSequence )
-        triggerAndLog(portCodes['instr'], "Showing Instruction")
+        triggerAndLog(portCodes['instr'] + portCodes['segStop'], "Instructions done.")
         
     elif item['type'] == 'set':
         temp=string.replace( item['file'], '\\', s )
@@ -793,6 +804,7 @@ for item in config['sets']:
         setSequence = json.loads( seqFile.read() )
         seqFile.close()
         currentSet += 1
+        #Ben, there's apparently no logical way of setting seg start and seg stop to a set?
         triggerAndLog( portCodes['set'], "{:02d}".format(currentSet) + '.00_' + 'Running set %s' % (item['file']) )
 
         #run test type based on confInfo
