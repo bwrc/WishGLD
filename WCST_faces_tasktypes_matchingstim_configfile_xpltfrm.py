@@ -6,7 +6,7 @@ WCST experiment / ReKnow
 """
 import sys
 
-global USE_LSL; USE_LSL = True 
+global USE_LSL; USE_LSL = False 
 # Create LSL outlet
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
@@ -39,9 +39,10 @@ global N_OF_CARDS; N_OF_CARDS = 4 #this is now fixed for each stim folder!
 global rules; rules = ['G1', 'G2', 'L1', 'L2'] # face/letter, color, shape/letter, orientation
 global portCodes;
 global s; s=os.sep
-global currentSet, currentTrial, currentBlock; currentSet = 0; currentTrial = 0; currentBlock = 1;
+global currentSet, currentBase, currentIns, currentTrial, currentBlock;\
+currentSet=0; currentBase=1; currentIns=1; currentTrial=0; currentBlock=1;
 global paraport; paraport=0xEC00    # or 0xEC00, 0xE880
-global EVENT_TYPE=['text', 'prac', 'ntlx', 'base', 'test']
+#global EVENT_TYPE; EVENT_TYPE=['text', 'prac', 'ntlx', 'base', 'test']
 
 global startTime; startTime = datetime.utcnow()
 
@@ -190,7 +191,6 @@ def SetupCategoryCards( cards, randomOrder = True ):
             cards[idx]['L2'] = feat4[idx]
 
             cards[idx]['fn'] = stimPath +'%02d_%02d_%02d_%02d.png' % (feat1[idx], feat2[idx], feat3[idx], feat4[idx])
-#            cards[idx]['fn'] = stimPath +'%02d_%02d_%02d_%02d.png' % (deck[feat1[idx]]*active_rules[0], feat2[idx], feat3[idx], feat4[idx])
             if DEBUG:
                 print cards[idx]['fn']
 
@@ -564,6 +564,7 @@ def ShowInstruction( txt, duration, col=(0.0, 0.0, 0.0) ):
     win.flip() #clear screen
     
 def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
+    global currentBase
 
     hasPic = False; hasTxt = False; logTxt=False
     h = 0;
@@ -611,17 +612,24 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
         instr.draw(win)
 
     win.flip()
+
+    if not(logTxt):
+        if hasTxt:
+            triggerAndLog(portCodes['instr'], "ITX", currentIns, 0, 'INSTRUCTION: ' + txt[0:12] )
+        elif hasPic:
+            triggerAndLog(portCodes['instr'], "IPC", currentIns, 0, 'INSTRUCTION: ' + picFile )
+
     if duration < 0:
-        if logTxt:
-            #triggerAndLog(portCodes['tlx'] + portCodes['segStart'] , "TLX", currentSet, 0, txt_to_log + " TLX start")
+        if logTxt and symbol=='*':
             keys = event.waitKeys(keyList=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
-            triggerAndLog(portCodes['tlx'] + portCodes['segStop'], "TLX", currentSet, 0, txt_to_log + ': ' + str(keys[0]))
+            triggerAndLog(portCodes['tlx'], "TLX", currentSet, 0, txt_to_log + ': ' + str(keys[0]))
         else:
             event.waitKeys()
     else:
-        if logTxt:
+        if logTxt and symbol=='+':
             #Ben, I'm not quite sure of how the portcodes (segStart, segStop) for a baseline section should be played?
-            triggerAndLog(portCodes['base'], "BAS", currentSet, 0, txt_to_log )
+            triggerAndLog(portCodes['base'], "BAS", currentBase, 0, txt_to_log )
+            currentBase += 1
         core.wait( duration )
 
     win.flip() #clear screen
@@ -629,7 +637,7 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 def CheckCard( stimNum, currentRule, currentTgt ):
     cardOK = False
 
-    if currentRule == 'G1':
+    if currentRule == 'G1':98
         if tgtCards[stimNum]['G1'] == currentTgt[0]:
             cardOK = True
     elif currentRule == 'G2':
@@ -811,9 +819,10 @@ for item in config['sets']:
         instrFile = open( temp )
         instrSequence = json.loads( instrFile.read() )
         instrFile.close()
-        triggerAndLog(portCodes['instr'] + portCodes['segStart'], "INS", 0, 0, "Showing Instruction")
+        triggerAndLog(portCodes['instr'] + portCodes['segStart'], "INS", currentIns, 0, "START Instruction")
         ShowInstructionSequence( instrSequence )
-        triggerAndLog(portCodes['instr'] + portCodes['segStop'], "INS", 0, 0, "Instructions done")
+        triggerAndLog(portCodes['instr'] + portCodes['segStop'], "INS", currentIns, 0, "STOP Instruction")
+        currentIns += 1
         
     elif item['type'] == 'set':
         temp=string.replace( item['file'], '\\', s )
@@ -821,8 +830,6 @@ for item in config['sets']:
         setSequence = json.loads( seqFile.read() )
         seqFile.close()
         currentSet += 1
-        #Ben, there's apparently no logical way of setting seg start and seg stop to a set?
-        triggerAndLog( portCodes['set'], "SET", currentSet, 0, 'Running set %s' % (item['file']) )
 
         #run test type based on confInfo
         global stimPath; stimPath = setSequence['set']['stimpath']
@@ -858,7 +865,9 @@ for item in config['sets']:
         rightAnswers = 0
         ruleCount=0
 
+        triggerAndLog( portCodes['set']+portCodes['segStart'], "SET", currentSet, 0, 'START set %s' % (item['file']) )
         RunSequence( setSequence['set'] )
+        triggerAndLog( portCodes['set']+portCodes['segStop'], "SET", currentSet, 0, 'STOP set %s' % (item['file']) )
         
     else:
         print 'unidentified item type in config: ' + item['type']
