@@ -112,12 +112,10 @@ def RunSequence( sequence ):
     global ruleList; ruleList = []
     for item in sequence['blocks']:
         ruleList.append( (int(item['rule']), int(item['reps'])) )
-    print 'RULELIST:', ruleList
+    # print 'RULELIST:', ruleList
     global RULE_COUNT; RULE_COUNT = len( ruleList )
     global ruleCount, cardCount, rightAnswers;
     ruleCount = 0;
-
-    ShowPicInstruction( u'Aloita painamalla jotain näppäintä.', -1, "", 1 )
 
     while ruleCount < RULE_COUNT: 
         currentRule = rules[ruleList[ruleCount][0]]
@@ -180,8 +178,9 @@ def SetupCategoryCards( cards, randomOrder = True ):
 
     #fill card parameters
     if len(cards) <> 4:
-        print 'setup card count: ' + str(len(cards))
-        DebugMsg( 'You have to supply 4 cards for setup' )
+        if DEBUG:
+            print 'setup card count: ' + str(len(cards))
+            DebugMsg( 'You have to supply 4 cards for setup' )
         return False
     else:
         for idx in range(4):
@@ -701,9 +700,11 @@ myDlg.show()  # show dialog and wait for OK or Cancel
 
 if myDlg.OK:  # then the user pressed OK
     confInfo = myDlg.data
-    print confInfo
+    if DEBUG:
+        print confInfo
 else:
-    print 'user cancelled'
+    if DEBUG:
+        print 'user cancelled'
     core.quit()
 
 # SETUP LOGGING & CLOCKING
@@ -865,12 +866,16 @@ for item in config['sets']:
         rightAnswers = 0
         ruleCount=0
 
+        triggerAndLog(portCodes['instr'] + portCodes['segStart'], "INS", currentIns, 0, "START Instruction")
+        ShowPicInstruction( u'Aloita painamalla jotain näppäintä.', -1, "", 1 )
+        triggerAndLog(portCodes['instr'] + portCodes['segStop'], "INS", currentIns, 0, "STOP Instruction")
         triggerAndLog( portCodes['set']+portCodes['segStart'], "SET", currentSet, 0, 'START set %s' % (item['file']) )
         RunSequence( setSequence['set'] )
         triggerAndLog( portCodes['set']+portCodes['segStop'], "SET", currentSet, 0, 'STOP set %s' % (item['file']) )
         
     else:
-        print 'unidentified item type in config: ' + item['type']
+        if DEBUG:
+            print 'unidentified item type in config: ' + item['type']
     
 
 triggerAndLog(portCodes['stop'], "STP", 0, 0, "STOP: tests completed")
