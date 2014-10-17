@@ -6,7 +6,7 @@ WCST experiment / ReKnow
 """
 import sys
 
-global USE_LSL; USE_LSL = False 
+global USE_LSL; USE_LSL = True 
 # Create LSL outlet
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
@@ -17,7 +17,7 @@ if USE_LSL:
 
 
 from random import randint, random, seed
-from psychopy import visual,core,monitors,event,gui,logging#,parallel
+from psychopy import visual,core,monitors,event,gui,logging, sound
 from copy import deepcopy
 import csv
 from datetime import datetime
@@ -42,7 +42,6 @@ global s; s=os.sep
 global currentSet, currentBase, currentIns, currentTrial, currentBlock;\
 currentSet=0; currentBase=1; currentIns=1; currentTrial=0; currentBlock=1;
 global paraport; paraport=0xEC00    # or 0xEC00, 0xE880
-#global EVENT_TYPE; EVENT_TYPE=['text', 'prac', 'ntlx', 'base', 'test']
 
 global startTime; startTime = datetime.utcnow()
 
@@ -636,7 +635,7 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 def CheckCard( stimNum, currentRule, currentTgt ):
     cardOK = False
 
-    if currentRule == 'G1':98
+    if currentRule == 'G1':
         if tgtCards[stimNum]['G1'] == currentTgt[0]:
             cardOK = True
     elif currentRule == 'G2':
@@ -879,7 +878,8 @@ for item in config['sets']:
     
 
 triggerAndLog(portCodes['stop'], "STP", 0, 0, "STOP: tests completed")
+endtone=sound.Sound(u'A', secs=1.0)
+endtone.play()
 # - CLEANUP -------------------------------------------------------------------------------------
-
 win.close()
 core.quit()
