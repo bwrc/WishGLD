@@ -6,7 +6,7 @@ WCST experiment / ReKnow
 """
 import sys
 
-global USE_LSL; USE_LSL = True 
+global USE_LSL; USE_LSL = True
 # Create LSL outlet
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
@@ -139,8 +139,6 @@ def RunSequence( sequence ):
                 currentTrial = 0
 
         cardCount +=1
-
-#    logging.flush() # flush log when set has been run - don't want flush to cause display pause!
 
 #def IsNumLockOn():
 #    # return 1 if NUMLOCK is ON
@@ -542,11 +540,12 @@ def triggerAndLog( trigCode, id_str, major_inc, minor_inc, payload, trigDuration
     major_inc="{:02d}".format(major_inc)
     minor_inc="{:02d}".format(minor_inc)
     payload=string.replace( payload, '\t', '_' )
-    logThis(str( (datetime.utcnow()-startTime).total_seconds() ) + '\t' + str(trigCode) + '\t' + id_str + '\t' + major_inc + '\t' + minor_inc + '\t' + payload )
+    outstr=str( (datetime.utcnow()-startTime).total_seconds() ) + '\t' + str(trigCode) + '\t' + id_str + '\t' + major_inc + '\t' + minor_inc + '\t' + payload
+    logThis(outstr)
     if triggers:
         windll.inpout32.Out32(paraport, trigCode)
         if USE_LSL:
-            outlet.push_sample([trigCode])
+            outlet.push_sample([outstr])
         core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
         windll.inpout32.Out32(paraport, portCodes['clear'] ) #<-- add this for parallel triggering
 
@@ -717,11 +716,8 @@ myLog = logging.LogFile( '.'+s+'logs'+s+'' + confInfo[0] + '.log', filemode='w',
 logThis('Subj ID: ' + confInfo[0] )
 logThis('Run: ' + str(datetime.utcnow()) )
 logThis('Age: ' + str(confInfo[1]) )
-
-if confInfo[4] == 0:
-    logThis('Group: Test')
-else:
-    logThis('Group: Control')
+logThis('Group: ' + confInfo[4])
+logThis('Config: ' + confInfo[6])
 
 logThis('--------------------------------------------------------')
 logThis('INFO')
@@ -805,6 +801,7 @@ global currentTgt; currentTgt = (-1, -1, -1, -1)
 confFile = open( '.'+s+'configs'+s+confInfo[6]+'.json' )
 config = json.loads( confFile.read() )
 confFile.close()
+logging.flush()
 
 gameScore = 0
 lastScore = 0
@@ -871,11 +868,12 @@ for item in config['sets']:
         triggerAndLog( portCodes['set']+portCodes['segStart'], "SET", currentSet, 0, 'START set %s' % (item['file']) )
         RunSequence( setSequence['set'] )
         triggerAndLog( portCodes['set']+portCodes['segStop'], "SET", currentSet, 0, 'STOP set %s' % (item['file']) )
-        
+
     else:
         if DEBUG:
             print 'unidentified item type in config: ' + item['type']
-    
+
+    logging.flush() # flush log when set has been run
 
 triggerAndLog(portCodes['stop'], "STP", 0, 0, "STOP: tests completed")
 endtone=sound.Sound(u'A', secs=1.0)
