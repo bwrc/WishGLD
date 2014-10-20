@@ -6,7 +6,7 @@ WCST experiment / ReKnow
 """
 import sys
 
-global USE_LSL; USE_LSL = False
+global USE_LSL; USE_LSL = True
 # Create LSL outlet
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
