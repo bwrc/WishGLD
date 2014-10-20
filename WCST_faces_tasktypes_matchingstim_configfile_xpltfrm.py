@@ -19,7 +19,7 @@ if USE_LSL:
 
 
 from random import randint, random, seed
-from psychopy import visual,core,monitors,event,gui,logging, sound
+from psychopy import visual,core,monitors,event,gui,logging,sound
 from copy import deepcopy
 import csv
 from datetime import datetime
@@ -818,6 +818,13 @@ triggerAndLog(portCodes['start'], "STR", 0, 0, "START: " + str( startTime ) )
 
 win.setMouseVisible( False )
 
+# - BASELINE VIDEO ------------------------------------------------------------------------------#
+movbl = visual.MovieStim(win=win, filename='..'+s+'stimuli'+s+'baseline_wildlife.mp4', pos=[0,0])
+while movbl.status != visual.FINISHED:
+    movbl.draw()
+    win.flip()
+
+# - BEGIN RUNNING CONFIG ------------------------------------------------------------------------#
 for item in config['sets']:
     if( item['type'] == 'instruction'):
         temp=string.replace( item['file'], '\\', s )
