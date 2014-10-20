@@ -2,7 +2,7 @@
     "pages" : [
          {"pic":  "", 
           "duration": "-1",
-          "text": "Mitataan aluksi baseline. Sinulle n‰ytet‰‰n sarja kuvia, joihin sinun ei tarvitse vastata.\nIstu rauhassa paikallasi ja keskity ruudulla n‰kyviin kuviin."
+          "text": "Mitataan aluksi baseline. Sinulle naytetaan sarja kuvia, joihin sinun ei tarvitse vastata.\nIstu rauhassa paikallasi ja keskity ruudulla nakyviin kuviin."
          },
          {"pic":  ".\\instructions\\pics\\fixcross.png", 
           "duration": "5",
