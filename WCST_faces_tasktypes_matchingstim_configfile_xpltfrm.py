@@ -17,7 +17,7 @@ if USE_LSL:
 
 
 from random import randint, random, seed
-from psychopy import visual,core,monitors,event,gui,logging#,parallel
+from psychopy import visual,core,monitors,event,gui,logging, sound
 from copy import deepcopy
 import csv
 from datetime import datetime
@@ -42,7 +42,6 @@ global s; s=os.sep
 global currentSet, currentBase, currentIns, currentTrial, currentBlock;\
 currentSet=0; currentBase=1; currentIns=1; currentTrial=0; currentBlock=1;
 global paraport; paraport=0xEC00    # or 0xEC00, 0xE880
-#global EVENT_TYPE; EVENT_TYPE=['text', 'prac', 'ntlx', 'base', 'test']
 
 global startTime; startTime = datetime.utcnow()
 
@@ -140,8 +139,6 @@ def RunSequence( sequence ):
                 currentTrial = 0
 
         cardCount +=1
-
-#    logging.flush() # flush log when set has been run - don't want flush to cause display pause!
 
 #def IsNumLockOn():
 #    # return 1 if NUMLOCK is ON
@@ -543,11 +540,12 @@ def triggerAndLog( trigCode, id_str, major_inc, minor_inc, payload, trigDuration
     major_inc="{:02d}".format(major_inc)
     minor_inc="{:02d}".format(minor_inc)
     payload=string.replace( payload, '\t', '_' )
-    logThis(str( (datetime.utcnow()-startTime).total_seconds() ) + '\t' + str(trigCode) + '\t' + id_str + '\t' + major_inc + '\t' + minor_inc + '\t' + payload )
+    outstr=str( (datetime.utcnow()-startTime).total_seconds() ) + '\t' + str(trigCode) + '\t' + id_str + '\t' + major_inc + '\t' + minor_inc + '\t' + payload
+    logThis(outstr)
     if triggers:
         windll.inpout32.Out32(paraport, trigCode)
         if USE_LSL:
-            outlet.push_sample([trigCode])
+            outlet.push_sample([outstr])
         core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
         windll.inpout32.Out32(paraport, portCodes['clear'] ) #<-- add this for parallel triggering
 
@@ -669,32 +667,37 @@ myDlg.addText('Subject info')
 myDlg.addField('SubjID:', width=30)
 # confInfo 1
 myDlg.addField('Age:', 18)
-
-myDlg.addText('Experiment Info')
 # confInfo 2
-myDlg.addField('Randomize Category Cards:', choices=["No", "Yes"])
-# confInfo 3
-myDlg.addField('Select presentation mode', choices=["1 :: Sequential, Feedback: framed target", \
-                                                     "2 :: Sequential, Feedback: stimcard",\
-                                                     "3 :: Sequential, Feedback: R/W",\
-                                                     "4 :: Concurrent",\
-                                                     "5 :: Gamify"\
-                                                     ])
-# confInfo 4
 myDlg.addField('Group:', choices=["Test", "Control"])
-# confInfo 5
-myDlg.addField('Show Instructions?', choices=["No", "Yes"])
-myDlg.addText('IMPORTANT!! DOUBLE CHECK!')
-# confInfo 6
-myDlg.addField('Config File:', choices=['sep_latin1', 'sep_latin2', 'sep_latin3', 'sep_latin4',\
-                                        'sep_latin5', 'sep_latin6', 'sep_latin7', 'sep_latin8',\
-                                        'config_base', 'test_set_no_practice_no_baseline'], width=30);
-# confInfo 7
-myDlg.addField('Choose monitor', choices=["1", "2"])
+
+myDlg.addText('TEST info')
+# confInfo 3
+myDlg.addField('IMPORTANT!! Match to SUBJECT NUMBER:',\
+    choices=['wcst_conf1', 'wcst_conf2', 'wcst_conf3', 'wcst_conf4',\
+             'wcst_conf5', 'wcst_conf6', 'wcst_conf7', 'wcst_conf8',\
+             'wcst_conf9', 'wcst_conf10','wcst_conf11','wcst_conf12',\
+             'wcst_conf13','wcst_conf14','wcst_conf15','wcst_conf16',\
+             'wcst_conf17','wcst_conf18','wcst_conf19','wcst_conf20',\
+             'wcst_conf21','wcst_conf22','wcst_conf23','wcst_conf24',\
+             'wcst_conf25','wcst_conf26','wcst_conf27','wcst_conf28',\
+             'wcst_conf29','wcst_conf30','wcst_conf31','wcst_conf32',\
+             'config_base', 'test_set_no_practice_no_baseline'], width=30);
+# confInfo 4
 if sys.platform.startswith('win'):
     myDlg.addField('Send Triggers?', choices=["True", "False"])
 else:
     myDlg.addField('No Windows detected: Trigger status ', choices=["False"])
+
+# Remaining options
+#myDlg.addField('Randomize Category Cards:', choices=["No", "Yes"])
+#myDlg.addField('Select presentation mode', choices=["1 :: Sequential, Feedback: framed target", \
+#                                                     "2 :: Sequential, Feedback: stimcard",\
+#                                                     "3 :: Sequential, Feedback: R/W",\
+#                                                     "4 :: Concurrent",\
+#                                                     "5 :: Gamify"\
+#                                                     ])
+#myDlg.addField('Show Instructions?', choices=["No", "Yes"])
+#myDlg.addField('Choose monitor', choices=["1", "2"])
 
 myDlg.show()  # show dialog and wait for OK or Cancel
 
@@ -713,16 +716,13 @@ logging.setDefaultClock( testClock )
 
 myLogLevel = logging.CRITICAL + 1
 logging.addLevel( myLogLevel, '' )
-myLog = logging.LogFile( '.'+s+'logs'+s+'' + confInfo[0] + '.log', filemode='w', level = myLogLevel, encoding='utf8') #= myLogLevel )
+myLog = logging.LogFile( '.'+s+'logs'+s+''+confInfo[0] +'.log', filemode='w', level=myLogLevel, encoding='utf8')
 
 logThis('Subj ID: ' + confInfo[0] )
 logThis('Run: ' + str(datetime.utcnow()) )
 logThis('Age: ' + str(confInfo[1]) )
-
-if confInfo[4] == 0:
-    logThis('Group: Test')
-else:
-    logThis('Group: Control')
+logThis('Group: ' + confInfo[2])
+logThis('Config: ' + confInfo[3])
 
 logThis('--------------------------------------------------------')
 logThis('INFO')
@@ -734,41 +734,41 @@ logThis('timestamp1 FDB [block] [trial] FEEDBACK[correct/fail][correct answers]/
 logThis('--------------------------------------------------------')
 
 # SETUP TEST PARAMS
-if confInfo[2] == 'No':
-    RANDOMIZE_CATEGORY_CARDS = False
-else:
-    RANDOMIZE_CATEGORY_CARDS = True
+#if confInfo[5] == 'No':
+#    RANDOMIZE_CATEGORY_CARDS = False
+#else:
+#    RANDOMIZE_CATEGORY_CARDS = True
 
 #rendering window setup
 mntrs=[]
 monW=[]
 monH=[]
-# OIH experimenter's screen
-mntrs.append( monitors.Monitor('OIH1', width=37.8, distance=50) ); monW.append(1680); monH.append(1050)
-# OIH eye tracking screen
-mntrs.append( monitors.Monitor('OIH2', width=37.8, distance=50) ); monW.append(1680); monH.append(1050)
-#HP Elitebook 2560p
-mntrs.append( monitors.Monitor('Ben1', width=31.5, distance=40) ); monW.append(1366); monH.append(768)
-mntrs.append( monitors.Monitor('Ben2', width=31.5, distance=40) ); monW.append(1080); monH.append(1920)
-#Dynamite Mac
-mntrs.append( monitors.Monitor('DynMac', width=50, distance=90) ); monW.append(1920); monH.append(1200)
 #DELL Latitude
 mntrs.append( monitors.Monitor('bTTL', width=31.5, distance=40) ); monW.append(1600); monH.append(900)
+# OIH experimenter's screen
+#mntrs.append( monitors.Monitor('OIH1', width=37.8, distance=50) ); monW.append(1680); monH.append(1050)
+# OIH eye tracking screen
+#mntrs.append( monitors.Monitor('OIH2', width=37.8, distance=50) ); monW.append(1680); monH.append(1050)
+#HP Elitebook 2560p
+#mntrs.append( monitors.Monitor('Ben1', width=31.5, distance=40) ); monW.append(1366); monH.append(768)
+#mntrs.append( monitors.Monitor('Ben2', width=31.5, distance=40) ); monW.append(1080); monH.append(1920)
+#Dynamite Mac
+#mntrs.append( monitors.Monitor('DynMac', width=50, distance=90) ); monW.append(1920); monH.append(1200)
 # kride laptop
-mntrs.append( monitors.Monitor('yoga', width=29.3, distance=40) ); monW.append(3200); monH.append(1800)
+#mntrs.append( monitors.Monitor('yoga', width=29.3, distance=40) ); monW.append(3200); monH.append(1800)
 # kride desktop 1
-mntrs.append( monitors.Monitor('dell', width=37.8, distance=50) ); monW.append(1920); monH.append(1200)
+#mntrs.append( monitors.Monitor('dell', width=37.8, distance=50) ); monW.append(1920); monH.append(1200)
 # kride desktop 2
-mntrs.append( monitors.Monitor('dell', width=37.8, distance=50) ); monW.append(1920); monH.append(1080)
-midx=4
+#mntrs.append( monitors.Monitor('dell', width=37.8, distance=50) ); monW.append(1920); monH.append(1080)
+midx=0
 myMon=mntrs[midx]
 myMon.setSizePix((monW[midx], monH[midx]))
 win=visual.Window(winType='pyglet', size=(monW[midx], monH[midx]), units='pix', fullscr=True, monitor=myMon,\
-                screen=int(confInfo[7]), rgb=(1,1,1))
-taskType = int( confInfo[3][0] ) # 1, 2, 3, ...
+                screen=1, rgb=(1,1,1))
 global cardPos; cardPos = []
 
 # TARGET CARD POSITIONS
+taskType = 1
 #552 = 2*256 + 40
 # cards in clockwise order: up, right, down, left
 if taskType == 4: #concurrent presentation -> different format
@@ -792,7 +792,7 @@ global ruleCount
 
 global gameScore  #for the gamify mode
 global lastScore
-global triggers; triggers=(confInfo[8]=='True') # flag as True when actually recording 
+global triggers; triggers=(confInfo[4]=='True') # flag as True when actually recording 
 
 #SETUP CARDS 
 cardPrototype = {'G1':0, 'G2':0, 'L1':0, 'L2':0, 'fn':''}
@@ -803,9 +803,10 @@ cardPrototype = {'G1':0, 'G2':0, 'L1':0, 'L2':0, 'fn':''}
 global currentTgt; currentTgt = (-1, -1, -1, -1)
 
 #TODO: ADD ERROR CHECKING! Here we trust the json files to be correctly formed and valid
-confFile = open( '.'+s+'configs'+s+confInfo[6]+'.json' )
+confFile = open( '.'+s+'configs'+s+confInfo[3]+'.json' )
 config = json.loads( confFile.read() )
 confFile.close()
+logging.flush()
 
 gameScore = 0
 lastScore = 0
@@ -872,14 +873,16 @@ for item in config['sets']:
         triggerAndLog( portCodes['set']+portCodes['segStart'], "SET", currentSet, 0, 'START set %s' % (item['file']) )
         RunSequence( setSequence['set'] )
         triggerAndLog( portCodes['set']+portCodes['segStop'], "SET", currentSet, 0, 'STOP set %s' % (item['file']) )
-        
+
     else:
         if DEBUG:
             print 'unidentified item type in config: ' + item['type']
-    
+
+    logging.flush() # flush log when set has been run
 
 triggerAndLog(portCodes['stop'], "STP", 0, 0, "STOP: tests completed")
+endtone=sound.Sound(u'A', secs=1.0)
+endtone.play()
 # - CLEANUP -------------------------------------------------------------------------------------
-
 win.close()
 core.quit()
