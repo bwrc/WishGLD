@@ -11,9 +11,11 @@ global USE_LSL; USE_LSL = False
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
     from pylsl import StreamInfo, StreamOutlet, resolve_streams, StreamInlet, IRREGULAR_RATE, cf_int32
-    global outlet
+    global outlet, psychopylog
     info = StreamInfo('markerstream', 'markers', 1, 10, 'float32', 'streasdfsaamid002')
+    info2 = StreamInfo('logstream', 'markers', 1, 0, 'string', 'streasdfsaamid003')
     outlet = StreamOutlet(info)
+    psychopylog = StreamOutlet(info2)
 
 
 from random import randint, random, seed
@@ -532,7 +534,7 @@ def logThis( msg ):
 # parallel port code, LSL and test logging.
 def triggerAndLog( trigCode, id_str, major_inc, minor_inc, payload, trigDuration=10 ):
     global paraport
-    global outlet
+    global outlet, psychopylog
     global USE_LSL
     global startTime
 
@@ -545,7 +547,8 @@ def triggerAndLog( trigCode, id_str, major_inc, minor_inc, payload, trigDuration
     if triggers:
         windll.inpout32.Out32(paraport, trigCode)
         if USE_LSL:
-            outlet.push_sample([outstr])
+            outlet.push_sample([trigCode])
+            psychopylog.push_sample([outstr])
         core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) #<-- add this for parallel triggering
         windll.inpout32.Out32(paraport, portCodes['clear'] ) #<-- add this for parallel triggering
 
