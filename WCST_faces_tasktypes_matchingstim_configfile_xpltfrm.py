@@ -6,7 +6,7 @@ WCST experiment / ReKnow
 """
 import sys
 
-global USE_LSL; USE_LSL = False 
+global USE_LSL; USE_LSL = True
 # Create LSL outlet
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
@@ -636,7 +636,7 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 def CheckCard( stimNum, currentRule, currentTgt ):
     cardOK = False
 
-    if currentRule == 'G1':98
+    if currentRule == 'G1':
         if tgtCards[stimNum]['G1'] == currentTgt[0]:
             cardOK = True
     elif currentRule == 'G2':
