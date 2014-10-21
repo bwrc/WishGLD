@@ -19,7 +19,7 @@ DEBUGGING_MODE = False
 # -------------------------------------------------------------------------------
 # Define whether LSL should be used
 global USE_LSL;
-USE_LSL = False
+USE_LSL = True
 
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
@@ -814,7 +814,7 @@ mntrs=[]
 monW=[]
 monH=[]
 # Lab monitor
-mntrs.append( monitors.Monitor('labTTL', width=31.5, distance=40) ); monW.append(1600); monH.append(900)
+mntrs.append( monitors.Monitor('labTTL', width=37.8, distance=80) ); monW.append(1920); monH.append(1080)
 # OIH experimenter's screen
 #mntrs.append( monitors.Monitor('OIH1', width=37.8, distance=50) ); monW.append(1680); monH.append(1050)
 # OIH eye tracking screen
