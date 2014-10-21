@@ -19,7 +19,7 @@ DEBUGGING_MODE = False
 # -------------------------------------------------------------------------------
 # Define whether LSL should be used
 global USE_LSL;
-USE_LSL = True
+USE_LSL = False
 
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
@@ -49,9 +49,6 @@ if sys.platform.startswith('win'):
     from ctypes import windll
 
 # - GLOBALS -------------------------------------------------------------------------------------------
-global DEBUG
-DEBUG = False
-
 global RANDOMIZE_CATEGORY_CARDS
 RANDOMIZE_CATEGORY_CARDS = False
 
@@ -221,7 +218,7 @@ def SetupCategoryCards( cards, randomOrder = True ):
     feat2 = [x*active_rules[1] for x in feat2]
     feat3 = [x*active_rules[2] for x in feat3]
     feat4 = [x*active_rules[3] for x in feat4]
-    if DEBUG:
+    if DEBUGGING_MODE:
         print str(feat1)
         print str(feat2)
         print str(feat3)
@@ -229,7 +226,7 @@ def SetupCategoryCards( cards, randomOrder = True ):
 
     #fill card parameters
     if len(cards) <> 4:
-        if DEBUG:
+        if DEBUGGING_MODE:
             print 'setup card count: ' + str(len(cards))
             DebugMsg( 'You have to supply 4 cards for setup' )
         return False
@@ -241,7 +238,7 @@ def SetupCategoryCards( cards, randomOrder = True ):
             cards[idx]['L2'] = feat4[idx]
 
             cards[idx]['fn'] = stimPath +'%02d_%02d_%02d_%02d.png' % (feat1[idx], feat2[idx], feat3[idx], feat4[idx])
-            if DEBUG:
+            if DEBUGGING_MODE:
                 print cards[idx]['fn']
 
     cardstr = ''
@@ -263,7 +260,7 @@ def SetupTrial():
     ruleRepeats = int( ruleList[ruleCount][1] )
     currentTrial += 1
 
-    if DEBUG:
+    if DEBUGGING_MODE:
         print 'CURRENTRULE = ' + currentRule
 
     #get a random set for every round, if wanted
@@ -434,7 +431,7 @@ def NextTrial( tasktype ):
 
     currentTgt = GetStimCard( tgtCards )
 
-    if DEBUG:
+    if DEBUGGING_MODE:
         print 'stimcard', currentTgt
 
     fn = stimPath + '%02d_%02d_%02d_%02d.png' % (currentTgt[0], currentTgt[1], currentTgt[2], currentTgt[3])
@@ -442,7 +439,7 @@ def NextTrial( tasktype ):
     tgtCard.setImage( fn )
     idx=str(rules.index(currentRule)+1)
 
-    if DEBUG:
+    if DEBUGGING_MODE:
         print 'stim: ' + fn
 
     if tasktype == 1: # 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
@@ -758,6 +755,8 @@ if sys.platform.startswith('win'):
     myDlg.addField('Send Triggers?', choices=["True", "False"])
 else:
     myDlg.addField('No Windows detected: Trigger status ', choices=["False"])
+# confInfo 5
+myDlg.addField('Start video:', "D:/Experiments/video/habit_video_01_wcst.avi", width=50)
 
 # Remaining options
 #myDlg.addField('Randomize Category Cards:', choices=["No", "Yes"])
@@ -774,10 +773,10 @@ myDlg.show()  # show dialog and wait for OK or Cancel
 
 if myDlg.OK:  # then the user pressed OK
     confInfo = myDlg.data
-    if DEBUG:
+    if DEBUGGING_MODE:
         print confInfo
 else:
-    if DEBUG:
+    if DEBUGGING_MODE:
         print 'user cancelled'
     core.quit()
 
@@ -886,7 +885,7 @@ triggerAndLog(portCodes['start'], "STR", 0, 0, "START: " + str( startTime ) )
 win.setMouseVisible( False )
 
 # - BASELINE VIDEO ------------------------------------------------------------------------------#
-movie_filename = "D:/Experiments/video/habit_video_01_wcst.avi"
+movie_filename = confInfo[5]
 movie_baseline = visual.MovieStim(win = win, filename = movie_filename, pos = [0,0], size = (1350,1080))
 if DEBUGGING_MODE:
     for i in range(25 * 3):
@@ -896,8 +895,6 @@ else:
     while movie_baseline.status != visual.FINISHED:
         movie_baseline.draw()
         win.flip()
-    
-
 
 # - BEGIN RUNNING CONFIG ------------------------------------------------------------------------#
 for item in config['sets']:
@@ -960,7 +957,7 @@ for item in config['sets']:
         triggerAndLog( portCodes['set']+portCodes['segStop'], "SET", currentSet, 0, 'STOP set %s' % (item['file']) )
 
     else:
-        if DEBUG:
+        if DEBUGGING_MODE:
             print 'unidentified item type in config: ' + item['type']
 
     logging.flush() # flush log when set has been run
