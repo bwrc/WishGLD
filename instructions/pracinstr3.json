@@ -2,7 +2,7 @@
     "pages" : [
          {"pic":  "instructions\\pics\\practice3_example.png", 
           "duration": "-1",
-          "text": "Harjoitus 3/5\n\nSeuraavassa sarjassa korttien luokitteluperusteena on:\n- korttiin muodostuva iso kirjain ja\n kortin väri" 
+          "text": "Harjoitus 3/5\n\nSeuraavassa sarjassa korttien luokitteluperusteena on:\n- korttiin muodostuva iso kirjain ja\n- kortin väri" 
          }
     ]
 }

@@ -6,7 +6,7 @@
          },
          {"pic":  "", 
           "duration": "-1",
-          "text": "*TURHAUTUMINEN*.\n\nOlitko rentoutunut ja tyytyväinen vaiko rasittunut, ärtynyt ja turhautunut tehtävän suorituksen aikana?\n\nVähän >\t1\t2\t3\t4\t5\t6\t7\t8\t9\t< Paljon" 
+          "text": "*TURHAUTUMINEN*.\n\nOlitko tehtävää suorittaessasi\nrentoutunut ja tyytyväinen vai rasittunut, ärtynyt ja turhautunut?\n\nRentoutunut >\t1\t2\t3\t4\t5\t6\t7\t8\t9\t< Rasittunut" 
          }
     ]
 }

@@ -1,0 +1,48 @@
+{
+    "sets": [
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\start.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\short_break.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\pracinstr1.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\pracinstr2.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\pracinstr3.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\pracinstr4.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\pracinstr5.json"
+        },
+        {"part": 20,
+         "type": "instruction",
+         "file": ".\\instructions\\NasaTLX.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\second_break.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\third_break.json"
+        },
+        {"part": 0,
+         "type": "instruction",
+         "file": ".\\instructions\\end.json"
+        }
+    ]
+}

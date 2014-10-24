@@ -11,8 +11,8 @@ import sys
 # This affects, e.g., the length of the baseline video
 # -------------------------------------------------------------------------------
 global DEBUGGING_MODE
-# DEBUGGING_MODE = True
-DEBUGGING_MODE = False
+DEBUGGING_MODE = True
+#DEBUGGING_MODE = False
 
 # -------------------------------------------------------------------------------
 # Create LSL outlets
@@ -601,7 +601,7 @@ def triggerAndLog( trigCode, id_str, major_inc, minor_inc, payload, trigDuration
     major_inc = "{:02d}".format(major_inc)
     minor_inc = "{:02d}".format(minor_inc)
     payload   = string.replace( payload, '\t', '_' )
-    outstr    = '\t'.join([str((datetime.utcnow() - startTime).total_seconds()), str(trigCode), id_str, major_inc, minor_inc, payload])
+    outstr    = u'\t'.join([str((datetime.utcnow() - startTime).total_seconds()), str(trigCode), id_str, major_inc, minor_inc, payload]) 
     # outstr  = str( (datetime.utcnow() - startTime).total_seconds() ) + '\t' + str(trigCode) + '\t' + id_str + '\t' + major_inc + '\t' + minor_inc + '\t' + payload
 
     # Write string to log and also send to LSL outlet
@@ -612,8 +612,8 @@ def triggerAndLog( trigCode, id_str, major_inc, minor_inc, payload, trigDuration
         core.wait( trigDuration/1000.0, hogCPUperiod = trigDuration/1000.0 ) # <-- add this for parallel triggering
         windll.inpout32.Out32(paraport, portCodes['clear'] ) # <-- add this for parallel triggering
 
-        if USE_LSL:
-            lsl_outlet_marker.push_sample([trigCode])
+    if USE_LSL:
+        lsl_outlet_marker.push_sample([trigCode])
 
 
 def ShowInstruction( txt, duration, col=(0.0, 0.0, 0.0) ):
@@ -658,7 +658,7 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
 
     if hasTxt:
         if hasPic:
-            textpos = ( 0, -1* instr.height/2 - 10)
+            textpos = ( 0, -1* instr.height/2 - 80)
             picpos = ( 0, h[1]/2 + 20 )
         else:
             textpos = ( 0, 0 )
@@ -690,7 +690,9 @@ def ShowPicInstruction( txt, duration, picFile, location, col=(0.0, 0.0, 0.0) ):
             resp = str(keys[0]).replace('num_', '')
             triggerAndLog(portCodes['tlx'], "TLX", currentSet, 0, txt_to_log + ': ' + resp)
         else:
-            event.waitKeys()
+            keys_tmp = ['5', 'num_5']
+            keys = event.waitKeys( keyList = keys_tmp )
+            #event.waitKeys()
     else:
         if logTxt and symbol=='+':
             triggerAndLog(portCodes['base'], "BAS", currentBase, 0, txt_to_log )
@@ -749,7 +751,7 @@ myDlg.addField('IMPORTANT!! Match to SUBJECT NUMBER:',
              'wcst_conf21','wcst_conf22','wcst_conf23','wcst_conf24',
              'wcst_conf25','wcst_conf26','wcst_conf27','wcst_conf28',
              'wcst_conf29','wcst_conf30','wcst_conf31','wcst_conf32',
-             'config_base', 'test_set_no_practice_no_baseline'], width = 30);
+             'config_base', 'test_set_no_practice_no_baseline', 'onlyinstructionstest'], width = 30);
 # confInfo 4
 if sys.platform.startswith('win'):
     myDlg.addField('Send Triggers?', choices=["True", "False"])
@@ -833,7 +835,7 @@ mntrs.append( monitors.Monitor('labTTL', width=37.8, distance=80) ); monW.append
 midx=0
 myMon = mntrs[midx]
 myMon.setSizePix((monW[midx], monH[midx]))
-win = visual.Window(winType ='pyglet', size = (monW[midx], monH[midx]), units = 'pix', fullscr = True, monitor = myMon, screen = 1, rgb = (1,1,1))
+win = visual.Window(winType ='pyglet', size = (monW[midx], monH[midx]), units = 'pix', fullscr = True, monitor = myMon, screen = 1, rgb = (1,1,1), allowGUI=False)
 global cardPos; cardPos = []
 
 # TARGET CARD POSITIONS
@@ -897,10 +899,12 @@ else:
         win.flip()
 
 # - BEGIN RUNNING CONFIG ------------------------------------------------------------------------#
+import codecs
+
 for item in config['sets']:
     if( item['type'] == 'instruction'):
         temp=string.replace( item['file'], '\\', s )
-        instrFile = open( temp )
+        instrFile = codecs.open( temp, 'r', 'utf-8' )
         instrSequence = json.loads( instrFile.read() )
         instrFile.close()
         triggerAndLog(portCodes['instr'] + portCodes['segStart'], "INS", currentIns, 0, "START Instruction")
@@ -950,7 +954,7 @@ for item in config['sets']:
         ruleCount=0
 
         triggerAndLog(portCodes['instr'] + portCodes['segStart'], "INS", currentIns, 0, "START Instruction")
-        ShowPicInstruction( u'Aloita painamalla jotain näppäintä.', -1, "", 1 )
+        ShowPicInstruction( u'Aloita painamalla keskimmäistä 5-näppäintä', -1, "", 1 )
         triggerAndLog(portCodes['instr'] + portCodes['segStop'], "INS", currentIns, 0, "STOP Instruction")
         triggerAndLog( portCodes['set']+portCodes['segStart'], "SET", currentSet, 0, 'START set %s' % (item['file']) )
         RunSequence( setSequence['set'] )
