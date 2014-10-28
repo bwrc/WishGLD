@@ -898,6 +898,9 @@ else:
         movie_baseline.draw()
         win.flip()
 
+triggerAndLog(portCodes['stop'], "STP", 0, 0, "STOP: baseline video")
+triggerAndLog(portCodes['start'], "STR", 1, 0, "START: testing" )
+
 # - BEGIN RUNNING CONFIG ------------------------------------------------------------------------#
 import codecs
 
@@ -966,7 +969,7 @@ for item in config['sets']:
 
     logging.flush() # flush log when set has been run
 
-triggerAndLog(portCodes['stop'], "STP", 0, 0, "STOP: tests completed")
+triggerAndLog(portCodes['stop'], "STP", 1, 0, "STOP: tests completed")
 endtone=sound.Sound(u'A', secs=1.0)
 endtone.play()
 # - CLEANUP -------------------------------------------------------------------------------------
