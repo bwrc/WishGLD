@@ -882,6 +882,7 @@ logging.flush()
 gameScore = 0
 lastScore = 0
 
+ShowPicInstruction( u'Aloita painamalla keskimmäistä 5-näppäintä', -1, "", 1 )
 triggerAndLog(portCodes['start'], "STR", 0, 0, "START: " + str( startTime ) )
 
 win.setMouseVisible( False )
