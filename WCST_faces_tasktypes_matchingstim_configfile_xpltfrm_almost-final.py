@@ -11,16 +11,16 @@ import sys
 # This affects, e.g., the length of the baseline video
 # -------------------------------------------------------------------------------
 global DEBUGGING_MODE
-#DEBUGGING_MODE = False
-DEBUGGING_MODE = True
+DEBUGGING_MODE = False
+#DEBUGGING_MODE = True
 
 # -------------------------------------------------------------------------------
 # Create LSL outlets
 # -------------------------------------------------------------------------------
 # Define whether LSL should be used
 global USE_LSL;
-USE_LSL = False
-#USE_LSL = True
+#USE_LSL = False
+USE_LSL = True
 
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
@@ -817,7 +817,7 @@ mntrs=[]
 monW=[]
 monH=[]
 # Lab monitor
-mntrs.append( monitors.Monitor('labTTL', width=37.8, distance=80) ); monW.append(1920); monH.append(1080)
+mntrs.append( monitors.Monitor('labTTL', width=37.8, distance=86) ); monW.append(1920); monH.append(1080)
 # OIH experimenter's screen
 #mntrs.append( monitors.Monitor('OIH1', width=37.8, distance=50) ); monW.append(1680); monH.append(1050)
 # OIH eye tracking screen
@@ -836,7 +836,7 @@ mntrs.append( monitors.Monitor('labTTL', width=37.8, distance=80) ); monW.append
 midx=0
 myMon = mntrs[midx]
 myMon.setSizePix((monW[midx], monH[midx]))
-win = visual.Window(winType ='pyglet', size = (monW[midx], monH[midx]), units = 'pix', fullscr = True, monitor = myMon, screen = 1, rgb = (1,1,1), allowGUI=False)
+win = visual.Window(winType ='pyglet', size = (monW[midx], monH[midx]), units = 'pix', fullscr = True, monitor = myMon, screen = 0, rgb = (1,1,1), allowGUI=False)
 global cardPos; cardPos = []
 
 # TARGET CARD POSITIONS
@@ -890,10 +890,9 @@ win.setMouseVisible( False )
 
 # - BASELINE VIDEO ------------------------------------------------------------------------------#
 movie_baseline = visual.MovieStim(win = win, filename = confInfo[5], pos = [0,0])#, size = (1350,1080))
-fact=min(monW[midx]/movie_baseline.format.width, monH[midx]/movie_baseline.format.height)
+fact=min(1.0*monW[midx]/movie_baseline.format.width, 1.0*monH[midx]/movie_baseline.format.height)
 movie_baseline.size = (movie_baseline.format.width*fact, movie_baseline.format.height*fact)
 if DEBUGGING_MODE:
-    print 'movie size=[%i,%i]' %(movie_baseline.size[0], movie_baseline.size[1])
     for i in range(25 * 3):
         movie_baseline.draw()
         win.flip()
