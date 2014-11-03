@@ -11,15 +11,16 @@ import sys
 # This affects, e.g., the length of the baseline video
 # -------------------------------------------------------------------------------
 global DEBUGGING_MODE
-DEBUGGING_MODE = False
-#DEBUGGING_MODE = True
+#DEBUGGING_MODE = False
+DEBUGGING_MODE = True
 
 # -------------------------------------------------------------------------------
 # Create LSL outlets
 # -------------------------------------------------------------------------------
 # Define whether LSL should be used
 global USE_LSL;
-USE_LSL = True
+USE_LSL = False
+#USE_LSL = True
 
 if USE_LSL:
     sys.path.append('C:\Program Files (x86)\PsychoPy2\Lib\pylsl')
@@ -888,9 +889,11 @@ triggerAndLog(portCodes['start'], "STR", 0, 0, "START: " + str( startTime ) )
 win.setMouseVisible( False )
 
 # - BASELINE VIDEO ------------------------------------------------------------------------------#
-movie_filename = confInfo[5]
-movie_baseline = visual.MovieStim(win = win, filename = movie_filename, pos = [0,0], size = (1350,1080))
+movie_baseline = visual.MovieStim(win = win, filename = confInfo[5], pos = [0,0])#, size = (1350,1080))
+fact=min(monW[midx]/movie_baseline.format.width, monH[midx]/movie_baseline.format.height)
+movie_baseline.size = (movie_baseline.format.width*fact, movie_baseline.format.height*fact)
 if DEBUGGING_MODE:
+    print 'movie size=[%i,%i]' %(movie_baseline.size[0], movie_baseline.size[1])
     for i in range(25 * 3):
         movie_baseline.draw()
         win.flip()

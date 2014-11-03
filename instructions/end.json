@@ -1,8 +1,8 @@
 {
     "pages" : [
              {"pic":  "", 
-              "duration": "-1",
-              "text": "Valmista tuli!\n\nKiitos kokeen suorittamisesta!" 
+              "duration": "2",
+              "text": "Valmista tuli!\n\nKiitos kokeen suorittamisesta!\n\nNyt rentoudu" 
              }
     ]
 }
