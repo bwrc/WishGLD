@@ -11,8 +11,8 @@ import sys
 # This affects, e.g., the length of the baseline video
 # -------------------------------------------------------------------------------
 global DEBUGGING_MODE
-DEBUGGING_MODE = False
-#DEBUGGING_MODE = True
+#DEBUGGING_MODE = False
+DEBUGGING_MODE = True
 
 # -------------------------------------------------------------------------------
 # Create LSL outlets
