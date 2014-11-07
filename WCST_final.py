@@ -883,7 +883,7 @@ logging.flush()
 gameScore = 0
 lastScore = 0
 
-ShowPicInstruction( u'Katsot aluksi viiden minuutin baseline-videon.\n\nAloita painamalla keskimmäistä 5-näppäintä\nkun hoitaja antaa sinulle luvan.', -1, "", 1 )
+ShowPicInstruction( u'Aloitetaan katsomalla viiden minuutin baseline-video.\n\nAloita painamalla keskimmäistä 5-näppäintä\nkun hoitaja antaa sinulle luvan.', -1, "", 1 )
 triggerAndLog(portCodes['start'], "STR", 0, 0, "START: " + str( startTime ) )
 
 win.setMouseVisible( False )
