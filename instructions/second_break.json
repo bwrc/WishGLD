@@ -2,7 +2,7 @@
     "pages" : [
          {"pic":  "", 
           "duration": "-1",
-          "text": "Jee! Yksi kolmasosa kokeesta on nyt suoritettu.\nNyt sinulla on hetki aikaa levätä ja tyhjentää ajatuksesi.\n\nKun painat nappia, käymme taas läpi samanlaisen koetilanteen kuin äsken.\n Tehtäväsi pysyy edelleen samana." 
+          "text": "Jee! Yksi kolmasosa kokeesta on nyt suoritettu.\nNyt sinulla on hetki aikaa levätä ja tyhjentää ajatuksesi.\n\nKun painat näppäintä 5, käymme taas läpi samanlaisen koetilanteen kuin äsken.\n Tehtäväsi pysyy edelleen samana." 
          }
     ]
 }

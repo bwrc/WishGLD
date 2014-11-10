@@ -2,7 +2,7 @@
     "pages" : [
          {"pic":  "instructions\\pics\\practice1_example.png", 
           "duration": "-1",
-          "text": "Harjoitus 1/5\n\nHarjoitellaan aluksi. Tässä sarjassa sinulle esitetään kortteja, joissa luokittelutekijöitä on kaksi:\n- kortin väri ja\n- kortin kasvokuva" 
+          "text": "Harjoitus 1/5\n\nHarjoitellaan aluksi. Tässä sarjassa sinulle esitetään kortteja, joissa luokittelutekijöitä on kaksi:\n- kortin väri ja\n- kortin kasvokuva\n\nSiirry eteenpäin painamalla 5-näppäintä." 
          }
     ]
 }
